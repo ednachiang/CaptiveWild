@@ -67,3 +67,17 @@ median(sample_sums(mothurdata))
 max(sample_sums(mothurdata))
 ```
  
+
+### Examine coverage
+```{r}
+cov <- read.table("mothur_output/final.summary", header=T)
+
+summary(cov$coverage)
+
+bad <- which(cov$coverage < 0.95)
+
+cov[bad, 3]
+
+cov[bad,2]
+
+```
