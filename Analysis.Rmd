@@ -70,14 +70,81 @@ max(sample_sums(mothurdata))
 
 ### Examine coverage
 ```{r}
-cov <- read.table("mothur_output/final.summary", header=T)
-
+cov <- read.table("mothur_output/6830.summary", header=T)
 summary(cov$coverage)
-
 bad <- which(cov$coverage < 0.95)
-
 cov[bad, 3]
-
 cov[bad,2]
+sort(cov$coverage)
+
+cov2 <- read.table("mothur_output/7940.summary", header=T)
+summary(cov2$coverage)
+bad2 <- which(cov2$coverage < 0.95)
+cov2[bad2, 3]
+cov2[bad2,2]
+sort(cov2$coverage)
+
+cov3 <- read.table("mothur_output/8334.summary", header=T)
+summary(cov3$coverage)
+bad3 <- which(cov3$coverage < 0.95)
+cov3[bad3, 3]
+cov3[bad3,2]
+sort(cov3$coverage)
+
+cov4 <- read.table("mothur_output/8509.summary", header=T)
+summary(cov4$coverage)
+bad4 <- which(cov4$coverage < 0.95)
+cov4[bad4, 3]
+cov4[bad4,2]
+sort(cov4$coverage)
+
+
+cov5 <- read.table("mothur_output/8589.summary", header=T)
+summary(cov5$coverage)
+bad5 <- which(cov5$coverage < 0.95)
+cov5[bad5, 3]
+cov5[bad5,2]
+sort(cov5$coverage)
+
+
+cov6 <- read.table("mothur_output/8855.summary", header=T)
+summary(cov6$coverage)
+bad6 <- which(cov6$coverage < 0.95)
+cov6[bad6, 3]
+cov6[bad6,2]
+sort(cov6$coverage)
+
+
+cov7 <- read.table("mothur_output/8900.summary", header=T)
+summary(cov7$coverage)
+bad7 <- which(cov7$coverage < 0.95)
+cov7[bad7, 3]
+cov7[bad7,2]
+sort(cov7$coverage)
+
+
+cov8 <- read.table("mothur_output/9027.summary", header=T)
+summary(cov8$coverage)
+bad8 <- which(cov8$coverage < 0.95)
+cov8[bad8, 3]
+cov8[bad8,2]
+sort(cov8$coverage)
+
+#### EVERYTHING ABOVE 95% COVERAGE!!!!! ####
+cov9 <- read.table("mothur_output/9629.summary", header=T)
+summary(cov9$coverage)
+bad9 <- which(cov9$coverage < 0.95)
+cov9[bad9, 3]
+cov9[bad9,2]
+sort(cov9$coverage)
+
+
+cov10 <- read.table("mothur_output/10811.summary", header=T)
+summary(cov10$coverage)
+bad10 <- which(cov10$coverage < 0.95)
+cov10[bad10, 3]
+cov10[bad10,2]
+sort(cov10$coverage)
+
 
 ```
