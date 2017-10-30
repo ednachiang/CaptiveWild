@@ -20,8 +20,8 @@ library(phyloseq)
 ### Import Data
 ```{r}
 # Link files
-shared = "mothur_output/cecum.shared"
-taxonomy = "mothur_output/cecum.taxonomy"
+shared = "mothur_output/old/cecum.shared"
+taxonomy = "mothur_output/old/cecum.taxonomy"
 
 
 # Import mothur data
@@ -35,6 +35,29 @@ tax_table(mothurdata) <- cbind(tax_table(mothurdata),
 
 # Rename taxonomy table columns
 colnames(tax_table(mothurdata)) <- 
+  c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+
+
+
+
+
+### Try2 ###
+# Link files
+shared2 = "mothur_output/cecum2.shared"
+taxonomy2 = "mothur_output/cecum2.taxonomy"
+
+
+# Import mothur data
+mothurdata2 = import_mothur(
+  mothur_shared_file = shared2,
+  mothur_constaxonomy_file = taxonomy2)
+
+# Add OTU column in taxonomy table
+tax_table(mothurdata2) <- cbind(tax_table(mothurdata2), 
+                               row.names(tax_table(mothurdata2)))
+
+# Rename taxonomy table columns
+colnames(tax_table(mothurdata2)) <- 
   c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 
 ```
@@ -65,6 +88,17 @@ min(sample_sums(mothurdata))
 mean(sample_sums(mothurdata))
 median(sample_sums(mothurdata))
 max(sample_sums(mothurdata))
+
+
+
+
+
+### Try2 ###
+samp.sum2 <- data.frame(colSums(otu_table(mothurdata2)))
+colnames(samp.sum2) <- "Sample_TotalSeqs"
+samp.sum2$sample <- row.names(samp.sum2)
+samp.sum2 <- arrange(samp.sum2, Sample_TotalSeqs)
+
 ```
  
 
@@ -145,6 +179,16 @@ bad10 <- which(cov10$coverage < 0.95)
 cov10[bad10, 3]
 cov10[bad10,2]
 sort(cov10$coverage)
+
+
+### Attempt 2 ###
+try2 <- read.table("mothur_output/cecum2.summary", header=T)
+summary(try2$coverage)
+bad2 <- which(try2$coverage < 0.95)
+try2[bad2, 3]
+try2[bad2,2]
+sort(try2$coverage)
+
 
 
 ```
