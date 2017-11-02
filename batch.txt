@@ -1,0 +1,3 @@
+summary.seqs(fasta=example.trim.contigs.fasta)
+screen.seqs(fasta=example.trim.contigs.fasta, group=example.contigs.groups, maxambig=0, maxlength=300, maxhomop=8)
+unique.seqs(fasta=example.trim.contigs.good.fasta)
