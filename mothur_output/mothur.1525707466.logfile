@@ -1,0 +1,1794 @@
+Linux version
+
+Using ReadLine
+
+Running 64Bit Version
+
+mothur v.1.39.5
+Last updated: 3/20/2017
+
+by
+Patrick D. Schloss
+
+Department of Microbiology & Immunology
+University of Michigan
+http://www.mothur.org
+
+When using, please cite:
+Schloss, P.D., et al., Introducing mothur: Open-source, platform-independent, community-supported software for describing and comparing microbial communities. Appl Environ Microbiol, 2009. 75(23):7537-41.
+
+Distributed under the GNU General Public License
+
+Type 'help()' for information on the commands that are available
+
+For questions and analysis support, please visit our forum at https://www.mothur.org/forum
+
+Type 'quit()' to exit program
+Interactive Mode
+
+
+mothur > normalize.shared(shared=current, method=totalgroup)
+[WARNING]: no file was saved for shared parameter.
+No valid current files. You must provide a list, sabund, rabund, relabund or shared file.
+[ERROR]: did not complete normalize.shared.
+
+mothur > normalize.shared(shared=stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.shared, method=totalgroup, norm=8262)
+BT1_920_T contains 7940. Eliminating.
+CC1_057_W contains 78. Eliminating.
+CC1_895_T contains 6830. Eliminating.
+CC4_059_W contains 140. Eliminating.
+CHOW1 contains 970. Eliminating.
+CHOW3 contains 719. Eliminating.
+CM1_057_W contains 2610. Eliminating.
+CM1_886_T contains 289. Eliminating.
+CM1_921_P contains 3076. Eliminating.
+CONTROL_BUF1 contains 12. Eliminating.
+CONTROL_ELB1 contains 31. Eliminating.
+CONTROL_PBS1 contains 3. Eliminating.
+CONTROL_PBS2 contains 40. Eliminating.
+CONTROL_WTR1 contains 5. Eliminating.
+CONTROL_WTR2 contains 118. Eliminating.
+CONTROL_WTR3 contains 22. Eliminating.
+CONTROL_WTR4 contains 22. Eliminating.
+Normalizing to 8262.
+0.03
+
+Output File Names: 
+stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.shared
+
+
+mothur > summary.single(shared=current, label=0.03, calc=coverage-nseqs-bergerparker-chao-shannon-invsimpson)
+Using stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.shared as input file for the shared parameter.
+
+Processing group BT1_895_T
+
+0.03
+
+Processing group BT1_919_I
+
+0.03
+
+Processing group BT1_921_P
+
+0.03
+
+Processing group BT2_920_T
+
+0.03
+
+Processing group CC1_058_W
+
+0.03
+
+Processing group CC1_059_W
+
+0.03
+
+Processing group CC1_060_W
+
+0.03
+
+Processing group CC1_881_S
+
+0.03
+
+Processing group CC1_883_I
+
+0.03
+
+Processing group CC1_884_T
+
+0.03
+
+Processing group CC1_885_T
+
+0.03
+
+Processing group CC1_886_T
+
+0.03
+
+Processing group CC1_890_S
+
+0.03
+
+Processing group CC1_894_P
+
+0.03
+
+Processing group CC1_899_I
+
+0.03
+
+Processing group CC1_901_T
+
+0.03
+
+Processing group CC1_906_P
+
+0.03
+
+Processing group CC1_907_S
+
+0.03
+
+Processing group CC1_910_I
+
+0.03
+
+Processing group CC1_912_S
+
+0.03
+
+Processing group CC1_916_P
+
+0.03
+
+Processing group CC1_917_I
+
+0.03
+
+Processing group CC1_919_I
+
+0.03
+
+Processing group CC1_920_T
+
+0.03
+
+Processing group CC1_921_P
+
+0.03
+
+Processing group CC1_922_I
+
+0.03
+
+Processing group CC1_923_S
+
+0.03
+
+Processing group CC1_924_I
+
+0.03
+
+Processing group CC1_925_I
+
+0.03
+
+Processing group CC2_057_W
+
+0.03
+
+Processing group CC2_058_W
+
+0.03
+
+Processing group CC2_059_W
+
+0.03
+
+Processing group CC2_060_W
+
+0.03
+
+Processing group CC2_882_S
+
+0.03
+
+Processing group CC2_886_T
+
+0.03
+
+Processing group CC2_889_S
+
+0.03
+
+Processing group CC2_895_T
+
+0.03
+
+Processing group CC2_910_I
+
+0.03
+
+Processing group CC2_911_S
+
+0.03
+
+Processing group CC2_912_S
+
+0.03
+
+Processing group CC2_924_I
+
+0.03
+
+Processing group CC3_057_W
+
+0.03
+
+Processing group CHOW2
+
+0.03
+
+Processing group CM1_058_W
+
+0.03
+
+Processing group CM1_059_W
+
+0.03
+
+Processing group CM1_060_W
+
+0.03
+
+Processing group CM1_882_S
+
+0.03
+
+Processing group CM1_883_I
+
+0.03
+
+Processing group CM1_884_T
+
+0.03
+
+Processing group CM1_885_T
+
+0.03
+
+Processing group CM1_889_S
+
+0.03
+
+Processing group CM1_894_P
+
+0.03
+
+Processing group CM1_895_T
+
+0.03
+
+Processing group CM1_899_I
+
+0.03
+
+Processing group CM1_901_T
+
+0.03
+
+Processing group CM1_906_P
+
+0.03
+
+Processing group CM1_907_S
+
+0.03
+
+Processing group CM1_910_I
+
+0.03
+
+Processing group CM1_911_S
+
+0.03
+
+Processing group CM1_916_P
+
+0.03
+
+Processing group CM1_917_I
+
+0.03
+
+Processing group CM1_919_I
+
+0.03
+
+Processing group CM1_920_T
+
+0.03
+
+Processing group CM1_922_I
+
+0.03
+
+Processing group CM1_923_S
+
+0.03
+
+Processing group CM1_924_I
+
+0.03
+
+Processing group CM1_925_I
+
+0.03
+
+Processing group CM2_057_W
+
+0.03
+
+Processing group CM2_058_W
+
+0.03
+
+Processing group CM2_059_W
+
+0.03
+
+Processing group CM2_060_W
+
+0.03
+
+Processing group CM2_890_S
+
+0.03
+
+Processing group CM2_907_S
+
+0.03
+
+Processing group CM2_912_S
+
+0.03
+
+Processing group CM2_921_P
+
+0.03
+
+Processing group CM2_925_I
+
+0.03
+
+Processing group CM3_057_W
+
+0.03
+
+Processing group CM3_912_S
+
+0.03
+
+Output File Names: 
+stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.groups.summary
+
+
+mothur > normalize.shared(shared=stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.shared, method=totalgroup, norm=3076)
+CC1_057_W contains 78. Eliminating.
+CC4_059_W contains 140. Eliminating.
+CHOW1 contains 970. Eliminating.
+CHOW3 contains 719. Eliminating.
+CM1_057_W contains 2610. Eliminating.
+CM1_886_T contains 289. Eliminating.
+CONTROL_BUF1 contains 12. Eliminating.
+CONTROL_ELB1 contains 31. Eliminating.
+CONTROL_PBS1 contains 3. Eliminating.
+CONTROL_PBS2 contains 40. Eliminating.
+CONTROL_WTR1 contains 5. Eliminating.
+CONTROL_WTR2 contains 118. Eliminating.
+CONTROL_WTR3 contains 22. Eliminating.
+CONTROL_WTR4 contains 22. Eliminating.
+Normalizing to 3076.
+0.03
+
+Output File Names: 
+stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.shared
+
+
+mothur > summary.single(shared=current, label=0.03, calc=coverage-nseqs-bergerparker-chao-shannon-invsimpson)
+Using stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.shared as input file for the shared parameter.
+
+Processing group BT1_895_T
+
+0.03
+
+Processing group BT1_919_I
+
+0.03
+
+Processing group BT1_920_T
+
+0.03
+
+Processing group BT1_921_P
+
+0.03
+
+Processing group BT2_920_T
+
+0.03
+
+Processing group CC1_058_W
+
+0.03
+
+Processing group CC1_059_W
+
+0.03
+
+Processing group CC1_060_W
+
+0.03
+
+Processing group CC1_881_S
+
+0.03
+
+Processing group CC1_883_I
+
+0.03
+
+Processing group CC1_884_T
+
+0.03
+
+Processing group CC1_885_T
+
+0.03
+
+Processing group CC1_886_T
+
+0.03
+
+Processing group CC1_890_S
+
+0.03
+
+Processing group CC1_894_P
+
+0.03
+
+Processing group CC1_895_T
+
+0.03
+
+Processing group CC1_899_I
+
+0.03
+
+Processing group CC1_901_T
+
+0.03
+
+Processing group CC1_906_P
+
+0.03
+
+Processing group CC1_907_S
+
+0.03
+
+Processing group CC1_910_I
+
+0.03
+
+Processing group CC1_912_S
+
+0.03
+
+Processing group CC1_916_P
+
+0.03
+
+Processing group CC1_917_I
+
+0.03
+
+Processing group CC1_919_I
+
+0.03
+
+Processing group CC1_920_T
+
+0.03
+
+Processing group CC1_921_P
+
+0.03
+
+Processing group CC1_922_I
+
+0.03
+
+Processing group CC1_923_S
+
+0.03
+
+Processing group CC1_924_I
+
+0.03
+
+Processing group CC1_925_I
+
+0.03
+
+Processing group CC2_057_W
+
+0.03
+
+Processing group CC2_058_W
+
+0.03
+
+Processing group CC2_059_W
+
+0.03
+
+Processing group CC2_060_W
+
+0.03
+
+Processing group CC2_882_S
+
+0.03
+
+Processing group CC2_886_T
+
+0.03
+
+Processing group CC2_889_S
+
+0.03
+
+Processing group CC2_895_T
+
+0.03
+
+Processing group CC2_910_I
+
+0.03
+
+Processing group CC2_911_S
+
+0.03
+
+Processing group CC2_912_S
+
+0.03
+
+Processing group CC2_924_I
+
+0.03
+
+Processing group CC3_057_W
+
+0.03
+
+Processing group CHOW2
+
+0.03
+
+Processing group CM1_058_W
+
+0.03
+
+Processing group CM1_059_W
+
+0.03
+
+Processing group CM1_060_W
+
+0.03
+
+Processing group CM1_882_S
+
+0.03
+
+Processing group CM1_883_I
+
+0.03
+
+Processing group CM1_884_T
+
+0.03
+
+Processing group CM1_885_T
+
+0.03
+
+Processing group CM1_889_S
+
+0.03
+
+Processing group CM1_894_P
+
+0.03
+
+Processing group CM1_895_T
+
+0.03
+
+Processing group CM1_899_I
+
+0.03
+
+Processing group CM1_901_T
+
+0.03
+
+Processing group CM1_906_P
+
+0.03
+
+Processing group CM1_907_S
+
+0.03
+
+Processing group CM1_910_I
+
+0.03
+
+Processing group CM1_911_S
+
+0.03
+
+Processing group CM1_916_P
+
+0.03
+
+Processing group CM1_917_I
+
+0.03
+
+Processing group CM1_919_I
+
+0.03
+
+Processing group CM1_920_T
+
+0.03
+
+Processing group CM1_921_P
+
+0.03
+
+Processing group CM1_922_I
+
+0.03
+
+Processing group CM1_923_S
+
+0.03
+
+Processing group CM1_924_I
+
+0.03
+
+Processing group CM1_925_I
+
+0.03
+
+Processing group CM2_057_W
+
+0.03
+
+Processing group CM2_058_W
+
+0.03
+
+Processing group CM2_059_W
+
+0.03
+
+Processing group CM2_060_W
+
+0.03
+
+Processing group CM2_890_S
+
+0.03
+
+Processing group CM2_907_S
+
+0.03
+
+Processing group CM2_912_S
+
+0.03
+
+Processing group CM2_921_P
+
+0.03
+
+Processing group CM2_925_I
+
+0.03
+
+Processing group CM3_057_W
+
+0.03
+
+Processing group CM3_912_S
+
+0.03
+
+Output File Names: 
+stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.groups.summary
+
+
+mothur > normalize.shared(shared=stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.shared, method=totalgroup, norm=6830)
+CC1_057_W contains 78. Eliminating.
+CC4_059_W contains 140. Eliminating.
+CHOW1 contains 970. Eliminating.
+CHOW3 contains 719. Eliminating.
+CM1_057_W contains 2610. Eliminating.
+CM1_886_T contains 289. Eliminating.
+CM1_921_P contains 3076. Eliminating.
+CONTROL_BUF1 contains 12. Eliminating.
+CONTROL_ELB1 contains 31. Eliminating.
+CONTROL_PBS1 contains 3. Eliminating.
+CONTROL_PBS2 contains 40. Eliminating.
+CONTROL_WTR1 contains 5. Eliminating.
+CONTROL_WTR2 contains 118. Eliminating.
+CONTROL_WTR3 contains 22. Eliminating.
+CONTROL_WTR4 contains 22. Eliminating.
+Normalizing to 6830.
+0.03
+
+Output File Names: 
+stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.shared
+
+
+mothur > summary.single(shared=current, label=0.03, calc=coverage-nseqs-bergerparker-chao-shannon-invsimpson)
+Using stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.shared as input file for the shared parameter.
+
+Processing group BT1_895_T
+
+0.03
+
+Processing group BT1_919_I
+
+0.03
+
+Processing group BT1_920_T
+
+0.03
+
+Processing group BT1_921_P
+
+0.03
+
+Processing group BT2_920_T
+
+0.03
+
+Processing group CC1_058_W
+
+0.03
+
+Processing group CC1_059_W
+
+0.03
+
+Processing group CC1_060_W
+
+0.03
+
+Processing group CC1_881_S
+
+0.03
+
+Processing group CC1_883_I
+
+0.03
+
+Processing group CC1_884_T
+
+0.03
+
+Processing group CC1_885_T
+
+0.03
+
+Processing group CC1_886_T
+
+0.03
+
+Processing group CC1_890_S
+
+0.03
+
+Processing group CC1_894_P
+
+0.03
+
+Processing group CC1_895_T
+
+0.03
+
+Processing group CC1_899_I
+
+0.03
+
+Processing group CC1_901_T
+
+0.03
+
+Processing group CC1_906_P
+
+0.03
+
+Processing group CC1_907_S
+
+0.03
+
+Processing group CC1_910_I
+
+0.03
+
+Processing group CC1_912_S
+
+0.03
+
+Processing group CC1_916_P
+
+0.03
+
+Processing group CC1_917_I
+
+0.03
+
+Processing group CC1_919_I
+
+0.03
+
+Processing group CC1_920_T
+
+0.03
+
+Processing group CC1_921_P
+
+0.03
+
+Processing group CC1_922_I
+
+0.03
+
+Processing group CC1_923_S
+
+0.03
+
+Processing group CC1_924_I
+
+0.03
+
+Processing group CC1_925_I
+
+0.03
+
+Processing group CC2_057_W
+
+0.03
+
+Processing group CC2_058_W
+
+0.03
+
+Processing group CC2_059_W
+
+0.03
+
+Processing group CC2_060_W
+
+0.03
+
+Processing group CC2_882_S
+
+0.03
+
+Processing group CC2_886_T
+
+0.03
+
+Processing group CC2_889_S
+
+0.03
+
+Processing group CC2_895_T
+
+0.03
+
+Processing group CC2_910_I
+
+0.03
+
+Processing group CC2_911_S
+
+0.03
+
+Processing group CC2_912_S
+
+0.03
+
+Processing group CC2_924_I
+
+0.03
+
+Processing group CC3_057_W
+
+0.03
+
+Processing group CHOW2
+
+0.03
+
+Processing group CM1_058_W
+
+0.03
+
+Processing group CM1_059_W
+
+0.03
+
+Processing group CM1_060_W
+
+0.03
+
+Processing group CM1_882_S
+
+0.03
+
+Processing group CM1_883_I
+
+0.03
+
+Processing group CM1_884_T
+
+0.03
+
+Processing group CM1_885_T
+
+0.03
+
+Processing group CM1_889_S
+
+0.03
+
+Processing group CM1_894_P
+
+0.03
+
+Processing group CM1_895_T
+
+0.03
+
+Processing group CM1_899_I
+
+0.03
+
+Processing group CM1_901_T
+
+0.03
+
+Processing group CM1_906_P
+
+0.03
+
+Processing group CM1_907_S
+
+0.03
+
+Processing group CM1_910_I
+
+0.03
+
+Processing group CM1_911_S
+
+0.03
+
+Processing group CM1_916_P
+
+0.03
+
+Processing group CM1_917_I
+
+0.03
+
+Processing group CM1_919_I
+
+0.03
+
+Processing group CM1_920_T
+
+0.03
+
+Processing group CM1_922_I
+
+0.03
+
+Processing group CM1_923_S
+
+0.03
+
+Processing group CM1_924_I
+
+0.03
+
+Processing group CM1_925_I
+
+0.03
+
+Processing group CM2_057_W
+
+0.03
+
+Processing group CM2_058_W
+
+0.03
+
+Processing group CM2_059_W
+
+0.03
+
+Processing group CM2_060_W
+
+0.03
+
+Processing group CM2_890_S
+
+0.03
+
+Processing group CM2_907_S
+
+0.03
+
+Processing group CM2_912_S
+
+0.03
+
+Processing group CM2_921_P
+
+0.03
+
+Processing group CM2_925_I
+
+0.03
+
+Processing group CM3_057_W
+
+0.03
+
+Processing group CM3_912_S
+
+0.03
+
+Output File Names: 
+stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.groups.summary
+
+
+mothur > normalize.shared(shared=stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.shared, method=totalgroup, norm=7940)
+CC1_057_W contains 78. Eliminating.
+CC1_895_T contains 6830. Eliminating.
+CC4_059_W contains 140. Eliminating.
+CHOW1 contains 970. Eliminating.
+CHOW3 contains 719. Eliminating.
+CM1_057_W contains 2610. Eliminating.
+CM1_886_T contains 289. Eliminating.
+CM1_921_P contains 3076. Eliminating.
+CONTROL_BUF1 contains 12. Eliminating.
+CONTROL_ELB1 contains 31. Eliminating.
+CONTROL_PBS1 contains 3. Eliminating.
+CONTROL_PBS2 contains 40. Eliminating.
+CONTROL_WTR1 contains 5. Eliminating.
+CONTROL_WTR2 contains 118. Eliminating.
+CONTROL_WTR3 contains 22. Eliminating.
+CONTROL_WTR4 contains 22. Eliminating.
+Normalizing to 7940.
+0.03
+
+Output File Names: 
+stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.shared
+
+
+mothur > summary.single(shared=current, label=0.03, calc=coverage-nseqs-bergerparker-chao-shannon-invsimpson)
+Using stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.shared as input file for the shared parameter.
+
+Processing group BT1_895_T
+
+0.03
+
+Processing group BT1_919_I
+
+0.03
+
+Processing group BT1_920_T
+
+0.03
+
+Processing group BT1_921_P
+
+0.03
+
+Processing group BT2_920_T
+
+0.03
+
+Processing group CC1_058_W
+
+0.03
+
+Processing group CC1_059_W
+
+0.03
+
+Processing group CC1_060_W
+
+0.03
+
+Processing group CC1_881_S
+
+0.03
+
+Processing group CC1_883_I
+
+0.03
+
+Processing group CC1_884_T
+
+0.03
+
+Processing group CC1_885_T
+
+0.03
+
+Processing group CC1_886_T
+
+0.03
+
+Processing group CC1_890_S
+
+0.03
+
+Processing group CC1_894_P
+
+0.03
+
+Processing group CC1_899_I
+
+0.03
+
+Processing group CC1_901_T
+
+0.03
+
+Processing group CC1_906_P
+
+0.03
+
+Processing group CC1_907_S
+
+0.03
+
+Processing group CC1_910_I
+
+0.03
+
+Processing group CC1_912_S
+
+0.03
+
+Processing group CC1_916_P
+
+0.03
+
+Processing group CC1_917_I
+
+0.03
+
+Processing group CC1_919_I
+
+0.03
+
+Processing group CC1_920_T
+
+0.03
+
+Processing group CC1_921_P
+
+0.03
+
+Processing group CC1_922_I
+
+0.03
+
+Processing group CC1_923_S
+
+0.03
+
+Processing group CC1_924_I
+
+0.03
+
+Processing group CC1_925_I
+
+0.03
+
+Processing group CC2_057_W
+
+0.03
+
+Processing group CC2_058_W
+
+0.03
+
+Processing group CC2_059_W
+
+0.03
+
+Processing group CC2_060_W
+
+0.03
+
+Processing group CC2_882_S
+
+0.03
+
+Processing group CC2_886_T
+
+0.03
+
+Processing group CC2_889_S
+
+0.03
+
+Processing group CC2_895_T
+
+0.03
+
+Processing group CC2_910_I
+
+0.03
+
+Processing group CC2_911_S
+
+0.03
+
+Processing group CC2_912_S
+
+0.03
+
+Processing group CC2_924_I
+
+0.03
+
+Processing group CC3_057_W
+
+0.03
+
+Processing group CHOW2
+
+0.03
+
+Processing group CM1_058_W
+
+0.03
+
+Processing group CM1_059_W
+
+0.03
+
+Processing group CM1_060_W
+
+0.03
+
+Processing group CM1_882_S
+
+0.03
+
+Processing group CM1_883_I
+
+0.03
+
+Processing group CM1_884_T
+
+0.03
+
+Processing group CM1_885_T
+
+0.03
+
+Processing group CM1_889_S
+
+0.03
+
+Processing group CM1_894_P
+
+0.03
+
+Processing group CM1_895_T
+
+0.03
+
+Processing group CM1_899_I
+
+0.03
+
+Processing group CM1_901_T
+
+0.03
+
+Processing group CM1_906_P
+
+0.03
+
+Processing group CM1_907_S
+
+0.03
+
+Processing group CM1_910_I
+
+0.03
+
+Processing group CM1_911_S
+
+0.03
+
+Processing group CM1_916_P
+
+0.03
+
+Processing group CM1_917_I
+
+0.03
+
+Processing group CM1_919_I
+
+0.03
+
+Processing group CM1_920_T
+
+0.03
+
+Processing group CM1_922_I
+
+0.03
+
+Processing group CM1_923_S
+
+0.03
+
+Processing group CM1_924_I
+
+0.03
+
+Processing group CM1_925_I
+
+0.03
+
+Processing group CM2_057_W
+
+0.03
+
+Processing group CM2_058_W
+
+0.03
+
+Processing group CM2_059_W
+
+0.03
+
+Processing group CM2_060_W
+
+0.03
+
+Processing group CM2_890_S
+
+0.03
+
+Processing group CM2_907_S
+
+0.03
+
+Processing group CM2_912_S
+
+0.03
+
+Processing group CM2_921_P
+
+0.03
+
+Processing group CM2_925_I
+
+0.03
+
+Processing group CM3_057_W
+
+0.03
+
+Processing group CM3_912_S
+
+0.03
+
+Output File Names: 
+stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.groups.summary
+
+
+mothur > normalize.shared(shared=stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.shared, method=totalgroup, norm=8494)
+BT1_920_T contains 7940. Eliminating.
+CC1_057_W contains 78. Eliminating.
+CC1_895_T contains 6830. Eliminating.
+CC2_057_W contains 8262. Eliminating.
+CC4_059_W contains 140. Eliminating.
+CHOW1 contains 970. Eliminating.
+CHOW3 contains 719. Eliminating.
+CM1_057_W contains 2610. Eliminating.
+CM1_886_T contains 289. Eliminating.
+CM1_921_P contains 3076. Eliminating.
+CONTROL_BUF1 contains 12. Eliminating.
+CONTROL_ELB1 contains 31. Eliminating.
+CONTROL_PBS1 contains 3. Eliminating.
+CONTROL_PBS2 contains 40. Eliminating.
+CONTROL_WTR1 contains 5. Eliminating.
+CONTROL_WTR2 contains 118. Eliminating.
+CONTROL_WTR3 contains 22. Eliminating.
+CONTROL_WTR4 contains 22. Eliminating.
+Normalizing to 8494.
+0.03
+
+Output File Names: 
+stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.shared
+
+
+mothur > summary.single(shared=current, label=0.03, calc=coverage-nseqs-bergerparker-chao-shannon-invsimpson)
+Using stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.shared as input file for the shared parameter.
+
+Processing group BT1_895_T
+
+0.03
+
+Processing group BT1_919_I
+
+0.03
+
+Processing group BT1_921_P
+
+0.03
+
+Processing group BT2_920_T
+
+0.03
+
+Processing group CC1_058_W
+
+0.03
+
+Processing group CC1_059_W
+
+0.03
+
+Processing group CC1_060_W
+
+0.03
+
+Processing group CC1_881_S
+
+0.03
+
+Processing group CC1_883_I
+
+0.03
+
+Processing group CC1_884_T
+
+0.03
+
+Processing group CC1_885_T
+
+0.03
+
+Processing group CC1_886_T
+
+0.03
+
+Processing group CC1_890_S
+
+0.03
+
+Processing group CC1_894_P
+
+0.03
+
+Processing group CC1_899_I
+
+0.03
+
+Processing group CC1_901_T
+
+0.03
+
+Processing group CC1_906_P
+
+0.03
+
+Processing group CC1_907_S
+
+0.03
+
+Processing group CC1_910_I
+
+0.03
+
+Processing group CC1_912_S
+
+0.03
+
+Processing group CC1_916_P
+
+0.03
+
+Processing group CC1_917_I
+
+0.03
+
+Processing group CC1_919_I
+
+0.03
+
+Processing group CC1_920_T
+
+0.03
+
+Processing group CC1_921_P
+
+0.03
+
+Processing group CC1_922_I
+
+0.03
+
+Processing group CC1_923_S
+
+0.03
+
+Processing group CC1_924_I
+
+0.03
+
+Processing group CC1_925_I
+
+0.03
+
+Processing group CC2_058_W
+
+0.03
+
+Processing group CC2_059_W
+
+0.03
+
+Processing group CC2_060_W
+
+0.03
+
+Processing group CC2_882_S
+
+0.03
+
+Processing group CC2_886_T
+
+0.03
+
+Processing group CC2_889_S
+
+0.03
+
+Processing group CC2_895_T
+
+0.03
+
+Processing group CC2_910_I
+
+0.03
+
+Processing group CC2_911_S
+
+0.03
+
+Processing group CC2_912_S
+
+0.03
+
+Processing group CC2_924_I
+
+0.03
+
+Processing group CC3_057_W
+
+0.03
+
+Processing group CHOW2
+
+0.03
+
+Processing group CM1_058_W
+
+0.03
+
+Processing group CM1_059_W
+
+0.03
+
+Processing group CM1_060_W
+
+0.03
+
+Processing group CM1_882_S
+
+0.03
+
+Processing group CM1_883_I
+
+0.03
+
+Processing group CM1_884_T
+
+0.03
+
+Processing group CM1_885_T
+
+0.03
+
+Processing group CM1_889_S
+
+0.03
+
+Processing group CM1_894_P
+
+0.03
+
+Processing group CM1_895_T
+
+0.03
+
+Processing group CM1_899_I
+
+0.03
+
+Processing group CM1_901_T
+
+0.03
+
+Processing group CM1_906_P
+
+0.03
+
+Processing group CM1_907_S
+
+0.03
+
+Processing group CM1_910_I
+
+0.03
+
+Processing group CM1_911_S
+
+0.03
+
+Processing group CM1_916_P
+
+0.03
+
+Processing group CM1_917_I
+
+0.03
+
+Processing group CM1_919_I
+
+0.03
+
+Processing group CM1_920_T
+
+0.03
+
+Processing group CM1_922_I
+
+0.03
+
+Processing group CM1_923_S
+
+0.03
+
+Processing group CM1_924_I
+
+0.03
+
+Processing group CM1_925_I
+
+0.03
+
+Processing group CM2_057_W
+
+0.03
+
+Processing group CM2_058_W
+
+0.03
+
+Processing group CM2_059_W
+
+0.03
+
+Processing group CM2_060_W
+
+0.03
+
+Processing group CM2_890_S
+
+0.03
+
+Processing group CM2_907_S
+
+0.03
+
+Processing group CM2_912_S
+
+0.03
+
+Processing group CM2_921_P
+
+0.03
+
+Processing group CM2_925_I
+
+0.03
+
+Processing group CM3_057_W
+
+0.03
+
+Processing group CM3_912_S
+
+0.03
+
+Output File Names: 
+stability.file.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.an.unique_list.0.03.norm.groups.summary
+
+
+mothur > exit
+[ERROR]: You are missing (
+Invalid.
+
+mothur > exit()
+
+mothur > quit()
+
+
+************************************************************
+************************************************************
+************************************************************
+Detected 2 [ERROR] messages, please review.
+************************************************************
+************************************************************
+************************************************************
+
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<^>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<^>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<^>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Detected 1 [WARNING] messages, please review.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<^>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<^>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<^>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
