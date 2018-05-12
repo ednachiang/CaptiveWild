@@ -942,8 +942,6 @@ rownames(adiv.pvals)[21:30] <- rows
 adiv.pvals <- adiv.pvals[,-7:-9]
 
 
-
-
 adiv.group <- data.frame(rep(999,5))
 for(i in 1:5){
   gro <- levels(adiv$Group)[i]
@@ -985,7 +983,7 @@ adiv.muc.pvals$invsimp.BH <- p.adjust(adiv.muc.pvals$invsimp.pval, method="BH")
 ### Examine Phyla
 ```{r}
 # Merge samples with the same taxonomic rank
-goodphy <- tax_glom(physeq.use, taxrank="Phylum")
+goodphy <- tax_glom(physeq.rem, taxrank="Phylum")
 
 # Transform each merged phylum count to rel abund
 phy99 <- transform_sample_counts(goodphy, function(x){(x/sum(x))*100})
@@ -1045,8 +1043,221 @@ sampdf$Relative_Abundance <- otu_table(phy99)
 
 
 
-### Bray-Curtis Ordination
+### Bray-Curtis NMDS Ordination
 ```{r}
+### Bray NMDS
+nmds <- ordinate(physeq=physeq.rem, method="NMDS", distance="bray")
+  # Stress = 0.102554
+
+plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sample_Type")
+
+sample_data(physeq.rem)$Elip <- paste(sample_data(physeq.rem)$Group)
+elip.nmds <- data.frame(MDS1 = nmds$points[,1], MDS2 = nmds$points[,2],
+                        Group = sample_data(physeq.rem)$Elip)
+plot.new()
+elip.ord <- ordiellipse(nmds, sample_data(physeq.rem)$Elip, display="sites", kind="se", conf=0.95, label=T)
+
+veganCovEllipse <- function(cov, center = c(0, 0), scale = 1, npoints = 100) {
+    theta <- (0:npoints) * 2 * pi/npoints
+    Circle <- cbind(cos(theta), sin(theta))
+    t(center + scale * t(Circle %*% chol(cov)))
+}
+
+elip.df <- data.frame()
+for(i in levels(elip.nmds$Group)){
+  elip.df <- rbind(elip.df, cbind(as.data.frame(with(elip.nmds[elip.nmds$Group==i,],
+                                                     veganCovEllipse(elip.ord[[i]]$cov,
+                                                                     elip.ord[[i]]$center,
+                                                                     elip.ord[[i]]$scale))),
+                                  group=i))
+  
+}
+
+
+
+
+plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group") +
+  geom_path(data=elip.df, aes(x=NMDS1, y=NMDS2, colour=group), size=1, linetype=1) +
+  guides(color=guide_legend(title="Group")) +
+  scale_color_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen"))
+
+
+### PERMANOVA
+sampdf <- data.frame(sample_data(physeq.rem))
+bray<- phyloseq::distance(physeq=physeq.rem, method="bray")
+adonis(bray~ Group, data=sampdf)
+  # p-value = 0.001
+beta.tax = betadisper(d=bray, group=sampdf$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.026
+adonis(bray~ Sample_Type, data=sampdf)
+  # p-value = 1
+beta.tax = betadisper(d=bray, group=sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.192
+
+combos <- combn(x=levels(sampdf$Group), m=2)
+bray.pvals <- data.frame(rep(999,10))
+for( i in 1:ncol(combos)){
+  temp.physeq <- subset_samples(physeq.rem, Group%in% combos[,i])
+  temp.sampdf <- data.frame(sample_data(temp.physeq))
+  temp.bray <- phyloseq::distance(physeq=temp.physeq, method="bray")
+  test <- adonis(temp.bray ~ Group, data=temp.sampdf)
+  rownames(bray.pvals)[i] <- paste(combos[1,i], combos[2,i])
+  bray.pvals[i,1]<- test[[1]]$`Pr(>F)`[1]
+}
+colnames(bray.pvals) <- "pval"
+bray.pvals$Adj.bonf <- p.adjust(bray.pvals$pval, method="bonferroni")
+bray.pvals$Adj.BH <- p.adjust(bray.pvals$pval, method="BH")
+
+sampdf2 <- data.frame(sample_data(physeq.rem))
+combos2 <- combn(x=levels(sampdf2$Group), m=2)
+bray.pvals2 <- data.frame(rep(999,10))
+for( i in 1:ncol(combos2)){
+  temp.physeq2 <- subset_samples(physeq.rem, Group%in% combos2[,i])
+  temp.sampdf2 <- data.frame(sample_data(temp.physeq2))
+  temp.bray2 <- phyloseq::distance(physeq=temp.physeq2, method="bray")
+  test2 <- adonis(temp.bray2 ~ Group, data=temp.sampdf2)
+  rownames(bray.pvals2)[i] <- paste(combos2[1,i], combos2[2,i])
+  bray.pvals2[i,1]<- test2[[1]]$`Pr(>F)`[1]
+}
+colnames(bray.pvals2) <- "pval"
+bray.pvals2$Adj.bonf <- p.adjust(bray.pvals2$pval, method="bonferroni")
+bray.pvals2$Adj.BH <- p.adjust(bray.pvals2$pval, method="BH")
+
+
+
+sampdf <- data.frame(sample_data(physeq.rem))
+bray<- phyloseq::distance(physeq=physeq.rem, method="bray")
+adonis(bray~ Group, data=sampdf)
+
+#pulls out p-value:
+  test[[1]]$`Pr(>F)`[1]
+  #https://stackoverflow.com/questions/3366506/extract-p-value-from-aov?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+```
+
+
+### Bray-Curtis PCoA Ordination
+```{r}
+### Bray NMDS
+nmds <- ordinate(physeq=physeq.rem, method="NMDS", distance="bray")
+  # Stress = 0.102554
+
+plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sample_Type")
+
+bray.pcoa <- ordinate(physeq=physeq.rem, method="PCoA", distance="bray")
+plot_ordination(physeq=physeq.rem, ordination=bray.pcoa, axes=c(1,2), color="Group", shape="Sample_Type")
+
+
+
+plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group") +
+  geom_path(data=elip.df, aes(x=NMDS1, y=NMDS2, colour=group), size=1, linetype=1) +
+  guides(color=guide_legend(title="Group")) +
+  scale_color_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen"))
+
+
+
+
+
+
+sample_data(physeq.rem)$ElipPCoA <- paste(sample_data(physeq.rem)$Group)
+elip.pcoa <- data.frame(Axis1 = bray.pcoa$vectors[,1], Axis2 = bray.pcoa$vectors[,2],
+                        Group = sample_data(physeq.rem)$ElipPCoA)
+bray.pcoa.elip <- bray.pcoa
+bray.pcoa.elip <- bray.pcoa.elip$vectors[,-3:-41]
+  # ordiellipse can only work w/ 1 axes. If you have more than 2 (like in a PCoA), it won't work
+plot.new()
+elip.bray.pcoa.ord <- ordiellipse(bray.pcoa.elip, sample_data(physeq.rem)$ElipPCoA, display="sites", kind="se", conf=0.95, label=T)
+
+veganCovEllipse <- function(cov, center = c(0, 0), scale = 1, npoints = 100) {
+    theta <- (0:npoints) * 2 * pi/npoints
+    Circle <- cbind(cos(theta), sin(theta))
+    t(center + scale * t(Circle %*% chol(cov)))
+}
+
+elip.bray.pcoa.df <- data.frame()
+for(i in levels(elip.bray.pcoa.ord$Group)){
+  elip.bray.pcoa.df <- rbind(elip.bray.pcoa.df, cbind(as.data.frame(with(elip.pcoa[elip.pcoa$Group==i,],
+                                                     veganCovEllipse(elip.bray.pcoa.ord[[i]]$cov,
+                                                                     elip.bray.pcoa.ord[[i]]$center,
+                                                                     elip.bray.pcoaord[[i]]$scale))),
+                                  group=i))
+  
+}
+
+
+
+
+plot_ordination(physeq=physeq.rem, ordination=bray.pcoa, color="Group") +
+  geom_path(data=elip.bray.pcoa.df, aes(x=NMDS1, y=NMDS2, colour=group), size=1, linetype=1) +
+  guides(color=guide_legend(title="Group")) +
+  scale_color_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen"))
+
+
+### PERMANOVA
+sampdf <- data.frame(sample_data(physeq.rem))
+bray<- phyloseq::distance(physeq=physeq.rem, method="bray")
+adonis(bray~ Group, data=sampdf)
+  # p-value = 0.001
+beta.tax = betadisper(d=bray, group=sampdf$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.026
+adonis(bray~ Sample_Type, data=sampdf)
+  # p-value = 1
+beta.tax = betadisper(d=bray, group=sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.192
+
+combos <- combn(x=levels(sampdf$Group), m=2)
+bray.pvals <- data.frame(rep(999,10))
+for( i in 1:ncol(combos)){
+  temp.physeq <- subset_samples(physeq.rem, Group%in% combos[,i])
+  temp.sampdf <- data.frame(sample_data(temp.physeq))
+  temp.bray <- phyloseq::distance(physeq=temp.physeq, method="bray")
+  test <- adonis(temp.bray ~ Group, data=temp.sampdf)
+  rownames(bray.pvals)[i] <- paste(combos[1,i], combos[2,i])
+  bray.pvals[i,1]<- test[[1]]$`Pr(>F)`[1]
+}
+colnames(bray.pvals) <- "pval"
+bray.pvals$Adj.bonf <- p.adjust(bray.pvals$pval, method="bonferroni")
+bray.pvals$Adj.BH <- p.adjust(bray.pvals$pval, method="BH")
+
+sampdf2 <- data.frame(sample_data(physeq.rem))
+combos2 <- combn(x=levels(sampdf2$Group), m=2)
+bray.pvals2 <- data.frame(rep(999,10))
+for( i in 1:ncol(combos2)){
+  temp.physeq2 <- subset_samples(physeq.rem, Group%in% combos2[,i])
+  temp.sampdf2 <- data.frame(sample_data(temp.physeq2))
+  temp.bray2 <- phyloseq::distance(physeq=temp.physeq2, method="bray")
+  test2 <- adonis(temp.bray2 ~ Group, data=temp.sampdf2)
+  rownames(bray.pvals2)[i] <- paste(combos2[1,i], combos2[2,i])
+  bray.pvals2[i,1]<- test2[[1]]$`Pr(>F)`[1]
+}
+colnames(bray.pvals2) <- "pval"
+bray.pvals2$Adj.bonf <- p.adjust(bray.pvals2$pval, method="bonferroni")
+bray.pvals2$Adj.BH <- p.adjust(bray.pvals2$pval, method="BH")
+
+
+
+sampdf <- data.frame(sample_data(physeq.rem))
+bray<- phyloseq::distance(physeq=physeq.rem, method="bray")
+adonis(bray~ Group, data=sampdf)
+
+#pulls out p-value:
+  test[[1]]$`Pr(>F)`[1]
+  #https://stackoverflow.com/questions/3366506/extract-p-value-from-aov?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+```
+
+
+
+
+### Bray-Curtis Content
+```{r}
+
 ### Bray NMDS
 nmds <- ordinate(physeq=physeq.use, method="NMDS", distance="bray")
   # Stress = 0.102554
@@ -1136,9 +1347,8 @@ sampdf <- data.frame(sample_data(physeq.use))
 bray<- phyloseq::distance(physeq=physeq.use, method="bray")
 adonis(bray~ Group, data=sampdf)
 
-#pulls out p-value:
-  test[[1]]$`Pr(>F)`[1]
-  #https://stackoverflow.com/questions/3366506/extract-p-value-from-aov?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+
+
 ```
 
 
