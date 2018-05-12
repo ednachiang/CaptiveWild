@@ -1045,6 +1045,21 @@ adonis(bray~ Group, data=sampdf)
 ```
 
 
+### Cyanobacteria???
+```{r}
+cya <- subset_taxa(physeq.rem, Phylum == "Cyanobacteria")
+cya.tax <- data.frame(tax_table(cya))
+cya.rel <- transform_sample_counts(cya, function(x){(x/sum(x))*100})
+cya.rel <- subset_samples(cya.rel, sample_names(cya.rel)!= "CC1_923_S")
+cya.rel <- subset_samples(cya.rel, sample_names(cya.rel)!= "CC1_925_I")
+cya.rel <- subset_samples(cya.rel, sample_names(cya.rel)!= "CM1_916_P")
+cya.rel <- prune_taxa(taxa_sums(cya.rel)>0, cya.rel)
+View(data.frame(otu_table(cya.rel)))
+View(data.frame(tax_table(cya.rel)))
+```
+
+
+
 
 ### Jaccard Ordination
 ```{r}
