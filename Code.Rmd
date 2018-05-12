@@ -418,7 +418,6 @@ p$tab
 ```{r}
 adiv <- data.frame(sample_data(physeq.rem))
 
-par(mfrow=c(5,1))
 
 # Coverage
 ggplot(adiv, aes(x=Group, y= coverage, fill = Group)) +
@@ -521,6 +520,59 @@ kruskal.test(formula = Total_OTUs ~ Diet, data = otusum, subset=Season=="Summer"
   # p-value = 0.009111
 wilcox.test(Total_OTUs ~ Diet, data=otusum)
   # p-value = 0.0001003
+
+
+### Summarize adiv
+adiv.sum <- adiv %>%
+  group_by(Group) %>%
+  summarize(TotalOTUs_Mean = mean(Total_OTUs),
+            TotalOTUs_Median = median(Total_OTUs),
+            TotalOTUs_SD = sd(Total_OTUs),
+            TotalOTUs_SE = (sd(Total_OTUs)/sqrt(length(Total_OTUs))),
+            TotalOTUs_iqr = IQR(Total_OTUs),
+            Chao_Mean = mean(chao),
+            Chao_Median = median(chao),
+            Chao_SD = sd(chao),
+            Chao_SE = (sd(chao)/sqrt(length(chao))),
+            Chao_iqr = IQR(chao),
+            Shannon_Mean = mean(shannon),
+            Shannon_Median = median(shannon),
+            Shannon_SD = sd(shannon),
+            Shannon_SE = (sd(shannon)/sqrt(length(shannon))),
+            Shannon_iqr = IQR(shannon),
+            InvSimp_Mean = mean(invsimpson),
+            InvSimp_Median = median(invsimpson),
+            InvSimp_SD = sd(invsimpson),
+            InvSimp_SE = (sd(invsimpson)/sqrt(length(invsimpson))),
+            InvSimp_iqr = IQR(invsimpson))
+
+
+adiv.samptype.sum <- adiv %>%
+  group_by(Group, Sample_Type) %>%
+  summarize(TotalOTUs_Mean = mean(Total_OTUs),
+            TotalOTUs_Median = median(Total_OTUs),
+            TotalOTUs_SD = sd(Total_OTUs),
+            TotalOTUs_SE = (sd(Total_OTUs)/sqrt(length(Total_OTUs))),
+            TotalOTUs_iqr = IQR(Total_OTUs),
+            Chao_Mean = mean(chao),
+            Chao_Median = median(chao),
+            Chao_SD = sd(chao),
+            Chao_SE = (sd(chao)/sqrt(length(chao))),
+            Chao_iqr = IQR(chao),
+            Shannon_Mean = mean(shannon),
+            Shannon_Median = median(shannon),
+            Shannon_SD = sd(shannon),
+            Shannon_SE = (sd(shannon)/sqrt(length(shannon))),
+            Shannon_iqr = IQR(shannon),
+            InvSimp_Mean = mean(invsimpson),
+            InvSimp_Median = median(invsimpson),
+            InvSimp_SD = sd(invsimpson),
+            InvSimp_SE = (sd(invsimpson)/sqrt(length(invsimpson))),
+            InvSimp_iqr = IQR(invsimpson))
+
+
+
+
 
 ### Chao
 # Color by group
@@ -702,7 +754,7 @@ wilcox.test(invsimpson ~ Diet, data=adiv)
 
 
 
-adiv.rem.combos <- combn(x=levels(sampdf$Group), m=2)
+adiv.rem.combos <- combn(x=levels(adiv$Group), m=2)
 adiv.pvals <- data.frame(rep(999,10))
 for(i in 1:ncol(adiv.rem.combos)){
   group1 <- which(adiv$Group == adiv.rem.combos[1,i])
@@ -757,10 +809,6 @@ for(i in 1:ncol(adiv.rem.combos)){
 colnames(adiv.pvals)[11] <- "invsimp.pval"
 adiv.pvals$invsimp.bonf <- p.adjust(adiv.pvals$invsimp.pval, method="bonferroni")
 adiv.pvals$invsimp.BH <- p.adjust(adiv.pvals$invsimp.pval, method="BH")
-
-
-
-
 
 
 adiv.con <- adiv[which(adiv$Sample_Type=="Content"),]
@@ -821,11 +869,6 @@ adiv.con.pvals$invsimp.BH <- p.adjust(adiv.con.pvals$invsimp.pval, method="BH")
 
 
 
-
-
-
-
-
 adiv.muc <- adiv[which(adiv$Sample_Type=="Content"),]
 adiv.muc.pvals <- data.frame(rep(999,10))
 for(i in 1:ncol(adiv.rem.combos)){
@@ -881,6 +924,22 @@ for(i in 1:ncol(adiv.rem.combos)){
 colnames(adiv.muc.pvals)[11] <- "invsimp.pval"
 adiv.muc.pvals$invsimp.bonf <- p.adjust(adiv.muc.pvals$invsimp.pval, method="bonferroni")
 adiv.muc.pvals$invsimp.BH <- p.adjust(adiv.muc.pvals$invsimp.pval, method="BH")
+
+
+adiv.pvals[11:20,] <- adiv.con.pvals
+adiv.pvals[21:30,] <- adiv.muc.pvals
+rows <- rownames(adiv.con.pvals)
+for (i in 1:length(rows)){
+  rows[i] <- paste(rows[i], "Content")
+}
+rownames(adiv.pvals)[11:20] <- rows
+rows <- rownames(adiv.muc.pvals)
+for (i in 1:length(rows)){
+  rows[i] <- paste(rows[i], "Mucosa")
+}
+rownames(adiv.pvals)[21:30] <- rows
+
+adiv.pvals <- adiv.pvals[,-7:-9]
 
 
 
