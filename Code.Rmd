@@ -106,7 +106,29 @@ physeq.rem <- subset_samples(physeq, Sample_Type != "Black_Tissue" & Season != "
 
 #save(physeq.rem, file="Physeq.RData")
 ```
+### Chow
+```{r}
+physeq.chow <- subset_samples(physeq, Sample_Type == "Chow")
+chow.phy <- tax_glom(physeq.chow, taxrank="Phylum")
+chow.phy99 <- transform_sample_counts(chow.phy, function(x){(x/sum(x))*100})
+chow.phy99 <- prune_taxa(taxa_sums(chow.phy99) > 1, chow.phy99)
 
+barplot(sort(taxa_sums(chow.phy99),TRUE)[1:20]/nsamples(phy99),las=2,cex.axis=.7)
+
+chow.df <- psmelt(chow.phy99)
+chow.df$Phylum <- ordered(chow.df$Phylum, levels=c("Proteobacteria", "Firmicutes", "Actinobacteria", "Bacteroidetes"))
+
+ggplot(chow.df, aes(x=Phylum, y=Abundance, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  scale_fill_brewer(palette="Set1") +
+  xlab("Phyla") +
+  ylab("Relative Abundance for Phyla > 1%") +
+  theme(axis.text.x = element_blank(),
+        axis.title.x = element_text(size=14),
+        axis.title.y = element_text(size=14),
+        strip.text.x = element_text(size=12),
+        strip.text.y = element_text(size=12))
+```
 
 ### Load Phyloseq Object
 ```{r}
@@ -1014,6 +1036,7 @@ phy.sum$iqr.max <- phy.sum$Median + 0.5*phy.sum$iqr
 
 
 ### Barplot ###
+tiff("Phyla.tiff", width=13, height=4, units="in", res=600)
 ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
   geom_bar(stat="identity", color="black") +
   geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
@@ -1021,7 +1044,12 @@ ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
   scale_fill_brewer(palette="Set1") +
   xlab("Phyla") +
   ylab("Median Relative Abundance for Phyla > 1%") +
-  theme(axis.text.x = element_blank())
+  theme(axis.text.x = element_blank(),
+        axis.title.x = element_text(size=14),
+        axis.title.y = element_text(size=14),
+        strip.text.x = element_text(size=12),
+        strip.text.y = element_text(size=12))
+dev.off()
 
 # Pull out otu table to test phyla
 phy.num <- as.numeric(otu_table(phy99))
@@ -1074,13 +1102,12 @@ for(i in levels(elip.nmds$Group)){
 }
 
 
-
-
+tiff("NMDS.tiff", width=6, height=5, units="in", res=600)
 plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group") +
   geom_path(data=elip.df, aes(x=NMDS1, y=NMDS2, colour=group), size=1, linetype=1) +
   guides(color=guide_legend(title="Group")) +
   scale_color_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen"))
-
+dev.off()
 
 ### PERMANOVA
 sampdf <- data.frame(sample_data(physeq.rem))
