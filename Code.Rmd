@@ -462,7 +462,7 @@ keep$Total_OTUs <- as.integer(keep$Total_OTUs)
 adiv$Total_OTUs <- keep$Total_OTUs
 
 # Color by group
-ggplot(otusum, aes(x=Group, y=Total_OTUs, fill = Group)) +
+ggplot(adiv, aes(x=Group, y=Total_OTUs, fill = Group)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
   #facet_grid(.~Sample_Type) +
@@ -471,7 +471,7 @@ ggplot(otusum, aes(x=Group, y=Total_OTUs, fill = Group)) +
   ylab("Total OTUs")
 
 # Color by group, facet by sample type
-ggplot(otusum, aes(x=Group, y=Total_OTUs, fill = Group)) +
+ggplot(adiv, aes(x=Group, y=Total_OTUs, fill = Group)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
   facet_grid(.~Sample_Type) +
@@ -480,7 +480,7 @@ ggplot(otusum, aes(x=Group, y=Total_OTUs, fill = Group)) +
   ylab("Total OTUs")
 
 # Color by sample type, facet by group
-ggplot(otusum, aes(x=Sample_Type, y=Total_OTUs, fill = Sample_Type)) +
+ggplot(adiv, aes(x=Sample_Type, y=Total_OTUs, fill = Sample_Type)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
   facet_grid(.~Group) +
@@ -881,6 +881,44 @@ for(i in 1:ncol(adiv.rem.combos)){
 colnames(adiv.muc.pvals)[11] <- "invsimp.pval"
 adiv.muc.pvals$invsimp.bonf <- p.adjust(adiv.muc.pvals$invsimp.pval, method="bonferroni")
 adiv.muc.pvals$invsimp.BH <- p.adjust(adiv.muc.pvals$invsimp.pval, method="BH")
+
+
+
+
+adiv.group <- data.frame(rep(999,5))
+for(i in 1:5){
+  gro <- levels(adiv$Group)[i]
+  adiv.temp <- adiv[which(adiv$Group==gro),]
+  test <- wilcox.test(Total_OTUs ~ Sample_Type, data=adiv.temp)
+  adiv.group[i,1] <- test$p.value
+  test <- wilcox.test(chao ~ Sample_Type, data=adiv.temp)
+  adiv.group[i,2] <- test$p.value
+  test <- wilcox.test(bergerparker ~ Sample_Type, data=adiv.temp)
+  adiv.group[i,3] <- test$p.value
+  test <- t.test(shannon ~ Sample_Type, data=adiv.temp)
+  adiv.group[i,4] <- test$p.value
+  test <- wilcox.test(invsimpson ~ Sample_Type, data=adiv.temp)
+  adiv.group[i,5] <- test$p.value
+}
+rownames(adiv.group) <- levels(adiv$Group)
+colnames(adiv.group) <- c("otusum.pval", "chao.pval", "bp.pval", "shannon.pval", "invsimp.pval")
+adiv.group$otusum.bonf <- p.adjust(adiv.group$otusum.pval, method="bonferroni")
+adiv.group$otusum.BH <- p.adjust(adiv.group$otusum.pval, method="BH")
+adiv.group$chao.bonf <- p.adjust(adiv.group$chao.pval, method="bonferroni")
+adiv.group$chao.BH <- p.adjust(adiv.group$chao.pval, method="BH")
+adiv.group$bp.bonf <- p.adjust(adiv.group$bp.pval, method="bonferroni")
+adiv.group$bp.BH <- p.adjust(adiv.group$bp.pval, method="BH")
+adiv.group$shannon.bonf <- p.adjust(adiv.group$shannon.pval, method="bonferroni")
+adiv.group$shannon.BH <- p.adjust(adiv.group$shannon.pval, method="BH")
+adiv.group$invsimp.bonf <- p.adjust(adiv.group$invsimp.pval, method="bonferroni")
+adiv.group$invsimp.BH <- p.adjust(adiv.group$invsimp.pval, method="BH")
+
+
+adiv.muc.pvals$invsimp.bonf <- p.adjust(adiv.muc.pvals$invsimp.pval, method="bonferroni")
+adiv.muc.pvals$invsimp.BH <- p.adjust(adiv.muc.pvals$invsimp.pval, method="BH")
+
+
+
 
 ```
 
