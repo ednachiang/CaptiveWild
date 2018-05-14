@@ -483,22 +483,28 @@ keep$Total_OTUs <- as.integer(keep$Total_OTUs)
 adiv$Total_OTUs <- keep$Total_OTUs
 
 # Color by group
+tiff("Total_OTUs.tiff", width=6.5, height=3.5, units="in", res=600)
 ggplot(adiv, aes(x=Group, y=Total_OTUs, fill = Group)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
   #facet_grid(.~Sample_Type) +
+  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
   #scale_fill_manual(values=c("gray95", "dimgray")) +
   xlab("Group") +
   ylab("Total OTUs")
+dev.off()
 
 # Color by group, facet by sample type
+#tiff("Total_OTUs.tiff", width=11, height=3.5, units="in", res=600)
 ggplot(adiv, aes(x=Group, y=Total_OTUs, fill = Group)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
   facet_grid(.~Sample_Type) +
+  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
   #scale_fill_manual(values=c("gray95", "dimgray")) +
   xlab("Group") +
   ylab("Total OTUs")
+#dev.off()
 
 # Color by sample type, facet by group
 ggplot(adiv, aes(x=Sample_Type, y=Total_OTUs, fill = Sample_Type)) +
@@ -598,21 +604,27 @@ adiv.samptype.sum <- adiv %>%
 
 ### Chao
 # Color by group
+tiff("Chao.tiff", width=6.5, height=3.5, units="in", res=600)
 ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
   #facet_grid(.~Substrate) +
+  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
   #scale_fill_manual(values=c("gray95", "dimgray") )+
   xlab("Group") +
   ylab("Chao Richness")
+dev.off()
 # Color by group, facet by sample type
+#tiff("Chao.tiff", width=11, height=3.5, units="in", res=600)
 ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
   facet_grid(.~Sample_Type) +
+  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
   #scale_fill_manual(values=c("gray95", "dimgray")) +
   xlab("Group") +
   ylab("Chao Richness")
+#dev.off()
 
 # Test normality
 hist(adiv$chao, breaks=10)
@@ -1036,7 +1048,7 @@ phy.sum$iqr.max <- phy.sum$Median + 0.5*phy.sum$iqr
 
 
 ### Barplot ###
-tiff("Phyla.tiff", width=13, height=4, units="in", res=600)
+tiff("Phyla2.tiff", width=13, height=8, units="in", res=600)
 ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
   geom_bar(stat="identity", color="black") +
   geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
