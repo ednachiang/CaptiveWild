@@ -604,7 +604,7 @@ adiv.samptype.sum <- adiv %>%
 
 ### Chao
 # Color by group
-tiff("Chao.tiff", width=6.5, height=3.5, units="in", res=600)
+tiff("Chao.tiff", width=6.5, height=3, units="in", res=600)
 ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
@@ -739,21 +739,24 @@ t.test(shannon ~ Diet, data=adiv)
 
 ### Inverse Simpson
 # Color by group
+tiff("InvSimp.tiff", width=6.5, height=3, units="in", res=600)
 ggplot(adiv, aes(x=Group, y= invsimpson, fill = Group)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
   #facet_grid(.~Substrate) +
-  #scale_fill_manual(values=c("gray95", "dimgray")) +
+  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
   xlab("Group") +
-  ylab("Inverse Simpson Diversity")
+  ylab("Inverse Simpson Weighted Diversity")
+dev.off()
 # Color by group, facet by sample type
 ggplot(adiv, aes(x=Group, y= invsimpson, fill = Group)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
   facet_grid(.~Sample_Type) +
-  #scale_fill_manual(values=c("gray95", "dimgray")) +
+  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
   xlab("Group") +
   ylab("Inverse Simpson Diversity")
+
 
 # Test normality
 hist(adiv$invsimpson, breaks=10)
