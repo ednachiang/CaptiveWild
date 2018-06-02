@@ -97,7 +97,7 @@ sample_data(physeq)$Season <- ordered(sample_data(physeq)$Season,
 sample_data(physeq)$Metabolism <- ordered(sample_data(physeq)$Metabolism,
                                      levels=c("Active", "Torpor", "IBA"))
 sample_data(physeq)$Group <- ordered(sample_data(physeq)$Group,
-                                     levels=c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring"))
+                                     levels=c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring", "Chow"))
 
 # Remove unwanted samples
 physeq.rem <- subset_samples(physeq, Sample_Type != "Black_Tissue" & Season != "NA")
@@ -113,21 +113,61 @@ chow.phy <- tax_glom(physeq.chow, taxrank="Phylum")
 chow.phy99 <- transform_sample_counts(chow.phy, function(x){(x/sum(x))*100})
 chow.phy99 <- prune_taxa(taxa_sums(chow.phy99) > 1, chow.phy99)
 
-barplot(sort(taxa_sums(chow.phy99),TRUE)[1:20]/nsamples(phy99),las=2,cex.axis=.7)
+barplot(sort(taxa_sums(chow.phy99),TRUE)[1:20],las=2,cex.axis=.7)
 
 chow.df <- psmelt(chow.phy99)
-chow.df$Phylum <- ordered(chow.df$Phylum, levels=c("Proteobacteria", "Firmicutes", "Actinobacteria", "Bacteroidetes"))
+chow.df$Phylum <- ordered(chow.df$Phylum, levels=c("Proteobacteria", "Firmicutes", "Bacteroidetes", "Actinobacteria"))
 
+tiff("Chow.tiff", width=5, height=5, units="in", res=600)
 ggplot(chow.df, aes(x=Phylum, y=Abundance, fill=Phylum)) +
   geom_bar(stat="identity", color="black") +
-  scale_fill_brewer(palette="Set1") +
+  scale_fill_manual(values=c("#984ea3", "#e41a1c", "#377eb8", "grey")) +
   xlab("Phyla") +
   ylab("Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,65),expand=c(0,0)) +
   theme(axis.text.x = element_blank(),
         axis.title.x = element_text(size=14),
         axis.title.y = element_text(size=14),
         strip.text.x = element_text(size=12),
-        strip.text.y = element_text(size=12))
+        strip.text.y = element_text(size=12),
+        panel.spacing=unit(1, "lines"))
+dev.off()
+
+##### Alpha Div
+physeq.wchow <- subset_samples(physeq, Sample_Type != "Black_Tissue")
+chow.adiv <- data.frame(sample_data(physeq.wchow))
+chow.adiv.sum <- chow.adiv %>%
+  group_by(Group) %>%
+  summarize(Chao_Mean = mean(chao),
+            Chao_Median = median(chao),
+            Chao_SD = sd(chao),
+            Chao_SE = (sd(chao)/sqrt(length(chao))),
+            Chao_iqr = IQR(chao),
+            InvSimp_Mean = mean(invsimpson),
+            InvSimp_Median = median(invsimpson),
+            InvSimp_SD = sd(invsimpson),
+            InvSimp_SE = (sd(invsimpson)/sqrt(length(invsimpson))),
+            InvSimp_iqr = IQR(invsimpson))
+tiff("Chow.chao.tiff", width=7, height=3, units="in", res=600)
+ggplot(chow.adiv, aes(x=Group, y=chao, fill = Group)) +
+  geom_boxplot(position=position_dodge(1)) +
+  geom_point() + 
+  #facet_grid(.~Substrate) +
+  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen", "gray26")) +
+  #scale_fill_manual(values=c("gray95", "dimgray") )+
+  xlab("Group") +
+  ylab("Chao Richness")
+dev.off()
+
+tiff("Chow.InvSimp.tiff", width=7, height=3, units="in", res=600)
+ggplot(chow.adiv, aes(x=Group, y= invsimpson, fill = Group)) +
+  geom_boxplot(position=position_dodge(1)) +
+  geom_point() + 
+  #facet_grid(.~Substrate) +
+  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen", "gray26")) +
+  xlab("Group") +
+  ylab("Inverse Simpson Weighted Diversity")
+dev.off()
 ```
 
 ### Load Phyloseq Object
@@ -615,7 +655,7 @@ ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
   ylab("Chao Richness")
 dev.off()
 # Color by group, facet by sample type
-#tiff("Chao.tiff", width=11, height=3.5, units="in", res=600)
+tiff("Chao.facet.tiff", width=11, height=3.5, units="in", res=600)
 ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
@@ -624,7 +664,7 @@ ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
   #scale_fill_manual(values=c("gray95", "dimgray")) +
   xlab("Group") +
   ylab("Chao Richness")
-#dev.off()
+dev.off()
 
 # Test normality
 hist(adiv$chao, breaks=10)
@@ -749,13 +789,15 @@ ggplot(adiv, aes(x=Group, y= invsimpson, fill = Group)) +
   ylab("Inverse Simpson Weighted Diversity")
 dev.off()
 # Color by group, facet by sample type
+tiff("InvSimp.facet.tiff", width=11, height=3, units="in", res=600)
 ggplot(adiv, aes(x=Group, y= invsimpson, fill = Group)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
   facet_grid(.~Sample_Type) +
   scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
   xlab("Group") +
-  ylab("Inverse Simpson Diversity")
+  ylab("Inverse Simpson Weighted Diversity")
+dev.off()
 
 
 # Test normality
@@ -1051,7 +1093,7 @@ phy.sum$iqr.max <- phy.sum$Median + 0.5*phy.sum$iqr
 
 
 ### Barplot ###
-tiff("Phyla2.tiff", width=13, height=8, units="in", res=600)
+tiff("Phyla3.tiff", width=13, height=8, units="in", res=600)
 ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
   geom_bar(stat="identity", color="black") +
   geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
@@ -1059,11 +1101,16 @@ ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
   scale_fill_brewer(palette="Set1") +
   xlab("Phyla") +
   ylab("Median Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
   theme(axis.text.x = element_blank(),
-        axis.title.x = element_text(size=14),
-        axis.title.y = element_text(size=14),
-        strip.text.x = element_text(size=12),
-        strip.text.y = element_text(size=12))
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        strip.text.x = element_text(size=14),
+        strip.text.y = element_text(size=14),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size=12),
+        axis.text.y = element_text(size=12))
 dev.off()
 
 # Pull out otu table to test phyla
@@ -1122,6 +1169,13 @@ plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group") +
   geom_path(data=elip.df, aes(x=NMDS1, y=NMDS2, colour=group), size=1, linetype=1) +
   guides(color=guide_legend(title="Group")) +
   scale_color_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen"))
+dev.off()
+
+tiff("NMDS.samptype.tiff", width=6, height=5, units="in", res=600)
+plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape = "Sample_Type") +
+  guides(color=guide_legend(title="Group")) +
+  scale_color_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
+  scale_shape_manual(values=c(19,2))
 dev.off()
 
 ### PERMANOVA
