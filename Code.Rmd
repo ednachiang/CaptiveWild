@@ -1076,9 +1076,9 @@ barplot(sort(taxa_sums(phy99),TRUE)[1:20]/nsamples(phy99),las=2,cex.axis=.7)
 # Summarize data
 phy.df <- psmelt(phy99)
 phy.df$Phylum <- ordered(phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia"))
-#phy.df$Phylum[which(is.na(phy.df$Phylum))] <- rep("Unclassified",18)
+phy.df$Phylum[which(is.na(phy.df$Phylum))] <- rep("Unclassified",18)
 phy.sum <- phy.df %>%
-  group_by(Diet, Phylum) %>%
+  group_by(Diet, Sample_Type, Phylum) %>%
   summarize(Mean = mean(Abundance),
             Median = median(Abundance),
             SD = sd(Abundance),
