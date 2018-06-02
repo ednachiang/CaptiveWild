@@ -121,7 +121,7 @@ chow.df$Phylum <- ordered(chow.df$Phylum, levels=c("Proteobacteria", "Firmicutes
 tiff("Chow.tiff", width=5, height=5, units="in", res=600)
 ggplot(chow.df, aes(x=Phylum, y=Abundance, fill=Phylum)) +
   geom_bar(stat="identity", color="black") +
-  scale_fill_manual(values=c("#984ea3", "#e41a1c", "#377eb8", "grey")) +
+  scale_fill_manual(values=c("#984ea3", "#e41a1c", "#377eb8", "#f781bf")) +
   xlab("Phyla") +
   ylab("Relative Abundance for Phyla > 1%") +
   scale_y_continuous(limits=c(0,65),expand=c(0,0)) +
@@ -1075,10 +1075,10 @@ barplot(sort(taxa_sums(phy99),TRUE)[1:20]/nsamples(phy99),las=2,cex.axis=.7)
 
 # Summarize data
 phy.df <- psmelt(phy99)
-phy.df$Phylum <- ordered(phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes","Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Elusimicrobia"))
-phy.df$Phylum[which(is.na(phy.df$Phylum))] <- rep("Unclassified",18)
+phy.df$Phylum <- ordered(phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia"))
+#phy.df$Phylum[which(is.na(phy.df$Phylum))] <- rep("Unclassified",18)
 phy.sum <- phy.df %>%
-  group_by(Group, Sample_Type, Phylum) %>%
+  group_by(Diet, Phylum) %>%
   summarize(Mean = mean(Abundance),
             Median = median(Abundance),
             SD = sd(Abundance),
@@ -1093,7 +1093,27 @@ phy.sum$iqr.max <- phy.sum$Median + 0.5*phy.sum$iqr
 
 
 ### Barplot ###
-tiff("Phyla3.tiff", width=13, height=8, units="in", res=600)
+tiff("Phyla.prelim.tiff", width=12, height=3.5, units="in", res=600)
+ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
+  facet_grid(Sample_Type ~ Group) +
+  scale_fill_brewer(palette="Set1") +
+  xlab("Phyla") +
+  ylab("Median Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
+  theme(axis.text.x = element_blank(),
+        #axis.title.x = element_text(size=10),
+        #axis.title.y = element_text(size=10),
+        #strip.text.x = element_text(size=8),
+        #strip.text.y = element_text(size=8),
+        panel.spacing=unit(1, "lines")#,
+        #legend.title = element_text(size = 8),
+        #legend.text = element_text(size=8)
+        )
+dev.off()
+
+#tiff("Phyla3.tiff", width=13, height=8, units="in", res=600)
 ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
   geom_bar(stat="identity", color="black") +
   geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
@@ -1111,7 +1131,7 @@ ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
         legend.title = element_text(size = 14),
         legend.text = element_text(size=12),
         axis.text.y = element_text(size=12))
-dev.off()
+#dev.off()
 
 # Pull out otu table to test phyla
 phy.num <- as.numeric(otu_table(phy99))
