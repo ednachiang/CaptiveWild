@@ -2022,6 +2022,7 @@ write.table(simper.all, "simper.csv", sep=",")
 
 
 
+
 ### Cyanobacteria???
 ```{r}
 cya <- subset_taxa(physeq.rem, Phylum == "Cyanobacteria")
@@ -2033,6 +2034,77 @@ cya.rel <- subset_samples(cya.rel, sample_names(cya.rel)!= "CM1_916_P")
 cya.rel <- prune_taxa(taxa_sums(cya.rel)>0, cya.rel)
 View(data.frame(otu_table(cya.rel)))
 View(data.frame(tax_table(cya.rel)))
+
+
+
+
+### Simper @ Phylum-level
+# Change Group names to be compatible (no "_")
+physeq.simp <- physeq.rem
+rename.samp <- data.frame(sample_data(physeq.simp))
+rename.wild <- which(data.frame(sample_data(physeq.simp))$Group == "Summer_Wild")
+rename.lab <- which(data.frame(sample_data(physeq.simp))$Group == "Summer_Lab")
+levels(rename.samp$Group) <- c("SummerWild", "SummerLab", "Torpor", "IBA", "Spring")
+physeq.simp <- merge_phyloseq(otu_table(physeq.rem), sample_data(rename.samp), tax_table(physeq.rem))
+physeq.phylum <- tax_glom(physeq.simp, taxrank="Phylum")
+
+# All
+
+simper.pretty(data.frame(otu_table(physeq.phylum)),
+              data.frame(sample_data(physeq.phylum)),
+              c("Group", "Sample_Type"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='all.phylum')
+all.phylum.simper <- read.csv("all.phylum_clean_simper.csv")
+kruskal.pretty(data.frame(otu_table(physeq.phylum)),
+               data.frame(sample_data(physeq.phylum)),
+               csv = all.phylum.simper,
+               c("Group", "Sample_Type"),
+               output_name = 'all.phylum',
+               taxonomy = data.frame(tax_table(physeq.phylum)))
+all.phylum.simper.kw <- read.csv("all.phylum_krusk_simper.csv")
+for(i in 1:nrow(all.phylum.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(physeq.phylum))) == all.phylum.simper.kw$OTU[i])
+  all.phylum.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(physeq.phylum))[save,2], "-",
+          data.frame(tax_table(physeq.phylum))[save,3], "-",
+          data.frame(tax_table(physeq.phylum))[save,4], "-",
+          data.frame(tax_table(physeq.phylum))[save,5], "-",
+          data.frame(tax_table(physeq.phylum))[save,6])
+}
+write.table(all.phylum.simper.kw, "all.phylum_krusk_simper.csv", sep=",")
+
+
+
+
+### Test Cyano Phy Rel Abund
+# Merge samples with the same taxonomic rank
+goodphy <- tax_glom(physeq.rem, taxrank="Phylum")
+
+# Transform each merged phylum count to rel abund
+phy99 <- transform_sample_counts(goodphy, function(x){(x/sum(x))*100})
+
+# Remove any phyla with <1% rel abund
+phy99 <- prune_taxa(taxa_sums(phy99) > 1, phy99)
+
+# Pull out cyanos
+cya.phy <- subset_taxa(phy99, Phylum == "Cyanobacteria")
+cya.df <- data.frame(sample_data(cya.phy))
+cya.df$RelAbund <- t(data.frame(otu_table(cya.phy)))
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=cya.df)
+  # p-value = 8.591e-05
+kruskalmc(resp = RelAbund ~ Group, data=cya.df)
+  # Summer_Wild vs. Summer_Lab
+  # Summer_Wild vs. IBA
+  # Summer_Wild vs. Spring
+  # Torpor vs. Spring
+kruskal.test(formula = RelAbund ~ Sample_Type, data=cya.df)
+  # p-value = 0.733
+
+
+
 ```
 
 
