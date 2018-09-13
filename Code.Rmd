@@ -1749,11 +1749,11 @@ all.simper.kw <- read.csv("all_krusk_simper.csv")
 for(i in 1:nrow(all.simper.kw)){
   save <- which(rownames(data.frame(tax_table(physeq.simp))) == all.simper.kw$OTU[i])
   all.simper.kw$Taxonomy[i] <-
-    paste(data.frame(tax_table(physeq.simp))[i,2], "-",
-          data.frame(tax_table(physeq.simp))[i,3], "-",
-          data.frame(tax_table(physeq.simp))[i,4], "-",
-          data.frame(tax_table(physeq.simp))[i,5], "-",
-          data.frame(tax_table(physeq.simp))[i,6])
+    paste(data.frame(tax_table(physeq.simp))[save,2], "-",
+          data.frame(tax_table(physeq.simp))[save,3], "-",
+          data.frame(tax_table(physeq.simp))[save,4], "-",
+          data.frame(tax_table(physeq.simp))[save,5], "-",
+          data.frame(tax_table(physeq.simp))[save,6])
 }
 write.table(all.simper.kw, "all_krusk_simper.csv", sep=",")
 
@@ -1774,11 +1774,11 @@ group.simper.kw <- read.csv("group_krusk_simper.csv")
 for(i in 1:nrow(group.simper.kw)){
   save <- which(rownames(data.frame(tax_table(physeq.simp))) == group.simper.kw$OTU[i])
   group.simper.kw$Taxonomy[i] <-
-    paste(data.frame(tax_table(physeq.simp))[i,2], "-",
-          data.frame(tax_table(physeq.simp))[i,3], "-",
-          data.frame(tax_table(physeq.simp))[i,4], "-",
-          data.frame(tax_table(physeq.simp))[i,5], "-",
-          data.frame(tax_table(physeq.simp))[i,6])
+    paste(data.frame(tax_table(physeq.simp))[save,2], "-",
+          data.frame(tax_table(physeq.simp))[save,3], "-",
+          data.frame(tax_table(physeq.simp))[save,4], "-",
+          data.frame(tax_table(physeq.simp))[save,5], "-",
+          data.frame(tax_table(physeq.simp))[save,6])
 }
 write.table(group.simper.kw, "group_krusk_simper.csv", sep=",")
 
@@ -1800,11 +1800,11 @@ con.simper.kw <- read.csv("con_krusk_simper.csv")
 for(i in 1:nrow(con.simper.kw)){
   save <- which(rownames(data.frame(tax_table(physeq.con))) == con.simper.kw$OTU[i])
   con.simper.kw$Taxonomy[i] <-
-    paste(data.frame(tax_table(physeq.con))[i,2], "-",
-          data.frame(tax_table(physeq.con))[i,3], "-",
-          data.frame(tax_table(physeq.con))[i,4], "-",
-          data.frame(tax_table(physeq.con))[i,5], "-",
-          data.frame(tax_table(physeq.con))[i,6])
+    paste(data.frame(tax_table(physeq.con))[save,2], "-",
+          data.frame(tax_table(physeq.con))[save,3], "-",
+          data.frame(tax_table(physeq.con))[save,4], "-",
+          data.frame(tax_table(physeq.con))[save,5], "-",
+          data.frame(tax_table(physeq.con))[save,6])
 }
 write.table(con.simper.kw, "con_krusk_simper.csv", sep=",")
 
@@ -1826,11 +1826,11 @@ muc.simper.kw <- read.csv("muc_krusk_simper.csv")
 for(i in 1:nrow(muc.simper.kw)){
   save <- which(rownames(data.frame(tax_table(physeq.muc))) == muc.simper.kw$OTU[i])
   muc.simper.kw$Taxonomy[i] <-
-    paste(data.frame(tax_table(physeq.muc))[i,2], "-",
-          data.frame(tax_table(physeq.muc))[i,3], "-",
-          data.frame(tax_table(physeq.muc))[i,4], "-",
-          data.frame(tax_table(physeq.muc))[i,5], "-",
-          data.frame(tax_table(physeq.muc))[i,6])
+    paste(data.frame(tax_table(physeq.muc))[save,2], "-",
+          data.frame(tax_table(physeq.muc))[save,3], "-",
+          data.frame(tax_table(physeq.muc))[save,4], "-",
+          data.frame(tax_table(physeq.muc))[save,5], "-",
+          data.frame(tax_table(physeq.muc))[save,6])
 }
 write.table(muc.simper.kw, "muc_krusk_simper.csv", sep=",")
 
@@ -1852,11 +1852,11 @@ wil.simper.kw <- read.csv("wil_krusk_simper.csv")
 for(i in 1:nrow(wil.simper.kw)){
   save <- which(rownames(data.frame(tax_table(physeq.wil))) == wil.simper.kw$OTU[i])
   wil.simper.kw$Taxonomy[i] <-
-    paste(data.frame(tax_table(physeq.wil))[i,2], "-",
-          data.frame(tax_table(physeq.wil))[i,3], "-",
-          data.frame(tax_table(physeq.wil))[i,4], "-",
-          data.frame(tax_table(physeq.wil))[i,5], "-",
-          data.frame(tax_table(physeq.wil))[i,6])
+    paste(data.frame(tax_table(physeq.wil))[save,2], "-",
+          data.frame(tax_table(physeq.wil))[save,3], "-",
+          data.frame(tax_table(physeq.wil))[save,4], "-",
+          data.frame(tax_table(physeq.wil))[save,5], "-",
+          data.frame(tax_table(physeq.wil))[save,6])
 }
 write.table(wil.simper.kw, "wil_krusk_simper.csv", sep=",")
 
@@ -1878,11 +1878,11 @@ lab.simper.kw <- read.csv("lab_krusk_simper.csv")
 for(i in 1:nrow(lab.simper.kw)){
   save <- which(rownames(data.frame(tax_table(physeq.lab))) == lab.simper.kw$OTU[i])
   lab.simper.kw$Taxonomy[i] <-
-    paste(data.frame(tax_table(physeq.lab))[i,2], "-",
-          data.frame(tax_table(physeq.lab))[i,3], "-",
-          data.frame(tax_table(physeq.lab))[i,4], "-",
-          data.frame(tax_table(physeq.lab))[i,5], "-",
-          data.frame(tax_table(physeq.lab))[i,6])
+    paste(data.frame(tax_table(physeq.lab))[save,2], "-",
+          data.frame(tax_table(physeq.lab))[save,3], "-",
+          data.frame(tax_table(physeq.lab))[save,4], "-",
+          data.frame(tax_table(physeq.lab))[save,5], "-",
+          data.frame(tax_table(physeq.lab))[save,6])
 }
 write.table(lab.simper.kw, "lab_krusk_simper.csv", sep=",")
 
@@ -1904,11 +1904,11 @@ tor.simper.kw <- read.csv("tor_krusk_simper.csv")
 for(i in 1:nrow(tor.simper.kw)){
   save <- which(rownames(data.frame(tax_table(physeq.tor))) == tor.simper.kw$OTU[i])
   tor.simper.kw$Taxonomy[i] <-
-    paste(data.frame(tax_table(physeq.tor))[i,2], "-",
-          data.frame(tax_table(physeq.tor))[i,3], "-",
-          data.frame(tax_table(physeq.tor))[i,4], "-",
-          data.frame(tax_table(physeq.tor))[i,5], "-",
-          data.frame(tax_table(physeq.tor))[i,6])
+    paste(data.frame(tax_table(physeq.tor))[save,2], "-",
+          data.frame(tax_table(physeq.tor))[save,3], "-",
+          data.frame(tax_table(physeq.tor))[save,4], "-",
+          data.frame(tax_table(physeq.tor))[save,5], "-",
+          data.frame(tax_table(physeq.tor))[save,6])
 }
 write.table(tor.simper.kw, "tor_krusk_simper.csv", sep=",")
 
@@ -1930,11 +1930,11 @@ iba.simper.kw <- read.csv("iba_krusk_simper.csv")
 for(i in 1:nrow(iba.simper.kw)){
   save <- which(rownames(data.frame(tax_table(physeq.iba))) == iba.simper.kw$OTU[i])
   iba.simper.kw$Taxonomy[i] <-
-    paste(data.frame(tax_table(physeq.iba))[i,2], "-",
-          data.frame(tax_table(physeq.iba))[i,3], "-",
-          data.frame(tax_table(physeq.iba))[i,4], "-",
-          data.frame(tax_table(physeq.iba))[i,5], "-",
-          data.frame(tax_table(physeq.iba))[i,6])
+    paste(data.frame(tax_table(physeq.iba))[save,2], "-",
+          data.frame(tax_table(physeq.iba))[save,3], "-",
+          data.frame(tax_table(physeq.iba))[save,4], "-",
+          data.frame(tax_table(physeq.iba))[save,5], "-",
+          data.frame(tax_table(physeq.iba))[save,6])
 }
 write.table(iba.simper.kw, "iba_krusk_simper.csv", sep=",")
 
@@ -1956,11 +1956,11 @@ spr.simper.kw <- read.csv("spr_krusk_simper.csv")
 for(i in 1:nrow(spr.simper.kw)){
   save <- which(rownames(data.frame(tax_table(physeq.spr))) == spr.simper.kw$OTU[i])
   spr.simper.kw$Taxonomy[i] <-
-    paste(data.frame(tax_table(physeq.spr))[i,2], "-",
-          data.frame(tax_table(physeq.spr))[i,3], "-",
-          data.frame(tax_table(physeq.spr))[i,4], "-",
-          data.frame(tax_table(physeq.spr))[i,5], "-",
-          data.frame(tax_table(physeq.spr))[i,6])
+    paste(data.frame(tax_table(physeq.spr))[save,2], "-",
+          data.frame(tax_table(physeq.spr))[save,3], "-",
+          data.frame(tax_table(physeq.spr))[save,4], "-",
+          data.frame(tax_table(physeq.spr))[save,5], "-",
+          data.frame(tax_table(physeq.spr))[save,6])
 }
 write.table(spr.simper.kw, "spr_krusk_simper.csv", sep=",")
 
@@ -2018,47 +2018,6 @@ simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(iba.simper.kw)),] <- iba.
 simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(spr.simper.kw)),] <- spr.simper.kw
 simper.all$fdr_krusk_p.val <- p.adjust(simper.all$krusk_p.val, "BH")
 write.table(simper.all, "simper.csv", sep=",")
-
-
-
-stevia.simper.all$fdr_krusk_p.val <- p.adjust(stevia.simper.all$krusk_p.val, "BH")
-write.table(stevia.simper.all, "stevia.simper.nosex.csv", sep=",")
-
-
-stevia.pre.simper.kw$Group <- rep("Pre", nrow(stevia.pre.simper.kw))
-stevia.pre.simper.kw$OTU <- as.character(stevia.pre.simper.kw$OTU)
-stevia.pre.simper.kw$Comparison <- as.character(stevia.pre.simper.kw$Comparison)
-stevia.pre.simper.kw$Taxonomy <- as.character(stevia.pre.simper.kw$Taxonomy)
-stevia.post.simper.kw$Group <- rep("Post", nrow(stevia.post.simper.kw))
-stevia.post.simper.kw$OTU <- as.character(stevia.post.simper.kw$OTU)
-stevia.post.simper.kw$Comparison <- as.character(stevia.post.simper.kw$Comparison)
-stevia.post.simper.kw$Taxonomy <- as.character(stevia.post.simper.kw$Taxonomy)
-stevia.hf.simper.kw$Group <- rep("High Fat", nrow(stevia.hf.simper.kw))
-stevia.hf.simper.kw$OTU <- as.character(stevia.hf.simper.kw$OTU)
-stevia.hf.simper.kw$Comparison <- as.character(stevia.hf.simper.kw$Comparison)
-stevia.hf.simper.kw$Taxonomy <- as.character(stevia.hf.simper.kw$Taxonomy)
-stevia.lf.simper.kw$Group <- rep("Low Fat", nrow(stevia.lf.simper.kw))
-stevia.lf.simper.kw$OTU <- as.character(stevia.lf.simper.kw$OTU)
-stevia.lf.simper.kw$Comparison <- as.character(stevia.lf.simper.kw$Comparison)
-stevia.lf.simper.kw$Taxonomy <- as.character(stevia.lf.simper.kw$Taxonomy)
-stevia.sc.simper.kw$Group <- rep("Saccharin", nrow(stevia.sc.simper.kw))
-stevia.sc.simper.kw$OTU <- as.character(stevia.sc.simper.kw$OTU)
-stevia.sc.simper.kw$Comparison <- as.character(stevia.sc.simper.kw$Comparison)
-stevia.sc.simper.kw$Taxonomy <- as.character(stevia.sc.simper.kw$Taxonomy)
-stevia.sc.simper.kw$Group <- as.character(stevia.sc.simper.kw$Group)
-stevia.tv.simper.kw$Group <- rep("Stevia", nrow(stevia.tv.simper.kw))
-stevia.tv.simper.kw$OTU <- as.character(stevia.tv.simper.kw$OTU)
-stevia.tv.simper.kw$Comparison <- as.character(stevia.tv.simper.kw$Comparison)
-stevia.tv.simper.kw$Taxonomy <- as.character(stevia.tv.simper.kw$Taxonomy)
-stevia.tv.simper.kw$Group <- as.character(stevia.tv.simper.kw$Group)
-stevia.simper.all <- stevia.pre.simper.kw
-stevia.simper.all[(nrow(stevia.simper.all)+1):(nrow(stevia.simper.all)+nrow(stevia.post.simper.kw)),] <- stevia.post.simper.kw
-stevia.simper.all[(nrow(stevia.simper.all)+1):(nrow(stevia.simper.all)+nrow(stevia.hf.simper.kw)),] <- stevia.hf.simper.kw
-stevia.simper.all[(nrow(stevia.simper.all)+1):(nrow(stevia.simper.all)+nrow(stevia.lf.simper.kw)),] <- stevia.lf.simper.kw
-stevia.simper.all[(nrow(stevia.simper.all)+1):(nrow(stevia.simper.all)+nrow(stevia.sc.simper.kw)),] <- stevia.sc.simper.kw
-stevia.simper.all[(nrow(stevia.simper.all)+1):(nrow(stevia.simper.all)+nrow(stevia.tv.simper.kw)),] <- stevia.tv.simper.kw
-stevia.simper.all$fdr_krusk_p.val <- p.adjust(stevia.simper.all$krusk_p.val, "BH")
-write.table(stevia.simper.all, "stevia.simper.nosex.csv", sep=",")
 ```
 
 
