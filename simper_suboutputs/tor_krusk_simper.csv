@@ -1,0 +1,11 @@
+Comparison,SIMPER,OTU,krusk_p.val,fdr_krusk_p.val,Taxonomy,Left.mean.abund,Left.stdev,Right.mean.abund,Right.stdev
+Content_Mucosa,0.085779007,Otu00004,0.75402253,1,Verrucomicrobia - Verrucomicrobiae - Verrucomicrobiales - Verrucomicrobiaceae - Akkermansia,0.082223332,0.137329689,0.094704585,0.112584345
+Content_Mucosa,0.069249672,Otu00010,0.91418355,1,Bacteroidetes - Bacteroidia - Bacteroidales - Bacteroidaceae - Bacteroides,0.076442411,0.145687578,0.038211566,0.062376772
+Content_Mucosa,0.05396628,Otu00001,0.577468662,1,Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified,0.049520702,0.070020402,0.058343074,0.084054815
+Content_Mucosa,0.051999862,Otu00049,0.881497452,1,Bacteroidetes - Bacteroidia - Bacteroidales - Porphyromonadaceae - Odoribacter,0.054020425,0.120793342,0.024608553,0.055026398
+Content_Mucosa,0.046255279,Otu00012,0.74325682,1,Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified,0.027135088,0.060544858,0.055426944,0.07614577
+Content_Mucosa,0.04357419,Otu00011,0.83403523,1,Bacteroidetes - Bacteroidia - Bacteroidales - Prevotellaceae - Prevotellaceae_unclassified,0.053076389,0.056144043,0.036956083,0.060211814
+Content_Mucosa,0.042624685,Otu00022,1,1,Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified,0.056076006,0.124473115,0.000965285,0.001376531
+Content_Mucosa,0.027641128,Otu00017,0.4647021,1,Bacteroidetes - Bacteroidia - Bacteroidales - Bacteroidales_S24-7_group - Bacteroidales_S24-7_group_ge,0.026429895,0.053065299,0.022987472,0.038156905
+Content_Mucosa,0.02754928,Otu00020,0.675173615,1,Bacteroidetes - Bacteroidia - Bacteroidales - Prevotellaceae - Prevotellaceae_unclassified,0.034485643,0.038884831,0.025859549,0.036055403
+Content_Mucosa,0.026435403,Otu00023,0.332111978,1,Verrucomicrobia - Verrucomicrobiae - Verrucomicrobiales - Verrucomicrobiaceae - Akkermansia,0.000421284,0.000526926,0.035263827,0.076954384

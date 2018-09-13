@@ -1757,6 +1757,31 @@ for(i in 1:nrow(all.simper.kw)){
 }
 write.table(all.simper.kw, "all_krusk_simper.csv", sep=",")
 
+# Group
+simper.pretty(data.frame(otu_table(physeq.simp)),
+              data.frame(sample_data(physeq.simp)),
+              c("Group"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='group')
+group.simper <- read.csv("group_clean_simper.csv")
+kruskal.pretty(data.frame(otu_table(physeq.simp)),
+               data.frame(sample_data(physeq.simp)),
+               csv = group.simper,
+               c("Group"),
+               output_name = 'group',
+               taxonomy = data.frame(tax_table(physeq.simp)))
+group.simper.kw <- read.csv("group_krusk_simper.csv")
+for(i in 1:nrow(group.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(physeq.simp))) == group.simper.kw$OTU[i])
+  group.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(physeq.simp))[i,2], "-",
+          data.frame(tax_table(physeq.simp))[i,3], "-",
+          data.frame(tax_table(physeq.simp))[i,4], "-",
+          data.frame(tax_table(physeq.simp))[i,5], "-",
+          data.frame(tax_table(physeq.simp))[i,6])
+}
+write.table(group.simper.kw, "group_krusk_simper.csv", sep=",")
+
 # Content
 physeq.con <- subset_samples(physeq.simp, Sample_Type == "Content")
 simper.pretty(data.frame(otu_table(physeq.con)),
@@ -1938,6 +1963,102 @@ for(i in 1:nrow(spr.simper.kw)){
           data.frame(tax_table(physeq.spr))[i,6])
 }
 write.table(spr.simper.kw, "spr_krusk_simper.csv", sep=",")
+
+
+
+
+### BH CORRECTION FOR ALL SIMPER COMPARISONS
+all.simper.kw$Group <- rep("All", nrow(all.simper.kw))
+all.simper.kw$OTU <- as.character(all.simper.kw$OTU)
+all.simper.kw$Comparison <- as.character(all.simper.kw$Comparison)
+all.simper.kw$Taxonomy <- as.character(all.simper.kw$Taxonomy)
+
+con.simper.kw$Group <- rep("Content", nrow(con.simper.kw))
+con.simper.kw$OTU <- as.character(con.simper.kw$OTU)
+con.simper.kw$Comparison <- as.character(con.simper.kw$Comparison)
+con.simper.kw$Taxonomy <- as.character(con.simper.kw$Taxonomy)
+
+muc.simper.kw$Group <- rep("Mucosa", nrow(muc.simper.kw))
+muc.simper.kw$OTU <- as.character(muc.simper.kw$OTU)
+muc.simper.kw$Comparison <- as.character(muc.simper.kw$Comparison)
+muc.simper.kw$Taxonomy <- as.character(muc.simper.kw$Taxonomy)
+
+wil.simper.kw$Group <- rep("Summer_Wild", nrow(wil.simper.kw))
+wil.simper.kw$OTU <- as.character(wil.simper.kw$OTU)
+wil.simper.kw$Comparison <- as.character(wil.simper.kw$Comparison)
+wil.simper.kw$Taxonomy <- as.character(wil.simper.kw$Taxonomy)
+
+lab.simper.kw$Group <- rep("Summer_Lab", nrow(lab.simper.kw))
+lab.simper.kw$OTU <- as.character(lab.simper.kw$OTU)
+lab.simper.kw$Comparison <- as.character(lab.simper.kw$Comparison)
+lab.simper.kw$Taxonomy <- as.character(lab.simper.kw$Taxonomy)
+
+tor.simper.kw$Group <- rep("Torpor", nrow(tor.simper.kw))
+tor.simper.kw$OTU <- as.character(tor.simper.kw$OTU)
+tor.simper.kw$Comparison <- as.character(tor.simper.kw$Comparison)
+tor.simper.kw$Taxonomy <- as.character(tor.simper.kw$Taxonomy)
+
+iba.simper.kw$Group <- rep("IBA", nrow(iba.simper.kw))
+iba.simper.kw$OTU <- as.character(iba.simper.kw$OTU)
+iba.simper.kw$Comparison <- as.character(iba.simper.kw$Comparison)
+iba.simper.kw$Taxonomy <- as.character(iba.simper.kw$Taxonomy)
+
+spr.simper.kw$Group <- rep("Spring", nrow(spr.simper.kw))
+spr.simper.kw$OTU <- as.character(spr.simper.kw$OTU)
+spr.simper.kw$Comparison <- as.character(spr.simper.kw$Comparison)
+spr.simper.kw$Taxonomy <- as.character(spr.simper.kw$Taxonomy)
+
+simper.all <- all.simper.kw
+simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(con.simper.kw)),] <- con.simper.kw
+simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(muc.simper.kw)),] <- muc.simper.kw
+simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(wil.simper.kw)),] <- wil.simper.kw
+simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(lab.simper.kw)),] <- lab.simper.kw
+simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(tor.simper.kw)),] <- tor.simper.kw
+simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(iba.simper.kw)),] <- iba.simper.kw
+simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(spr.simper.kw)),] <- spr.simper.kw
+simper.all$fdr_krusk_p.val <- p.adjust(simper.all$krusk_p.val, "BH")
+write.table(simper.all, "simper.csv", sep=",")
+
+
+
+stevia.simper.all$fdr_krusk_p.val <- p.adjust(stevia.simper.all$krusk_p.val, "BH")
+write.table(stevia.simper.all, "stevia.simper.nosex.csv", sep=",")
+
+
+stevia.pre.simper.kw$Group <- rep("Pre", nrow(stevia.pre.simper.kw))
+stevia.pre.simper.kw$OTU <- as.character(stevia.pre.simper.kw$OTU)
+stevia.pre.simper.kw$Comparison <- as.character(stevia.pre.simper.kw$Comparison)
+stevia.pre.simper.kw$Taxonomy <- as.character(stevia.pre.simper.kw$Taxonomy)
+stevia.post.simper.kw$Group <- rep("Post", nrow(stevia.post.simper.kw))
+stevia.post.simper.kw$OTU <- as.character(stevia.post.simper.kw$OTU)
+stevia.post.simper.kw$Comparison <- as.character(stevia.post.simper.kw$Comparison)
+stevia.post.simper.kw$Taxonomy <- as.character(stevia.post.simper.kw$Taxonomy)
+stevia.hf.simper.kw$Group <- rep("High Fat", nrow(stevia.hf.simper.kw))
+stevia.hf.simper.kw$OTU <- as.character(stevia.hf.simper.kw$OTU)
+stevia.hf.simper.kw$Comparison <- as.character(stevia.hf.simper.kw$Comparison)
+stevia.hf.simper.kw$Taxonomy <- as.character(stevia.hf.simper.kw$Taxonomy)
+stevia.lf.simper.kw$Group <- rep("Low Fat", nrow(stevia.lf.simper.kw))
+stevia.lf.simper.kw$OTU <- as.character(stevia.lf.simper.kw$OTU)
+stevia.lf.simper.kw$Comparison <- as.character(stevia.lf.simper.kw$Comparison)
+stevia.lf.simper.kw$Taxonomy <- as.character(stevia.lf.simper.kw$Taxonomy)
+stevia.sc.simper.kw$Group <- rep("Saccharin", nrow(stevia.sc.simper.kw))
+stevia.sc.simper.kw$OTU <- as.character(stevia.sc.simper.kw$OTU)
+stevia.sc.simper.kw$Comparison <- as.character(stevia.sc.simper.kw$Comparison)
+stevia.sc.simper.kw$Taxonomy <- as.character(stevia.sc.simper.kw$Taxonomy)
+stevia.sc.simper.kw$Group <- as.character(stevia.sc.simper.kw$Group)
+stevia.tv.simper.kw$Group <- rep("Stevia", nrow(stevia.tv.simper.kw))
+stevia.tv.simper.kw$OTU <- as.character(stevia.tv.simper.kw$OTU)
+stevia.tv.simper.kw$Comparison <- as.character(stevia.tv.simper.kw$Comparison)
+stevia.tv.simper.kw$Taxonomy <- as.character(stevia.tv.simper.kw$Taxonomy)
+stevia.tv.simper.kw$Group <- as.character(stevia.tv.simper.kw$Group)
+stevia.simper.all <- stevia.pre.simper.kw
+stevia.simper.all[(nrow(stevia.simper.all)+1):(nrow(stevia.simper.all)+nrow(stevia.post.simper.kw)),] <- stevia.post.simper.kw
+stevia.simper.all[(nrow(stevia.simper.all)+1):(nrow(stevia.simper.all)+nrow(stevia.hf.simper.kw)),] <- stevia.hf.simper.kw
+stevia.simper.all[(nrow(stevia.simper.all)+1):(nrow(stevia.simper.all)+nrow(stevia.lf.simper.kw)),] <- stevia.lf.simper.kw
+stevia.simper.all[(nrow(stevia.simper.all)+1):(nrow(stevia.simper.all)+nrow(stevia.sc.simper.kw)),] <- stevia.sc.simper.kw
+stevia.simper.all[(nrow(stevia.simper.all)+1):(nrow(stevia.simper.all)+nrow(stevia.tv.simper.kw)),] <- stevia.tv.simper.kw
+stevia.simper.all$fdr_krusk_p.val <- p.adjust(stevia.simper.all$krusk_p.val, "BH")
+write.table(stevia.simper.all, "stevia.simper.nosex.csv", sep=",")
 ```
 
 
