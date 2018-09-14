@@ -879,6 +879,20 @@ kruskal.test(formula = chao ~ Diet, data = adiv, subset=Season=="Summer")
   # p-value = 0.0208
 wilcox.test(chao ~ Diet, data=adiv)
   # p-value = 0.002454
+kruskal.test(formula = chao ~ Sex, data = adiv)
+  # p-value = 0.2632
+kruskal.test(formula = chao ~ Sex, data = adiv, subset=Diet=="Lab")
+  # p-value = 0.3634
+kruskal.test(formula = chao ~ Sex, data = adiv, subset=Group=="Summer_Lab")
+  # p-value = 0.5708
+kruskal.test(formula = chao ~ Sex, data = adiv, subset=Group=="Torpor")
+  # p-value = 0.8312
+kruskal.test(formula = chao ~ Sex, data = adiv, subset=Group=="IBA")
+  # p-value = 0.5677
+kruskal.test(formula = chao ~ Sex, data = adiv, subset=Group=="Spring")
+  # p-value = 0.4386
+
+
 
 
 ### Berger-Parker
@@ -921,6 +935,20 @@ kruskal.test(formula = bergerparker ~ Diet, data = adiv, subset=Season=="Summer"
   # p-value = 0.1317
 wilcox.test(bergerparker ~ Diet, data=adiv)
   # p-value = 0.03743
+kruskal.test(formula = bergerparker ~ Sex, data = adiv)
+  # p-value = 0.3438
+kruskal.test(formula = bergerparker ~ Sex, data = adiv, subset=Diet=="Lab")
+  # p-value = 0.2396
+kruskal.test(formula = bergerparker ~ Sex, data = adiv, subset=Group=="Summer_Lab")
+  # p-value = 0.4497
+kruskal.test(formula = bergerparker ~ Sex, data = adiv, subset=Group=="Torpor")
+  # p-value = 1
+kruskal.test(formula = bergerparker ~ Sex, data = adiv, subset=Group=="IBA")
+  # p-value = 0.06329
+kruskal.test(formula = bergerparker ~ Sex, data = adiv, subset=Group=="Spring")
+  # p-value = 1
+
+
 
 
 ### Shannon
@@ -957,7 +985,8 @@ t.test(shannon ~ Sample_Type, data=adiv)
   # p-value = 0.8445
 t.test(shannon ~ Diet, data=adiv)
   # p-value = 0.02371
-
+summary(aov(shannon ~ Sex, data=adiv))
+  # p-value = 0.718
 
 
 ### Inverse Simpson
@@ -1005,12 +1034,18 @@ kruskal.test(formula = invsimpson ~ Diet, data = adiv, subset=Season=="Summer")
   # p-value = 0.08753
 wilcox.test(invsimpson ~ Diet, data=adiv)
   # p-value = 0.0239
-
-
-
-
-
-
+kruskal.test(formula = invsimpson ~ Sex, data = adiv)
+  # p-value = 0.2725
+kruskal.test(formula = invsimpson ~ Sex, data = adiv, subset=Diet=="Lab")
+  # p-value = 0.1995
+kruskal.test(formula = invsimpson ~ Sex, data = adiv, subset=Group=="Summer_Lab")
+  # p-value = 0.4497
+kruskal.test(formula = invsimpson ~ Sex, data = adiv, subset=Group=="Torpor")
+  # p-value = 0.5224
+kruskal.test(formula = invsimpson ~ Sex, data = adiv, subset=Group=="IBA")
+  # p-value = 0.2531
+kruskal.test(formula = invsimpson ~ Sex, data = adiv, subset=Group=="Spring")
+  # p-value = 1
 
 
 
@@ -1261,7 +1296,7 @@ phy.df <- psmelt(phy99)
 phy.df$Phylum <- ordered(phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia"))
 phy.df$Phylum[which(is.na(phy.df$Phylum))] <- rep("Unclassified",18)
 phy.sum <- phy.df %>%
-  group_by(Diet, Sample_Type, Phylum) %>%
+  group_by(Group, Sample_Type, Phylum) %>%
   summarize(Mean = mean(Abundance),
             Median = median(Abundance),
             SD = sd(Abundance),
@@ -1430,6 +1465,135 @@ adonis(bray~ Group, data=sampdf)
 #pulls out p-value:
   test[[1]]$`Pr(>F)`[1]
   #https://stackoverflow.com/questions/3366506/extract-p-value-from-aov?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+```
+
+
+
+### Sex NMDS
+```{r}
+nmds <- ordinate(physeq=physeq.rem, method="NMDS", distance="bray")
+  # Stress = 0.102554
+
+plot_ordination(physeq=physeq.rem, ordination=nmds, color="Sex", shape="Sample_Type")
+
+sample_data(physeq.rem)$Elip <- paste(sample_data(physeq.rem)$Sex)
+elip.nmds <- data.frame(MDS1 = nmds$points[,1], MDS2 = nmds$points[,2],
+                        Sex = sample_data(physeq.rem)$Elip)
+plot.new()
+elip.ord <- ordiellipse(nmds, sample_data(physeq.rem)$Elip, display="sites", kind="se", conf=0.95, label=T)
+
+
+elip.df <- data.frame()
+for(i in levels(elip.nmds$Sex)){
+  elip.df <- rbind(elip.df, cbind(as.data.frame(with(elip.nmds[elip.nmds$Sex==i,],
+                                                     veganCovEllipse(elip.ord[[i]]$cov,
+                                                                     elip.ord[[i]]$center,
+                                                                     elip.ord[[i]]$scale))),
+                                  Sex=i))
+  
+}
+
+plot_ordination(physeq=physeq.rem, ordination=nmds, color="Sex") +
+  geom_path(data=elip.df, aes(x=NMDS1, y=NMDS2, colour=Sex), size=1, linetype=1)
+
+### Sex PERMANOVA
+sampdf <- data.frame(sample_data(physeq.rem))
+bray<- phyloseq::distance(physeq=physeq.rem, method="bray")
+adonis(bray~ Sex, data=sampdf)  
+  # p-value = 0.017
+beta.tax = betadisper(d=bray, group=sampdf$Sex)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.613
+
+# Content
+physeq.con <- subset_samples(physeq.rem, Sample_Type == "Content")
+sampdf <- data.frame(sample_data(physeq.con))
+bray<- phyloseq::distance(physeq=physeq.con, method="bray")
+adonis(bray~ Sex, data=sampdf)  
+  # p-value = 0.33
+beta.tax = betadisper(d=bray, group=sampdf$Sex)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.626
+
+# Mucosa
+physeq.muc <- subset_samples(physeq.rem, Sample_Type == "Mucosa")
+sampdf <- data.frame(sample_data(physeq.muc))
+bray<- phyloseq::distance(physeq=physeq.muc, method="bray")
+adonis(bray~ Sex, data=sampdf)  
+  # p-value = 0.74
+beta.tax = betadisper(d=bray, group=sampdf$Sex)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.951
+
+# Summer_Wild
+physeq.wil <- subset_samples(physeq.rem, Group == "Summer_Wild")
+sampdf <- data.frame(sample_data(physeq.wil))
+bray<- phyloseq::distance(physeq=physeq.wil, method="bray")
+adonis(bray~ Sex, data=sampdf)  
+  # p-value = 0.06667
+beta.tax = betadisper(d=bray, group=sampdf$Sex)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.0014
+
+# Summer_Lab
+physeq.lab <- subset_samples(physeq.rem, Group == "Summer_Lab")
+sampdf <- data.frame(sample_data(physeq.lab))
+bray<- phyloseq::distance(physeq=physeq.lab, method="bray")
+adonis(bray~ Sex, data=sampdf)  
+  # p-value = 0.012
+beta.tax = betadisper(d=bray, group=sampdf$Sex)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.041
+
+# Torpor
+physeq.tor <- subset_samples(physeq.rem, Group == "Torpor")
+sampdf <- data.frame(sample_data(physeq.tor))
+bray<- phyloseq::distance(physeq=physeq.tor, method="bray")
+adonis(bray~ Sex, data=sampdf)  
+  # p-value = 0.055
+beta.tax = betadisper(d=bray, group=sampdf$Sex)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.954
+
+# IBA
+physeq.iba <- subset_samples(physeq.rem, Group == "IBA")
+sampdf <- data.frame(sample_data(physeq.iba))
+bray<- phyloseq::distance(physeq=physeq.iba, method="bray")
+adonis(bray~ Sex, data=sampdf)  
+  # p-value = 0.065
+beta.tax = betadisper(d=bray, group=sampdf$Sex)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.46
+
+# Spring
+physeq.spr <- subset_samples(physeq.rem, Group == "Spring")
+sampdf <- data.frame(sample_data(physeq.spr))
+bray<- phyloseq::distance(physeq=physeq.spr, method="bray")
+adonis(bray~ Sex, data=sampdf)  
+  # p-value = 0.128
+beta.tax = betadisper(d=bray, group=sampdf$Sex)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.04
+
+# PERMANOVA BH Correction
+p.adjust(c(0.017, 0.33, 0.74, 0.06667, 0.012, 0.055, 0.065, 0.128), method="BH")
+  # All = 0.0680000
+  # Content = 0.3771429
+  # Mucosa = 0.7400000
+  # Summer_Wild = 0.1066720
+  # Summer_Lab = 0.0680000
+  # Torpor = 0.1066720
+  # IBA = 0.1066720
+  # Spring = 0.1706667
+       
 ```
 
 
