@@ -1379,6 +1379,8 @@ nmds <- ordinate(physeq=physeq.rem, method="NMDS", distance="bray")
 
 plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sample_Type")
 
+plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sex") + facet_grid(.~Group)
+
 sample_data(physeq.rem)$Elip <- paste(sample_data(physeq.rem)$Group)
 elip.nmds <- data.frame(MDS1 = nmds$points[,1], MDS2 = nmds$points[,2],
                         Group = sample_data(physeq.rem)$Elip)
@@ -1426,6 +1428,32 @@ beta.tax = betadisper(d=bray, group=sampdf$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.192
+adonis(bray~ Group*Sex*Sample_Type, data=sampdf)
+  # Group
+    # p-value = 0.001    
+    # R2 = 0.27974
+  # Sex
+    # p-value = 0.005
+    # R2 = 0.03814
+  # Sample_Type
+    # p-value = 0.998
+    # R2 = 0.00721
+  # Group:Sex
+    # p-value = 0.001
+    # R2 = 0.13012
+  # Group:Sample_Type
+    # p-value = 1.000
+    # R2 = 0.02178
+  # Sex:Sample_Type
+    # p-value = 1.000
+    # R2 = 0.00402
+  # Group:Sex:Sample_Type
+    # p-value = 1.000
+    # R2 = 0.01351
+  # Residuals
+    # R2 = 0.50549
+
+
 
 combos <- combn(x=levels(sampdf$Group), m=2)
 bray.pvals <- data.frame(rep(999,10))
@@ -1593,6 +1621,14 @@ p.adjust(c(0.017, 0.33, 0.74, 0.06667, 0.012, 0.055, 0.065, 0.128), method="BH")
   # Torpor = 0.1066720
   # IBA = 0.1066720
   # Spring = 0.1706667
+
+p.adjust(c(0.017, 0.06667, 0.012, 0.055, 0.065, 0.128), method="BH")
+  # All = 0.051000
+  # Summer_Wild = 0.080004
+  # Summer_Lab = 0.051000
+  # Torpor = 0.080004
+  # IBA = 0.080004
+  # Spring = 0.128000
        
 ```
 
