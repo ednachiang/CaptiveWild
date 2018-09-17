@@ -1366,6 +1366,45 @@ ks.test(phy.num, "pnorm", mean=mean(phy.num), sd=sd(phy.num))
 # Get ready for stats
 sampdf <- data.frame(sample_data(phy99))
 sampdf$Relative_Abundance <- otu_table(phy99)
+
+
+### Examine Sex
+# Summarize data
+phy.df <- psmelt(phy99)
+phy.df$Phylum <- ordered(phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia"))
+phy.df$Phylum[which(is.na(phy.df$Phylum))] <- rep("Unclassified",18)
+phy.sex <- phy.df %>%
+  group_by(Group, Sex, Sample_Type, Phylum) %>%
+  summarize(Mean = mean(Abundance),
+            Median = median(Abundance),
+            SD = sd(Abundance),
+            SE = (sd(Abundance)/(sqrt(length(Abundance)))),
+            iqr = IQR(Abundance))
+
+# Calculate IQR limits
+phy.sex$iqr.min <- phy.sum$Median - 0.5*phy.sum$iqr
+phy.sex[which(phy.sum$iqr.min < 0),10] <- 0
+  # Any IQR min < 0, change to 0 (otherwise error bar won't plot)
+phy.sex$iqr.max <- phy.sum$Median + 0.5*phy.sum$iqr
+
+# Plot
+ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
+  facet_grid(Sample_Type ~ Group) +
+  scale_fill_brewer(palette="Set1") +
+  xlab("Phyla") +
+  ylab("Median Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
+  theme(axis.text.x = element_blank(),
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        strip.text.x = element_text(size=14),
+        strip.text.y = element_text(size=14),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size=12),
+        axis.text.y = element_text(size=12))
 ```
 
 
@@ -1929,13 +1968,278 @@ rename.samp <- data.frame(sample_data(physeq.simp))
 rename.wild <- which(data.frame(sample_data(physeq.simp))$Group == "Summer_Wild")
 rename.lab <- which(data.frame(sample_data(physeq.simp))$Group == "Summer_Lab")
 levels(rename.samp$Group) <- c("SummerWild", "SummerLab", "Torpor", "IBA", "Spring")
+rename.samp$Sex <- ordered(rename.samp$Sex, levels=c("Female","Male"))
 physeq.simp <- merge_phyloseq(otu_table(physeq.rem), sample_data(rename.samp), tax_table(physeq.rem))
 
 
 # All
 simper.pretty(data.frame(otu_table(physeq.simp)),
               data.frame(sample_data(physeq.simp)),
-              c("Group", "Sample_Type"),
+              c("Group", "Sample_Type", "Sex"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='all')
+all.simper <- read.csv("all_clean_simper.csv")
+kruskal.pretty(data.frame(otu_table(physeq.simp)),
+               data.frame(sample_data(physeq.simp)),
+               csv = all.simper,
+               c("Group", "Sample_Type", "Sex"),
+               output_name = 'all',
+               taxonomy = data.frame(tax_table(physeq.simp)))
+all.simper.kw <- read.csv("all_krusk_simper.csv")
+for(i in 1:nrow(all.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(physeq.simp))) == all.simper.kw$OTU[i])
+  all.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(physeq.simp))[save,2], "-",
+          data.frame(tax_table(physeq.simp))[save,3], "-",
+          data.frame(tax_table(physeq.simp))[save,4], "-",
+          data.frame(tax_table(physeq.simp))[save,5], "-",
+          data.frame(tax_table(physeq.simp))[save,6])
+}
+write.table(all.simper.kw, "all_krusk_simper.csv", sep=",")
+
+# Group
+simper.pretty(data.frame(otu_table(physeq.simp)),
+              data.frame(sample_data(physeq.simp)),
+              c("Group"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='group')
+group.simper <- read.csv("group_clean_simper.csv")
+kruskal.pretty(data.frame(otu_table(physeq.simp)),
+               data.frame(sample_data(physeq.simp)),
+               csv = group.simper,
+               c("Group"),
+               output_name = 'group',
+               taxonomy = data.frame(tax_table(physeq.simp)))
+group.simper.kw <- read.csv("group_krusk_simper.csv")
+for(i in 1:nrow(group.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(physeq.simp))) == group.simper.kw$OTU[i])
+  group.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(physeq.simp))[save,2], "-",
+          data.frame(tax_table(physeq.simp))[save,3], "-",
+          data.frame(tax_table(physeq.simp))[save,4], "-",
+          data.frame(tax_table(physeq.simp))[save,5], "-",
+          data.frame(tax_table(physeq.simp))[save,6])
+}
+write.table(group.simper.kw, "group_krusk_simper.csv", sep=",")
+
+# Sex
+simper.pretty(data.frame(otu_table(physeq.simp)),
+              data.frame(sample_data(physeq.simp)),
+              c("Sex"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='sex')
+sex.simper <- read.csv("sex_clean_simper.csv")
+kruskal.pretty(data.frame(otu_table(physeq.simp)),
+               data.frame(sample_data(physeq.simp)),
+               csv = sex.simper,
+               c("Sex"),
+               output_name = 'sex',
+               taxonomy = data.frame(tax_table(physeq.simp)))
+sex.simper.kw <- read.csv("sex_krusk_simper.csv")
+for(i in 1:nrow(sex.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(physeq.simp))) == sex.simper.kw$OTU[i])
+  sex.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(physeq.simp))[save,2], "-",
+          data.frame(tax_table(physeq.simp))[save,3], "-",
+          data.frame(tax_table(physeq.simp))[save,4], "-",
+          data.frame(tax_table(physeq.simp))[save,5], "-",
+          data.frame(tax_table(physeq.simp))[save,6])
+}
+write.table(sex.simper.kw, "sex_krusk_simper.csv", sep=",")
+
+# Summer Wild
+physeq.wil <- subset_samples(physeq.simp, Group == "SummerWild")
+simper.pretty(data.frame(otu_table(physeq.wil)),
+              data.frame(sample_data(physeq.wil)),
+              c("Sex"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='wil')
+wil.simper <- read.csv("wil_clean_simper.csv")
+kruskal.pretty(data.frame(otu_table(physeq.wil)),
+               data.frame(sample_data(physeq.wil)),
+               csv = wil.simper,
+               c("Sex"),
+               output_name = 'wil',
+               taxonomy = data.frame(tax_table(physeq.wil)))
+wil.simper.kw <- read.csv("wil_krusk_simper.csv")
+for(i in 1:nrow(wil.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(physeq.wil))) == wil.simper.kw$OTU[i])
+  wil.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(physeq.wil))[save,2], "-",
+          data.frame(tax_table(physeq.wil))[save,3], "-",
+          data.frame(tax_table(physeq.wil))[save,4], "-",
+          data.frame(tax_table(physeq.wil))[save,5], "-",
+          data.frame(tax_table(physeq.wil))[save,6])
+}
+write.table(wil.simper.kw, "wil_krusk_simper.csv", sep=",")
+
+# Summer Lab
+physeq.lab <- subset_samples(physeq.simp, Group == "SummerLab")
+simper.pretty(data.frame(otu_table(physeq.lab)),
+              data.frame(sample_data(physeq.lab)),
+              c("Sex"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='lab')
+lab.simper <- read.csv("lab_clean_simper.csv")
+kruskal.pretty(data.frame(otu_table(physeq.lab)),
+               data.frame(sample_data(physeq.lab)),
+               csv = lab.simper,
+               c("Sex"),
+               output_name = 'lab',
+               taxonomy = data.frame(tax_table(physeq.lab)))
+lab.simper.kw <- read.csv("lab_krusk_simper.csv")
+for(i in 1:nrow(lab.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(physeq.lab))) == lab.simper.kw$OTU[i])
+  lab.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(physeq.lab))[save,2], "-",
+          data.frame(tax_table(physeq.lab))[save,3], "-",
+          data.frame(tax_table(physeq.lab))[save,4], "-",
+          data.frame(tax_table(physeq.lab))[save,5], "-",
+          data.frame(tax_table(physeq.lab))[save,6])
+}
+write.table(lab.simper.kw, "lab_krusk_simper.csv", sep=",")
+
+# Torpor
+physeq.tor <- subset_samples(physeq.simp, Group == "Torpor")
+simper.pretty(data.frame(otu_table(physeq.tor)),
+              data.frame(sample_data(physeq.tor)),
+              c("Sex"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='tor')
+tor.simper <- read.csv("tor_clean_simper.csv")
+kruskal.pretty(data.frame(otu_table(physeq.tor)),
+               data.frame(sample_data(physeq.tor)),
+               csv = tor.simper,
+               c("Sex"),
+               output_name = 'tor',
+               taxonomy = data.frame(tax_table(physeq.tor)))
+tor.simper.kw <- read.csv("tor_krusk_simper.csv")
+for(i in 1:nrow(tor.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(physeq.tor))) == tor.simper.kw$OTU[i])
+  tor.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(physeq.tor))[save,2], "-",
+          data.frame(tax_table(physeq.tor))[save,3], "-",
+          data.frame(tax_table(physeq.tor))[save,4], "-",
+          data.frame(tax_table(physeq.tor))[save,5], "-",
+          data.frame(tax_table(physeq.tor))[save,6])
+}
+write.table(tor.simper.kw, "tor_krusk_simper.csv", sep=",")
+
+# IBA
+physeq.iba <- subset_samples(physeq.simp, Group == "IBA")
+simper.pretty(data.frame(otu_table(physeq.iba)),
+              data.frame(sample_data(physeq.iba)),
+              c("Sex"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='iba')
+iba.simper <- read.csv("iba_clean_simper.csv")
+kruskal.pretty(data.frame(otu_table(physeq.iba)),
+               data.frame(sample_data(physeq.iba)),
+               csv = iba.simper,
+               c("Sex"),
+               output_name = 'iba',
+               taxonomy = data.frame(tax_table(physeq.iba)))
+iba.simper.kw <- read.csv("iba_krusk_simper.csv")
+for(i in 1:nrow(iba.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(physeq.iba))) == iba.simper.kw$OTU[i])
+  iba.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(physeq.iba))[save,2], "-",
+          data.frame(tax_table(physeq.iba))[save,3], "-",
+          data.frame(tax_table(physeq.iba))[save,4], "-",
+          data.frame(tax_table(physeq.iba))[save,5], "-",
+          data.frame(tax_table(physeq.iba))[save,6])
+}
+write.table(iba.simper.kw, "iba_krusk_simper.csv", sep=",")
+
+# Spring
+physeq.spr <- subset_samples(physeq.simp, Group == "Spring")
+simper.pretty(data.frame(otu_table(physeq.spr)),
+              data.frame(sample_data(physeq.spr)),
+              c("Sex"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='spr')
+spr.simper <- read.csv("spr_clean_simper.csv")
+kruskal.pretty(data.frame(otu_table(physeq.spr)),
+               data.frame(sample_data(physeq.spr)),
+               csv = spr.simper,
+               c("Sex"),
+               output_name = 'spr',
+               taxonomy = data.frame(tax_table(physeq.spr)))
+spr.simper.kw <- read.csv("spr_krusk_simper.csv")
+for(i in 1:nrow(spr.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(physeq.spr))) == spr.simper.kw$OTU[i])
+  spr.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(physeq.spr))[save,2], "-",
+          data.frame(tax_table(physeq.spr))[save,3], "-",
+          data.frame(tax_table(physeq.spr))[save,4], "-",
+          data.frame(tax_table(physeq.spr))[save,5], "-",
+          data.frame(tax_table(physeq.spr))[save,6])
+}
+write.table(spr.simper.kw, "spr_krusk_simper.csv", sep=",")
+
+
+
+### BH CORRECTION FOR ALL SIMPER COMPARISONS
+all.simper.kw$Group <- rep("All", nrow(all.simper.kw))
+all.simper.kw$OTU <- as.character(all.simper.kw$OTU)
+all.simper.kw$Comparison <- as.character(all.simper.kw$Comparison)
+all.simper.kw$Taxonomy <- as.character(all.simper.kw$Taxonomy)
+
+sex.simper.kw$Group <- rep("Sex", nrow(sex.simper.kw))
+sex.simper.kw$OTU <- as.character(sex.simper.kw$OTU)
+sex.simper.kw$Comparison <- as.character(sex.simper.kw$Comparison)
+sex.simper.kw$Taxonomy <- as.character(sex.simper.kw$Taxonomy)
+
+wil.simper.kw$Group <- rep("Summer_Wild", nrow(wil.simper.kw))
+wil.simper.kw$OTU <- as.character(wil.simper.kw$OTU)
+wil.simper.kw$Comparison <- as.character(wil.simper.kw$Comparison)
+wil.simper.kw$Taxonomy <- as.character(wil.simper.kw$Taxonomy)
+
+lab.simper.kw$Group <- rep("Summer_Lab", nrow(lab.simper.kw))
+lab.simper.kw$OTU <- as.character(lab.simper.kw$OTU)
+lab.simper.kw$Comparison <- as.character(lab.simper.kw$Comparison)
+lab.simper.kw$Taxonomy <- as.character(lab.simper.kw$Taxonomy)
+
+tor.simper.kw$Group <- rep("Torpor", nrow(tor.simper.kw))
+tor.simper.kw$OTU <- as.character(tor.simper.kw$OTU)
+tor.simper.kw$Comparison <- as.character(tor.simper.kw$Comparison)
+tor.simper.kw$Taxonomy <- as.character(tor.simper.kw$Taxonomy)
+
+iba.simper.kw$Group <- rep("IBA", nrow(iba.simper.kw))
+iba.simper.kw$OTU <- as.character(iba.simper.kw$OTU)
+iba.simper.kw$Comparison <- as.character(iba.simper.kw$Comparison)
+iba.simper.kw$Taxonomy <- as.character(iba.simper.kw$Taxonomy)
+
+spr.simper.kw$Group <- rep("Spring", nrow(spr.simper.kw))
+spr.simper.kw$OTU <- as.character(spr.simper.kw$OTU)
+spr.simper.kw$Comparison <- as.character(spr.simper.kw$Comparison)
+spr.simper.kw$Taxonomy <- as.character(spr.simper.kw$Taxonomy)
+
+simper.all <- all.simper.kw
+simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(wil.simper.kw)),] <- wil.simper.kw
+simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(lab.simper.kw)),] <- lab.simper.kw
+simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(tor.simper.kw)),] <- tor.simper.kw
+simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(iba.simper.kw)),] <- iba.simper.kw
+simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(spr.simper.kw)),] <- spr.simper.kw
+simper.all$fdr_krusk_p.val <- p.adjust(simper.all$krusk_p.val, "BH")
+write.table(simper.all, "simper.csv", sep=",")
+```
+
+### Old Simper
+```{r}
+# Change Group names to be compatible (no "_")
+physeq.simp <- physeq.rem
+rename.samp <- data.frame(sample_data(physeq.simp))
+rename.wild <- which(data.frame(sample_data(physeq.simp))$Group == "Summer_Wild")
+rename.lab <- which(data.frame(sample_data(physeq.simp))$Group == "Summer_Lab")
+levels(rename.samp$Group) <- c("SummerWild", "SummerLab", "Torpor", "IBA", "Spring")
+physeq.simp <- merge_phyloseq(otu_table(physeq.rem), sample_data(rename.samp), tax_table(physeq.rem))
+
+
+# All
+simper.pretty(data.frame(otu_table(physeq.simp)),
+              data.frame(sample_data(physeq.simp)),
+              c("Group", "Sample_Type", "Sex"),
               perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
               output_name='all')
 all.simper <- read.csv("all_clean_simper.csv")
@@ -2164,8 +2468,30 @@ for(i in 1:nrow(spr.simper.kw)){
 }
 write.table(spr.simper.kw, "spr_krusk_simper.csv", sep=",")
 
-
-
+# Sex
+simper.pretty(data.frame(otu_table(physeq.simp)),
+              data.frame(sample_data(physeq.simp)),
+              c("Sex"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='sex')
+sex.simper <- read.csv("sex_clean_simper.csv")
+kruskal.pretty(data.frame(otu_table(physeq.simp)),
+               data.frame(sample_data(physeq.simp)),
+               csv = sex.simper,
+               c("Sex"),
+               output_name = 'sex',
+               taxonomy = data.frame(tax_table(physeq.simp)))
+sex.simper.kw <- read.csv("sex_krusk_simper.csv")
+for(i in 1:nrow(sex.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(physeq.simp))) == sex.simper.kw$OTU[i])
+  sex.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(physeq.simp))[save,2], "-",
+          data.frame(tax_table(physeq.simp))[save,3], "-",
+          data.frame(tax_table(physeq.simp))[save,4], "-",
+          data.frame(tax_table(physeq.simp))[save,5], "-",
+          data.frame(tax_table(physeq.simp))[save,6])
+}
+write.table(sex.simper.kw, "sex_krusk_simper.csv", sep=",")
 
 ### BH CORRECTION FOR ALL SIMPER COMPARISONS
 all.simper.kw$Group <- rep("All", nrow(all.simper.kw))
@@ -2216,10 +2542,10 @@ simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(lab.simper.kw)),] <- lab.
 simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(tor.simper.kw)),] <- tor.simper.kw
 simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(iba.simper.kw)),] <- iba.simper.kw
 simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(spr.simper.kw)),] <- spr.simper.kw
+simper.all[(nrow(simper.all)+1):(nrow(simper.all)+nrow(sex.simper.kw)),] <- sex.simper.kw
 simper.all$fdr_krusk_p.val <- p.adjust(simper.all$krusk_p.val, "BH")
 write.table(simper.all, "simper.csv", sep=",")
 ```
-
 
 
 
