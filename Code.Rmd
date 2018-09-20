@@ -258,7 +258,7 @@ max(sample_sums(mothurdata))
 
 ### Interim Phyloseq Object
 ```{r}
-meta <- read.csv("metadata.csv")
+meta <- read.csv("metadata2.csv")
 colnames(meta)[1] <- "Sample"
 rownames(meta) <- meta$Sample
 divsum <- read.table("mothur_output/8494.summary", header=T)
@@ -266,10 +266,10 @@ remove <- setdiff(meta$Sample, divsum$group)
 for(i in 1:length(remove)){
   meta <- meta[-which(meta$Sample == remove[i]),]
 }
-
+#meta <- meta[,-12:-14]
 
 # Add in diversity summaries
-meta[,11:21] <- divsum[,3:12]
+meta[,11:20] <- divsum[,3:12]
 
 # Create intermin phyloseq object
 physeq <- merge_phyloseq(mothurdata, sample_data(meta))
@@ -776,11 +776,11 @@ wilcox.test(Total_OTUs ~ Diet, data=otusum)
 ### Summarize adiv
 adiv.sum <- adiv %>%
   group_by(Group) %>%
-  summarize(TotalOTUs_Mean = mean(Total_OTUs),
-            TotalOTUs_Median = median(Total_OTUs),
-            TotalOTUs_SD = sd(Total_OTUs),
-            TotalOTUs_SE = (sd(Total_OTUs)/sqrt(length(Total_OTUs))),
-            TotalOTUs_iqr = IQR(Total_OTUs),
+  summarize(#TotalOTUs_Mean = mean(Total_OTUs),
+            #TotalOTUs_Median = median(Total_OTUs),
+            #TotalOTUs_SD = sd(Total_OTUs),
+            #TotalOTUs_SE = (sd(Total_OTUs)/sqrt(length(Total_OTUs))),
+            #TotalOTUs_iqr = IQR(Total_OTUs),
             Chao_Mean = mean(chao),
             Chao_Median = median(chao),
             Chao_SD = sd(chao),
@@ -827,7 +827,7 @@ adiv.samptype.sum <- adiv %>%
 
 ### Chao
 # Color by group
-tiff("Chao.tiff", width=6.5, height=3, units="in", res=600)
+tiff("Chao.mdtp.tiff", width=8.5, height=4.75, units="in", res=600)
 ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
@@ -835,7 +835,17 @@ ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
   scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
   #scale_fill_manual(values=c("gray95", "dimgray") )+
   xlab("Group") +
-  ylab("Chao Richness")
+  ylab("Chao Richness") +
+  theme(axis.text.x = element_text(size=12),
+        axis.text.y = element_text(size=12),
+        axis.title.x = element_text(size=18),
+        axis.title.y = element_text(size=18),
+        #strip.text.x = element_text(size=12),
+        #strip.text.y = element_text(size=12),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size=14)
+        )
 dev.off()
 # Color by group, facet by sample type
 tiff("Chao.facet.tiff", width=11, height=3.5, units="in", res=600)
@@ -1011,6 +1021,25 @@ ggplot(adiv, aes(x=Group, y= invsimpson, fill = Group)) +
   ylab("Inverse Simpson Weighted Diversity")
 dev.off()
 
+tiff("InvSimp.mdtp.tiff", width=8.5, height=4.75, units="in", res=600)
+ggplot(adiv, aes(x=Group, y= invsimpson, fill = Group)) +
+  geom_boxplot(position=position_dodge(1)) +
+  geom_point() + 
+  #facet_grid(.~Substrate) +
+  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
+  xlab("Group") +
+  ylab("Inverse Simpson Weighted Diversity") +
+    theme(axis.text.x = element_text(size=12),
+          axis.text.y = element_text(size=12),
+          axis.title.x = element_text(size=18),
+          axis.title.y = element_text(size=18),
+          #strip.text.x = element_text(size=12),
+          #strip.text.y = element_text(size=12),
+          panel.spacing=unit(1, "lines"),
+          legend.title = element_text(size = 16),
+          legend.text = element_text(size=14)
+    )
+dev.off()
 
 # Test normality
 hist(adiv$invsimpson, breaks=10)
@@ -1350,6 +1379,28 @@ ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
         legend.text = element_text(size=12),
         axis.text.y = element_text(size=12))
 #dev.off()
+
+tiff("Phyla.mdtp.tiff", width=9.5, height=5.75, units="in", res=600)
+ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
+  facet_grid(Sample_Type ~ Group) +
+  scale_fill_brewer(palette="Set1") +
+  xlab("Phyla") +
+  ylab("Median Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size=12),
+        axis.title.x = element_text(size=18),
+        axis.title.y = element_text(size=18),
+        strip.text.x = element_text(size=12),
+        strip.text.y = element_text(size=12),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size=12)
+        )
+dev.off()
+
 
 # Pull out otu table to test phyla
 phy.num <- as.numeric(otu_table(phy99))
@@ -2626,14 +2677,294 @@ kruskalmc(resp = RelAbund ~ Group, data=cya.df)
   # Summer_Wild vs. IBA
   # Summer_Wild vs. Spring
   # Torpor vs. Spring
+pairwise.wilcox.test(cya.df$RelAbund, cya.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.00081
+  # Wild-Torpor = 0.00083
+  # Wild-IBA = 0.00074
+  # Wild-Spring = 0.00291
+  # Lab-Torpor = 0.10286
+  # Lab-IBA = 1
+  # Lab-Spring = 0.17796
+  # Torpor-IBA = 0.01648
+  # Torpor-Spring = 0.00391
+  # IBA-Spring = 0.17796
+kruskal.test(formula = RelAbund ~ Sample_Type, data=cya.df)
+  # p-value = 0.733
+```
+
+### Verruco OTUs???
+```{r}
+ver <- subset_taxa(physeq.rem, Phylum == "Verrucomicrobia")
+ver.tax <- data.frame(tax_table(ver))
+ver.rel <- transform_sample_counts(ver, function(x){(x/sum(x))*100})
+ver.rel <- subset_samples(ver.rel, sample_names(ver.rel)!= "CC1_923_S")
+ver.rel <- subset_samples(ver.rel, sample_names(ver.rel)!= "CC1_925_I")
+ver.rel <- subset_samples(ver.rel, sample_names(ver.rel)!= "CM1_916_P")
+ver.rel <- prune_taxa(taxa_sums(ver.rel)>0, ver.rel)
+
+```
+
+
+### Test Phyla Rel Abund
+```{r}
+# Merge samples with the same taxonomic rank
+goodphy <- tax_glom(physeq.rem, taxrank="Phylum")
+
+# Transform each merged phylum count to rel abund
+phy99 <- transform_sample_counts(goodphy, function(x){(x/sum(x))*100})
+
+# Remove any phyla with <1% rel abund
+phy99 <- prune_taxa(taxa_sums(phy99) > 1, phy99)
+
+### CYANOBACTERIA ###
+# Pull out cyanos
+cya.phy <- subset_taxa(phy99, Phylum == "Cyanobacteria")
+cya.df <- data.frame(sample_data(cya.phy))
+cya.df$RelAbund <- t(data.frame(otu_table(cya.phy)))
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=cya.df)
+  # p-value = 8.591e-05
+kruskalmc(resp = RelAbund ~ Group, data=cya.df)
+  # Summer_Wild vs. Summer_Lab
+  # Summer_Wild vs. IBA
+  # Summer_Wild vs. Spring
+  # Torpor vs. Spring
+pairwise.wilcox.test(cya.df$RelAbund, cya.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.00081
+  # Wild-Torpor = 0.00083
+  # Wild-IBA = 0.00074
+  # Wild-Spring = 0.00291
+  # Lab-Torpor = 0.10286
+  # Lab-IBA = 1
+  # Lab-Spring = 0.17796
+  # Torpor-IBA = 0.01648
+  # Torpor-Spring = 0.00391
+  # IBA-Spring = 0.17796
 kruskal.test(formula = RelAbund ~ Sample_Type, data=cya.df)
   # p-value = 0.733
 
 
 
+
+### FIRMICUTES ###
+fir.phy <- subset_taxa(phy99, Phylum == "Firmicutes")
+fir.df <- data.frame(sample_data(fir.phy))
+fir.df$RelAbund <- t(data.frame(otu_table(fir.phy)))
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=fir.df)
+  # p-value = 7.758e-07
+kruskalmc(resp = RelAbund ~ Group, data=fir.df)
+  # Summer_Wild vs. Torpor
+  # Summer_Wild vs. IBA
+  # Summer_Lab vs. Torpor
+  # Summer_Lab vs. IBA
+pairwise.wilcox.test(fir.df$RelAbund, fir.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.80753
+  # Wild-Torpor = 0.00062
+  # Wild-IBA = 0.00014
+  # Wild-Spring = 0.17191
+  # Lab-Torpor = 2.8e-05
+  # Lab-IBA = 8.0e-06
+  # Lab-Spring = 0.09894
+  # Torpor-IBA = 0.72018
+  # Torpor-Spring = 0.00326
+  # IBA-Spring = 0.00062
+kruskal.test(formula = RelAbund ~ Sample_Type, data=fir.df)
+  # p-value = 0.6089
+
+
+
+
+### BACTEROIDETES ###
+bac.phy <- subset_taxa(phy99, Phylum == "Bacteroidetes")
+bac.df <- data.frame(sample_data(bac.phy))
+bac.df$RelAbund <- t(data.frame(otu_table(bac.phy)))
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=bac.df)
+  # p-value = 0.006097
+kruskalmc(resp = RelAbund ~ Group, data=bac.df)
+pairwise.wilcox.test(bac.df$RelAbund, bac.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.578
+  # Wild-Torpor = 0.040
+  # Wild-IBA = 0.040
+  # Wild-Spring = 0.058
+  # Lab-Torpor = 0.040
+  # Lab-IBA = 0.040
+  # Lab-Spring = 0.058
+  # Torpor-IBA = 0.927
+  # Torpor-Spring = 0.722
+  # IBA-Spring = 0.607
+kruskal.test(formula = RelAbund ~ Sample_Type, data=bac.df)
+  # p-value = 0.03301
+
+
+
+
+
+### Verrucomicrobia ###
+ver.phy <- subset_taxa(phy99, Phylum == "Verrucomicrobia")
+ver.df <- data.frame(sample_data(ver.phy))
+ver.df$RelAbund <- t(data.frame(otu_table(ver.phy)))
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=ver.df)
+  # p-value = 1.621e-06
+kruskalmc(resp = RelAbund ~ Group, data=ver.df)
+  # Wild-Torpor
+  # Wild-IBA
+  # Lab-Torpor
+  # Lab-IBA
+  # Torpor-Spring
+  # IBA-Spring
+pairwise.wilcox.test(ver.df$RelAbund, ver.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 1
+  # Wild-Torpor = 0.00042
+  # Wild-IBA = 0.00021
+  # Wild-Spring = 1
+  # Lab-Torpor = 0.00011
+  # Lab-IBA = 0.00011
+  # Lab-Spring = 1
+  # Torpor-IBA = 1
+  # Torpor-Spring = 0.00021
+  # IBA-Spring = 0.00021
+kruskal.test(formula = RelAbund ~ Sample_Type, data=ver.df)
+  # p-value = 0.6544
+
+
+
+
+### PROTEOBACTERIA ###
+pro.phy <- subset_taxa(phy99, Phylum == "Proteobacteria")
+pro.df <- data.frame(sample_data(pro.phy))
+pro.df$RelAbund <- t(data.frame(otu_table(pro.phy)))
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=pro.df)
+  # p-value = 0.02498
+kruskalmc(resp = RelAbund ~ Group, data=pro.df)
+pairwise.wilcox.test(pro.df$RelAbund, pro.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.430
+  # Wild-Torpor = 0.023
+  # Wild-IBA = 0.0144
+  # Wild-Spring = 0.785
+  # Lab-Torpor = 0.144
+  # Lab-IBA = 0.420
+  # Lab-Spring = 805
+  # Torpor-IBA = 0.927
+  # Torpor-Spring = 0.023
+  # IBA-Spring = 0.229
+kruskal.test(formula = RelAbund ~ Sample_Type, data=pro.df)
+  # p-value = 0.2962
+
+
+
+
+### UNCLASSIFIED ###
+unc.phy <- subset_taxa(phy99, Phylum == "Bacteria_unclassified")
+unc.df <- data.frame(sample_data(unc.phy))
+unc.df$RelAbund <- t(data.frame(otu_table(unc.phy)))
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=unc.df)
+  # p-value = 0.08711
+kruskalmc(resp = RelAbund ~ Group, data=unc.df)
+pairwise.wilcox.test(unc.df$RelAbund, unc.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.192
+  # Wild-Torpor = 0.192
+  # Wild-IBA = 0.261
+  # Wild-Spring = 0.034
+  # Lab-Torpor = 0.409
+  # Lab-IBA = 0.695
+  # Lab-Spring = 0.348
+  # Torpor-IBA = 0.840
+  # Torpor-Spring = 0.961
+  # IBA-Spring = 0.791
+kruskal.test(formula = RelAbund ~ Sample_Type, data=unc.df)
+  # p-value = 0.7733
+
+
+
+### TENERICUTES ###
+ten.phy <- subset_taxa(phy99, Phylum == "Tenericutes")
+ten.df <- data.frame(sample_data(ten.phy))
+ten.df$RelAbund <- t(data.frame(otu_table(ten.phy)))
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=ten.df)
+  # p-value = 0.02485
+kruskalmc(resp = RelAbund ~ Group, data=ten.df)
+  # Wild-Torpor
+  # Wild-IBA
+pairwise.wilcox.test(ten.df$RelAbund, ten.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.3235
+  # Wild-Torpor = 0.0025
+  # Wild-IBA = 0.0049
+  # Wild-Spring = 0.5970
+  # Lab-Torpor = 0.5012
+  # Lab-IBA = 0.7848
+  # Lab-Spring = 0.7629
+  # Torpor-IBA = 0.7629
+  # Torpor-Spring = 0.5874
+  # IBA-Spring = 0.00021
+kruskal.test(formula = RelAbund ~ Sample_Type, data=ten.df)
+  # p-value = 0.6538
+
+
+
+### ACTINOBACTERIA ###
+act.phy <- subset_taxa(phy99, Phylum == "Actinobacteria")
+act.df <- data.frame(sample_data(act.phy))
+act.df$RelAbund <- t(data.frame(otu_table(act.phy)))
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=act.df)
+  # p-value = 0.03403
+kruskalmc(resp = RelAbund ~ Group, data=act.df)
+  # Wild-Spring
+pairwise.wilcox.test(act.df$RelAbund, act.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.196
+  # Wild-Torpor = 0.037
+  # Wild-IBA = 0.042
+  # Wild-Spring = 0.037
+  # Lab-Torpor = 0.619
+  # Lab-IBA = 0.618
+  # Lab-Spring = 0.358
+  # Torpor-IBA = 0.693
+  # Torpor-Spring = 0.596
+  # IBA-Spring = 0.458
+kruskal.test(formula = RelAbund ~ Sample_Type, data=act.df)
+  # p-value = 0.7981
+
+
+
+
+
+### ELUSIMICROBIA ###
+elu.phy <- subset_taxa(phy99, Phylum == "Elusimicrobia")
+elu.df <- data.frame(sample_data(elu.phy))
+elu.df$RelAbund <- t(data.frame(otu_table(elu.phy)))
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=elu.df)
+  # p-value = 0.03651
+kruskalmc(resp = RelAbund ~ Group, data=elu.df)
+pairwise.wilcox.test(elu.df$RelAbund, elu.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.11
+  # Wild-Torpor = 0.11
+  # Wild-IBA = 0.62
+  # Wild-Spring = 0.10
+  # Lab-Torpor = 0.97
+  # Lab-IBA = 0.29
+  # Lab-Spring = 0.29
+  # Torpor-IBA = 0.29
+  # Torpor-Spring = 0.49
+  # IBA-Spring = 0.15
+kruskal.test(formula = RelAbund ~ Sample_Type, data=elu.df)
+  # p-value = 0.7981
 ```
-
-
 
 
 ### Jaccard Ordination
