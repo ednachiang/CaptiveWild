@@ -316,6 +316,39 @@ ggplot(chow.df, aes(x=Phylum, y=Abundance, fill=Phylum)) +
         panel.spacing=unit(1, "lines"))
 dev.off()
 
+
+tiff("Chow.mdtp.tiff", width=8, height=6, units="in", res=300)
+ggplot(chow.df, aes(x=Phylum, y=Abundance, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  scale_fill_manual(values=c("#984ea3", "#e41a1c", "#377eb8", "#f781bf")) +
+  xlab("Phyla") +
+  ylab("Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,65),expand=c(0,0)) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size=16),
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 18, face="bold"),
+        legend.text = element_text(size=18),
+        panel.grid.major = element_blank())
+dev.off()
+
+
+
+theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size=12),
+        axis.title.x = element_text(size=18),
+        axis.title.y = element_text(size=18),
+        strip.text.x = element_text(size=13, face="bold"),
+        strip.text.y = element_text(size=13, face="bold"),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 14, face="bold"),
+        legend.text = element_text(size=13),
+        panel.grid.major = element_blank()
+
+
+
 ##### Alpha Div
 physeq.wchow <- subset_samples(physeq, Sample_Type != "Black_Tissue")
 chow.adiv <- data.frame(sample_data(physeq.wchow))
@@ -827,7 +860,7 @@ adiv.samptype.sum <- adiv %>%
 
 ### Chao
 # Color by group
-tiff("Chao.mdtp.tiff", width=8.5, height=4.75, units="in", res=600)
+tiff("Chao.mdtp.tiff", width=9.1, height=5.5, units="in", res=600)
 ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
   geom_boxplot(position=position_dodge(1)) +
   geom_point() + 
@@ -836,16 +869,34 @@ ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
   #scale_fill_manual(values=c("gray95", "dimgray") )+
   xlab("Group") +
   ylab("Chao Richness") +
-  theme(axis.text.x = element_text(size=12),
-        axis.text.y = element_text(size=12),
-        axis.title.x = element_text(size=18),
-        axis.title.y = element_text(size=18),
+  theme(axis.text.x = element_text(size=13),
+        axis.text.y = element_text(size=13),
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
         #strip.text.x = element_text(size=12),
         #strip.text.y = element_text(size=12),
         panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 16),
-        legend.text = element_text(size=14)
+        legend.title = element_text(size = 16, face="bold"),
+        legend.text = element_text(size=16),
+        panel.grid.major = element_blank()
+        #panel.grid.minor = element_blank()
         )
+dev.off()
+
+
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size=12),
+        axis.title.x = element_text(size=18),
+        axis.title.y = element_text(size=18),
+        strip.text.x = element_text(size=13, face="bold"),
+        strip.text.y = element_text(size=13, face="bold"),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 14, face="bold"),
+        legend.text = element_text(size=13),
+        panel.grid.major = element_blank()
+        #panel.grid.minor = element_blank()
+        
+        
 dev.off()
 # Color by group, facet by sample type
 tiff("Chao.facet.tiff", width=11, height=3.5, units="in", res=600)
@@ -1380,7 +1431,7 @@ ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
         axis.text.y = element_text(size=12))
 #dev.off()
 
-tiff("Phyla.mdtp.tiff", width=9.5, height=5.75, units="in", res=600)
+tiff("Phyla.mdtp.tiff", width=9.8, height=5.9, units="in", res=600)
 ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
   geom_bar(stat="identity", color="black") +
   geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
@@ -1390,17 +1441,41 @@ ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
   ylab("Median Relative Abundance for Phyla > 1%") +
   scale_y_continuous(limits=c(0,80),expand=c(0,0))+
   theme(axis.text.x = element_blank(),
-        axis.text.y = element_text(size=12),
+        axis.text.y = element_text(size=14),
         axis.title.x = element_text(size=18),
         axis.title.y = element_text(size=18),
-        strip.text.x = element_text(size=12),
-        strip.text.y = element_text(size=12),
+        strip.text.x = element_text(size=13, face="bold"),
+        strip.text.y = element_text(size=13, face="bold"),
         panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 12),
-        legend.text = element_text(size=12)
+        legend.title = element_text(size = 14, face="bold"),
+        legend.text = element_text(size=13),
+        panel.grid.major = element_blank()
+        #panel.grid.minor = element_blank()
         )
 dev.off()
 
+tiff("Phyla.mdtp2.tiff", width=9.7, height=5.9, units="in", res=600)
+ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
+  facet_grid(Sample_Type ~ Group) +
+  scale_fill_brewer(palette="Set1") +
+  xlab("Phyla") +
+  ylab("Median Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size=14),
+        axis.title.x = element_text(size=18),
+        axis.title.y = element_text(size=18),
+        strip.text.x = element_text(size=16, face="bold"),
+        strip.text.y = element_text(size=16, face="bold"),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size=14),
+        panel.grid.major = element_blank()
+        #panel.grid.minor = element_blank()
+        )
+dev.off()
 
 # Pull out otu table to test phyla
 phy.num <- as.numeric(otu_table(phy99))
@@ -1465,7 +1540,7 @@ ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
 ```{r}
 ### Bray NMDS
 nmds <- ordinate(physeq=physeq.rem, method="NMDS", distance="bray")
-  # Stress = 0.102554
+  # Stress = 0.1026393
 
 plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sample_Type")
 
@@ -1502,6 +1577,39 @@ plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape = "Samp
   scale_color_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
   scale_shape_manual(values=c(19,2))
 dev.off()
+
+tiff("NMDS.mdtp.tiff", width=8, height=6, units="in", res=600)
+plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group") +
+  geom_point(size=3) +
+  geom_path(data=elip.df, aes(x=NMDS1, y=NMDS2, colour=group), size=2, linetype=1) +
+  guides(color=guide_legend(title="Group")) +
+  scale_color_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
+    theme(axis.text.x = element_text(size=20),
+        axis.text.y = element_text(size=20),
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        legend.title = element_text(size=20, face="bold"),
+        legend.text = element_text(size=20),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()
+        )
+dev.off()
+
+
+
+
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size=14),
+        axis.title.x = element_text(size=18),
+        axis.title.y = element_text(size=18),
+        strip.text.x = element_text(size=13, face="bold"),
+        strip.text.y = element_text(size=13, face="bold"),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 14, face="bold"),
+        legend.text = element_text(size=13),
+        panel.grid.major = element_blank()
+        #panel.grid.minor = element_blank()
+        )
 
 ### PERMANOVA
 sampdf <- data.frame(sample_data(physeq.rem))
@@ -2762,7 +2870,7 @@ kruskalmc(resp = RelAbund ~ Group, data=fir.df)
   # Summer_Lab vs. IBA
 pairwise.wilcox.test(fir.df$RelAbund, fir.df$Group, p.adjust.method="fdr")
   # Wild-Lab = 0.80753
-  # Wild-Torpor = 0.00062
+  # Wild-Torpor = 0.00062 
   # Wild-IBA = 0.00014
   # Wild-Spring = 0.17191
   # Lab-Torpor = 2.8e-05
