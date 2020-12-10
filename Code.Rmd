@@ -107,11 +107,9 @@ sample_data(physeq)$Group <- ordered(sample_data(physeq)$Group,
 
 # Remove unwanted samples
 physeq.rem <- subset_samples(physeq, Sample_Type != "Black_Tissue" & Season != "NA")
-physeq.rem <- subset_samples(physeq.rem, Sample != "CC1_916_P" & Sample != "CM1_P16_P" & Sample != "CC1_925_I")
+physeq.rem <- subset_samples(physeq.rem, ID != "3916" & ID != "3925" )
 rem <- names(which(taxa_sums(physeq.rem) > 10))
 physeq.rem <- prune_taxa(rem, physeq.rem)
-
-# Remove outliers
 
 
 #save(physeq.rem, file="Physeq.RData")
@@ -159,19 +157,19 @@ hist(adiv.wild$Total_OTUs, breaks=10)
 qqnorm(adiv.wild$Total_OTUs)
 qqline(adiv.wild$Total_OTUs)
 shapiro.test(adiv.wild$Total_OTUs)
-  # p-value = 0.5486
+  # p-value = 0.5594
   # Normal
 hist(adiv.sum$Total_OTUs, breaks=10)
 qqnorm(adiv.sum$Total_OTUs)
 qqline(adiv.sum$Total_OTUs)
 shapiro.test(adiv.sum$Total_OTUs)
-  # p-value = 0.1322
+  # p-value = 0.1338
   # Normal
 hist(adiv.tor$Total_OTUs, breaks=10)
 qqnorm(adiv.tor$Total_OTUs)
 qqline(adiv.tor$Total_OTUs)
 shapiro.test(adiv.tor$Total_OTUs)
-  # p-value = 0.8896
+  # p-value = 0.8701
   # Normal
 hist(adiv.iba$Total_OTUs, breaks=10)
 qqnorm(adiv.iba$Total_OTUs)
