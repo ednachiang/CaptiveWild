@@ -163,38 +163,38 @@ hist(adiv.sum$Total_OTUs, breaks=10)
 qqnorm(adiv.sum$Total_OTUs)
 qqline(adiv.sum$Total_OTUs)
 shapiro.test(adiv.sum$Total_OTUs)
-  # p-value = 0.1338
+  # p-value = 0.1308
   # Normal
 hist(adiv.tor$Total_OTUs, breaks=10)
 qqnorm(adiv.tor$Total_OTUs)
 qqline(adiv.tor$Total_OTUs)
 shapiro.test(adiv.tor$Total_OTUs)
-  # p-value = 0.8701
+  # p-value = 0.9003
   # Normal
 hist(adiv.iba$Total_OTUs, breaks=10)
 qqnorm(adiv.iba$Total_OTUs)
 qqline(adiv.iba$Total_OTUs)
 shapiro.test(adiv.iba$Total_OTUs)
-  # p-value = 0.001198
-  # Not Normal
+  # p-value = 0.3332
+  # Normal
 hist(adiv.spr$Total_OTUs, breaks=10)
 qqnorm(adiv.spr$Total_OTUs)
 qqline(adiv.spr$Total_OTUs)
 shapiro.test(adiv.spr$Total_OTUs)
-  # p-value = 0.05006
+  # p-value = 0.627
   # Normal
 
 ### Wilcoxon & T-Test ###
 t.test(Total_OTUs ~ Sample_Type, data = adiv.wild)
-  # p-value = 0.4662
+  # p-value = 0.4694
 t.test(Total_OTUs ~ Sample_Type, data = adiv.sum)
-  # p-value = 0.7803
+  # p-value = 0.7782
 t.test(Total_OTUs ~ Sample_Type, data = adiv.tor)
-  # p-value = 0.7372
-wilcox.test(Total_OTUs ~ Sample_Type, data = adiv.iba)
-  # p-value = 0.1807
+  # p-value = 0.7268
+t.test(Total_OTUs ~ Sample_Type, data = adiv.iba)
+  # p-value = 0.4543
 t.test(Total_OTUs ~ Sample_Type, data = adiv.spr)
-  # p-value = 0.9702
+  # p-value = 0.383
 
 
 ##### Bergerparker #####
@@ -220,13 +220,13 @@ hist(adiv.iba$bergerparker, breaks=10)
 qqnorm(adiv.iba$bergerparker)
 qqline(adiv.iba$bergerparker)
 shapiro.test(adiv.iba$bergerparker)
-  # p-value = 0.04348
+  # p-value = 0.01936
   # Not Normal
 hist(adiv.spr$bergerparker, breaks=10)
 qqnorm(adiv.spr$bergerparker)
 qqline(adiv.spr$bergerparker)
 shapiro.test(adiv.spr$bergerparker)
-  # p-value = 0.05511
+  # p-value = 0.07013
   # Normal
 
 ### Wilcoxon & T-Test ###
@@ -239,7 +239,7 @@ t.test(bergerparker ~ Sample_Type, data = adiv.tor)
 wilcox.test(bergerparker ~ Sample_Type, data = adiv.iba)
   # p-value = 1
 t.test(bergerparker ~ Sample_Type, data = adiv.spr)
-  # p-value = 0.0977
+  # p-value = 0.1997
 
 
 
@@ -267,13 +267,13 @@ hist(adiv.iba$chao, breaks=10)
 qqnorm(adiv.iba$chao)
 qqline(adiv.iba$chao)
 shapiro.test(adiv.iba$chao)
-  # p-value = 0.01388
+  # p-value = 0.03129
   # Not Normal
 hist(adiv.spr$chao, breaks=10)
 qqnorm(adiv.spr$chao)
 qqline(adiv.spr$chao)
 shapiro.test(adiv.spr$chao)
-  # p-value = 0.7917
+  # p-value = 0.3883
   # Normal
 
 ### Wilcoxon & T-Test ###
@@ -284,9 +284,9 @@ t.test(chao ~ Sample_Type, data = adiv.sum)
 t.test(chao ~ Sample_Type, data = adiv.tor)
   # p-value = 0.03331*
 wilcox.test(chao ~ Sample_Type, data = adiv.iba)
-  # p-value = 0.4452
+  # p-value = 0.4318
 t.test(chao ~ Sample_Type, data = adiv.spr)
-  # p-value = 0.733
+  # p-value = 0.9252
 
 
 
@@ -313,13 +313,13 @@ hist(adiv.iba$shannon, breaks=10)
 qqnorm(adiv.iba$shannon)
 qqline(adiv.iba$shannon)
 shapiro.test(adiv.iba$shannon)
-  # p-value = 0.5948
+  # p-value = 0.7765
   # Normal
 hist(adiv.spr$shannon, breaks=10)
 qqnorm(adiv.spr$shannon)
 qqline(adiv.spr$shannon)
 shapiro.test(adiv.spr$shannon)
-  # p-value = 0.595
+  # p-value = 0.3872
   # Normal
 
 ### Wilcoxon & T-Test ###
@@ -330,9 +330,9 @@ t.test(shannon ~ Sample_Type, data = adiv.sum)
 t.test(shannon ~ Sample_Type, data = adiv.tor)
   # p-value = 0.4803
 t.test(shannon ~ Sample_Type, data = adiv.iba)
-  # p-value = 0.5365
+  # p-value = 0.4759
 t.test(shannon ~ Sample_Type, data = adiv.spr)
-  # p-value = 0.04495*
+  # p-value = 0.1112
 
 
 
@@ -359,13 +359,13 @@ hist(adiv.iba$invsimpson, breaks=10)
 qqnorm(adiv.iba$invsimpson)
 qqline(adiv.iba$invsimpson)
 shapiro.test(adiv.iba$invsimpson)
-  # p-value = 0.007011
+  # p-value = 0.01327
   # Not Normal
 hist(adiv.spr$invsimpson, breaks=10)
 qqnorm(adiv.spr$invsimpson)
 qqline(adiv.spr$invsimpson)
 shapiro.test(adiv.spr$invsimpson)
-  # p-value = 0.07875
+  # p-value = 0.7315
   # Normal
 
 ### Wilcoxon & T-Test ###
@@ -376,9 +376,9 @@ t.test(invsimpson ~ Sample_Type, data = adiv.sum)
 t.test(invsimpson ~ Sample_Type, data = adiv.tor)
   # p-value = 0.5769
 wilcox.test(invsimpson ~ Sample_Type, data = adiv.iba)
-  # p-value = 0.7308
+  # p-value = 0.6389
 t.test(invsimpson ~ Sample_Type, data = adiv.spr)
-  # p-value = 0.1489
+  # p-value = 0.02737*
 
 ```
 
@@ -388,30 +388,30 @@ t.test(invsimpson ~ Sample_Type, data = adiv.spr)
 ```{r}
 ### Bray NMDS - All
 nmds <- ordinate(physeq=physeq.rem, method="NMDS", distance="bray")
-  # Stress = 9.475696e-05 
+  # Stress = 0.1742581
 plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sample_Type") + facet_grid(.~Group)
 plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sex") + facet_grid(.~Group)
 
 
 ### Bray NMDS - By Season
 nmds.wild <- ordinate(physeq=physeq.wild, method="NMDS", distance="bray")
-  # stress = 0.001032834 
+  # stress = 0.1499987 
 plot_ordination(physeq=physeq.wild, ordination=nmds.wild, color="Sample_Type", shape="Sample_Type")
 
 nmds.sum <- ordinate(physeq=physeq.sum, method="NMDS", distance="bray")
-  # stress = 0.07065647 
+  # stress = 0.07056971 
 plot_ordination(physeq=physeq.sum, ordination=nmds.sum, color="Sample_Type", shape="Sample_Type")
 
 nmds.tor <- ordinate(physeq=physeq.tor, method="NMDS", distance="bray")
-  # stress = 4.76633e-05 
+  # stress = 0.1657292
 plot_ordination(physeq=physeq.tor, ordination=nmds.tor, color="Sample_Type", shape="Sample_Type")
 
 nmds.iba <- ordinate(physeq=physeq.iba, method="NMDS", distance="bray")
-  # stress = 9.967473e-05
+  # stress = 0.103724 
 plot_ordination(physeq=physeq.iba, ordination=nmds.iba, color="Sample_Type", shape="Sample_Type")
 
 nmds.spr <- ordinate(physeq=physeq.spr, method="NMDS", distance="bray")
-  # stress = 0.2926506
+  # stress = 0.1859594
 plot_ordination(physeq=physeq.spr, ordination=nmds.spr, color="Sample_Type", shape="Sample_Type")
 
 
@@ -426,22 +426,22 @@ adonis(bray.wild ~ Sample_Type, data = sampdf.wild)
 sampdf.sum <- data.frame(sample_data(physeq.sum))
 bray.sum <- phyloseq::distance(physeq = physeq.sum, method = "bray")
 adonis(bray.sum ~ Sample_Type, data = sampdf.sum)
-  # p-value = 0.98
+  # p-value = 0.973
 
 sampdf.tor <- data.frame(sample_data(physeq.tor))
 bray.tor <- phyloseq::distance(physeq = physeq.tor, method = "bray")
 adonis(bray.tor ~ Sample_Type, data = sampdf.tor)
-  # p-value = 0.94
+  # p-value = 0.941
 
 sampdf.iba <- data.frame(sample_data(physeq.iba))
 bray.iba <- phyloseq::distance(physeq = physeq.iba, method = "bray")
 adonis(bray.iba ~ Sample_Type, data = sampdf.iba)
-  # p-value = 0.848
+  # p-value = 0.951
 
 sampdf.spr <- data.frame(sample_data(physeq.spr))
 bray.spr <- phyloseq::distance(physeq = physeq.spr, method = "bray")
 adonis(bray.spr ~ Sample_Type, data = sampdf.spr)
-  # p-value = 0.858
+  # p-value = 0.9
 ```
 ### Test content & mucosa separately for season - Alpha Diversity
 ```{r}
@@ -539,35 +539,39 @@ ggplot(adiv.muc, aes(x=Group, y=Total_OTUs, fill = Group)) +
   xlab("Group") +
   ylab("Total OTUs")
 
+
+
 # Test normality
 hist(adiv.con$Total_OTUs, breaks=10)
 qqnorm(adiv.con$Total_OTUs)
 qqline(adiv.con$Total_OTUs)
 shapiro.test(adiv.con$Total_OTUs)
-  # p-value = 0.02096
+  # p-value = 0.0006017
   # Not Normal
 hist(adiv.muc$Total_OTUs, breaks=10)
 qqnorm(adiv.muc$Total_OTUs)
 qqline(adiv.muc$Total_OTUs)
 shapiro.test(adiv.muc$Total_OTUs)
-  # p-value = 0.001562
+  # p-value = 8.546e-05
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = Total_OTUs ~ Group, data = adiv.con)
-  # p-value = 0.01682
+  # p-value = 0.01647
 kruskalmc(resp = Total_OTUs ~ Group, data = adiv.con)
+  # Summer_Wild - Torpor
   # Summer_Wild - IBA
 kruskal.test(formula = Total_OTUs ~ Group, data = adiv.muc)
-  # p-value = 0.03301
+  # p-value = 0.01147
 kruskalmc(resp = Total_OTUs ~ Group, data = adiv.muc)
   # Summer_Wild - Torpor
 # Con/Muc combined
 kruskal.test(formula = Total_OTUs ~ Group, data = adiv)
-  # p-value = 7.235e-05
+  # p-value = 2.23e-05
 kruskalmc(resp = Total_OTUs ~ Group, data = adiv)
   # Summer_Wild-Torpor
   # Summer_Wild-IBA
+  # Summer_Lab-Torpor
 
 
 
@@ -576,25 +580,25 @@ hist(adiv.con$bergerparker, breaks=10)
 qqnorm(adiv.con$bergerparker)
 qqline(adiv.con$bergerparker)
 shapiro.test(adiv.con$bergerparker)
-  # p-value = 0.001532
+  # p-value = 0.001237
   # Not Normal
 hist(adiv.muc$bergerparker, breaks=10)
 qqnorm(adiv.muc$bergerparker)
 qqline(adiv.muc$bergerparker)
 shapiro.test(adiv.muc$bergerparker)
-  # p-value = 0.07078
+  # p-value = 0.1207
   # Normal, but for consistency I'll use kruskal-wallis
 
 # Kruskal-Wallis
 kruskal.test(formula = bergerparker ~ Group, data = adiv.con)
-  # p-value = 0.05109
+  # p-value = 0.05871
 kruskalmc(resp = bergerparker ~ Group, data = adiv.con)
   # Summer_Wild-Spring
 kruskal.test(formula = bergerparker ~ Group, data = adiv.muc)
-  # p-value = 0.7597
+  # p-value = 0.9166
 # Con/muc combined
 kruskal.test(formula = bergerparker ~ Group, data = adiv)
-  # p-value = 0.2527
+  # p-value = 0.1588
 
 
 
@@ -604,13 +608,13 @@ hist(adiv.con$chao, breaks=10)
 qqnorm(adiv.con$chao)
 qqline(adiv.con$chao)
 shapiro.test(adiv.con$chao)
-  # p-value = 0.02356
+  # p-value = 0.04263
   # Not Normal
 hist(adiv.muc$chao, breaks=10)
 qqnorm(adiv.muc$chao)
 qqline(adiv.muc$chao)
 shapiro.test(adiv.muc$chao)
-  # p-value = 6.598e-05
+  # p-value = 0.0001347
   # Not Normal
 
 # Kruskal-Wallis
@@ -619,10 +623,10 @@ kruskal.test(formula = chao ~ Group, data = adiv.con)
 kruskalmc(resp = chao ~ Group, data = adiv.con)
   # Summer_Wild-Spring
 kruskal.test(formula = chao ~ Group, data = adiv.muc)
-  # p-value = 0.1111
+  # p-value = 0.1638
 # Con/muc combined
 kruskal.test(formula = chao ~ Group, data = adiv)
-  # p-value = 0.0105
+  # p-value = 0.01262
 kruskalmc(resp = chao ~ Group, data = adiv)
   # Summer_Wild-Spring 
 
@@ -634,44 +638,44 @@ hist(adiv.con$shannon, breaks=10)
 qqnorm(adiv.con$shannon)
 qqline(adiv.con$shannon)
 shapiro.test(adiv.con$shannon)
-  # p-value = 0.7601
+  # p-value = 0.7362
   # Normal
 hist(adiv.muc$shannon, breaks=10)
 qqnorm(adiv.muc$shannon)
 qqline(adiv.muc$shannon)
 shapiro.test(adiv.muc$shannon)
-  # p-value = 0.3629
+  # p-value = 0.2441
   # Normal
 
 # ANOVA
 summary(aov(shannon ~ Group, data = adiv.con))
-  # p-value = 0.00146
+  # p-value = 0.00195
 TukeyHSD(aov(shannon ~ Group, data = adiv.con))
-  # Summer_Lab-Summer_Wild = 0.0295232*
-  # Torpor-Summer_Wild = 0.1006389
-  # IBA-Summer_Wild = 0.1280457
-  # Spring-Summer_Wild = 0.0005253***
-  # Torpor-Summer_Lab = 0.9827592
-  # IBA-Summer_Lab = 0.9165038
-  # Spring-Summer_Lab = 0.1118792
-  # IBA-Torpor = 0.1118792
-  # Spring-Torpor = 0.0629667
-  # Spring-IBA = 0.0306479*
+  # Summer_Lab-Summer_Wild = 0.03567322*
+  # Torpor-Summer_Wild =  0.1132440
+  # IBA-Summer_Wild = 0.1949274
+  # Spring-Summer_Wild = 0.0007291*
+  # Torpor-Summer_Lab = 0.9836541
+  # IBA-Summer_Lab = 0.8885960
+  # Spring-Summer_Lab = 0.0832229
+  # IBA-Torpor = 0.9961265
+  # Spring-Torpor = 0.0494151
+  # Spring-IBA = 0.0263590*
 summary(aov(shannon ~ Group, data = adiv.muc))
-  # p-value = 0.763
+  # p-value = 0.751
 summary(aov(shannon ~ Group, data = adiv))
-  # p-value = 0.0146
+  # p-value = 0.00903*
 TukeyHSD(aov(shannon ~ Group, data = adiv))
-  # Summer_Lab-Summer_Wild = 0.2033311
-  # Torpor-Summer_Wild = 0.1326307
-  # IBA-Summer_Wild = 0.1929768
-  # Spring-Summer_Wild = 0.0050119**
-  # Torpor-Summer_Lab = 0.9980613
-  # IBA-Summer_Lab = 0.9999993
-  # Spring-Summer_Lab = 0.2917135
-  # IBA-Torpor = 0.9964366
-  # Spring-Torpor = 0.4592940
-  # Spring-IBA = 0.2472826
+  # Summer_Lab-Summer_Wild = 0.2076838
+  # Torpor-Summer_Wild = 0.1364256
+  # IBA-Summer_Wild = 0.2187595
+  # Spring-Summer_Wild = 0.0028812*
+  # Torpor-Summer_Lab = 0.9980816
+  # IBA-Summer_Lab = 0.9999930
+  # Spring-Summer_Lab = 0.1460725
+  # IBA-Torpor = 0.9953298
+  # Spring-Torpor = 0.2450932
+  # Spring-IBA = 0.1219430
 
 
 
@@ -680,25 +684,25 @@ hist(adiv.con$invsimpson, breaks=10)
 qqnorm(adiv.con$invsimpson)
 qqline(adiv.con$invsimpson)
 shapiro.test(adiv.con$invsimpson)
-  # p-value = 0.001667
+  # p-value = 0.005803
   # Not Normal
 hist(adiv.muc$invsimpson, breaks=10)
 qqnorm(adiv.muc$invsimpson)
 qqline(adiv.muc$invsimpson)
 shapiro.test(adiv.muc$invsimpson)
-  # p-value = 0.0002469
+  # p-value = 0.0001229
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = invsimpson ~ Group, data = adiv.con)
-  # p-value = 0.02212
+  # p-value = 0.02975
 kruskalmc(resp = invsimpson ~ Group, data = adiv.con)
   # Summer_Wild-Spring
 kruskal.test(formula = invsimpson ~ Group, data = adiv.muc)
-  # p-value = 0.8751
+  # p-value = 0.967
 # Con/muc combined
 kruskal.test(formula = invsimpson ~ Group, data = adiv)
-  # p-value = 0.1583
+  # p-value = 0.1124
 
 
 
@@ -1129,7 +1133,7 @@ adiv.muc.pvals$invsimp.BH <- p.adjust(adiv.muc.pvals$invsimp.pval, method="BH")
 ```{r}
 ### Combined Bray
 nmds <- ordinate(physeq=physeq.rem, method="NMDS", distance="bray")
-  # stress = 9.928962e-05
+  # stress = 0.1328032 
 plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group")
 
 ### Combined PERMANOVA
@@ -1138,24 +1142,24 @@ bray <- phyloseq::distance(physeq = physeq.rem, method = "bray")
 adonis(bray ~ Group, data = sampdf)
   # 0.001
 pairwise.adonis(as.matrix(bray), sampdf$Group, sim.method = "bray", p.adjust.m = "fdr")
-  # Summer_Wild vs Summer_Lab = .000133*
-  # Summer_Wild vs IBA = .0000666*
-  # Summer_Wild vs Torpor = .0001571429*
-  # Summer_Wild vs Spring = .003012500*
-  # Summer_Lab vs IBA = .00005*
-  # Summer_Lab vs Torpor = .00005*
-  # Summer_Lab vs Spring = .08254444
-  # IBA vs Torpor = .2627900
-  # IBA vs Spring = .0001*
-  # Torpor vs SprinG = .0001333333*
+  # Summer_Wild vs Summer_Lab = 0.000175*
+  # Summer_Wild vs IBA = 0.000175*
+  # Summer_Wild vs Torpor = 0.0002*
+  # Summer_Wild vs Spring = 0.0025375*
+  # Summer_Lab vs IBA = 0.00005*
+  # Summer_Lab vs Torpor = 0.00005*
+  # Summer_Lab vs Spring = 0.07272
+  # IBA vs Torpor = 0.32849
+  # IBA vs Spring = 0.0002*
+  # Torpor vs SprinG = 0.0004857143*
 
  
 
 ### Bray NMDS
 nmds.con <- ordinate(physeq=physeq.con, method="NMDS", distance="bray")
-  # stress = 9.577792e-05 
+  # stress = 0.1583457  
 nmds.muc <- ordinate(physeq=physeq.muc, method="NMDS", distance="bray")
-  # stress = 9.681926e-05 
+  # stress = 0.1276705 
 plot_ordination(physeq=physeq.con, ordination=nmds.con, color="Group")
 plot_ordination(physeq=physeq.muc, ordination=nmds.muc, color="Group")
 
@@ -1166,32 +1170,32 @@ bray.con <- phyloseq::distance(physeq = physeq.con, method = "bray")
 adonis(bray.con ~ Group, data = sampdf.con)
   # p-value = 0.001
 pairwise.adonis(as.matrix(bray.con), sampdf.con$Group, sim.method = "bray", p.adjust.m = "fdr")
-  # Summer_Wild vs Summer_Lab = 0.03571429*
-  # Summer_Wild vs IBA = 0.03890000*
-  # Summer_Wild vs Torpor = 0.03571429*
-  # Summer_Wild vs Spring = 0.10714286
-  # Summer_Lab vs IBA = 0.00760000*
-  # Summer_Lab vs Torpor = 0.01755000*
-  # Summer_Lab vs Spring = 0.29847778
-  # IBA vs Torpor = 0.33044000
-  # IBA vs Spring = 0.07424286
-  # Torpor vs Spring = 0.02613333*
+  # Summer_Wild vs Summer_Lab = 0.03685714*
+  # Summer_Wild vs IBA = 0.0297619*
+  # Summer_Wild vs Torpor = 0.0297619*
+  # Summer_Wild vs Spring = 0.125
+  # Summer_Lab vs IBA = 0.0143*
+  # Summer_Lab vs Torpor = 0.01945*
+  # Summer_Lab vs Spring = 0.50896667
+  # IBA vs Torpor = 0.77242
+  # IBA vs Spring = 0.02976190*
+  # Torpor vs Spring = 0.02976190*
 
 sampdf.muc <- data.frame(sample_data(physeq.muc))
 bray.muc <- phyloseq::distance(physeq = physeq.muc, method = "bray")
 adonis(bray.muc ~ Group, data = sampdf.muc)
   # p-value = 0.001
 pairwise.adonis(as.matrix(bray.muc), sampdf.muc$Group, sim.method = "bray", p.adjust.m = "fdr")
-  # Summer_Wild vs Summer_Lab = 0.08163265
-  # Summer_Wild vs IBA = 0.02190000*
-  # Summer_Wild vs Torpor = 0.02976190*
-  # Summer_Wild vs Spring = 0.25000000
-  # Summer_Lab vs IBA = 0.02190000*
-  # Summer_Lab vs Torpor = 0.02190000*
-  # Summer_Lab vs Spring = 0.63492063
-  # IBA vs Torpor = 0.78103000
-  # IBA vs Spring = 0.02190000*
-  # Torpor vs Spring = 0.02976190*
+  # Summer_Wild vs Summer_Lab = 0.0816326
+  # Summer_Wild vs IBA = 0.02746667*
+  # Summer_Wild vs Torpor = 0.04464286*
+  # Summer_Wild vs Spring = 0.125
+  # Summer_Lab vs IBA = 0.02746667*
+  # Summer_Lab vs Torpor = 0.02746667*
+  # Summer_Lab vs Spring = 0.8
+  # IBA vs Torpor = 0.8
+  # IBA vs Spring = 0.05576
+  # Torpor vs Spring = 0.07936508
 
 
 
@@ -1201,22 +1205,22 @@ pairwise.adonis(as.matrix(bray.muc), sampdf.muc$Group, sim.method = "bray", p.ad
 sampdf.sum <- data.frame(sample_data(physeq.sum))
 bray.sum <- phyloseq::distance(physeq = physeq.sum, method = "bray")
 adonis(bray.sum ~ Sample_Type, data = sampdf.sum)
-  # p-value = 0.98
+  # p-value = 0.983
 
 sampdf.tor <- data.frame(sample_data(physeq.tor))
 bray.tor <- phyloseq::distance(physeq = physeq.tor, method = "bray")
 adonis(bray.tor ~ Sample_Type, data = sampdf.tor)
-  # p-value = 0.94
+  # p-value = 0.93
 
 sampdf.iba <- data.frame(sample_data(physeq.iba))
 bray.iba <- phyloseq::distance(physeq = physeq.iba, method = "bray")
 adonis(bray.iba ~ Sample_Type, data = sampdf.iba)
-  # p-value = 0.848
+  # p-value = 0.973
 
 sampdf.spr <- data.frame(sample_data(physeq.spr))
 bray.spr <- phyloseq::distance(physeq = physeq.spr, method = "bray")
 adonis(bray.spr ~ Sample_Type, data = sampdf.spr)
-  # p-value = 0.858
+  # p-value = 0.9
 ```
 ### Chow
 ```{r}
