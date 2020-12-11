@@ -132,7 +132,7 @@ physeq.lab <- subset_samples(physeq.rem, Diet != "Wild")
 ```{r}
 adiv <- data.frame(sample_data(physeq.rem))
 
-########## Compare Con vs. Muc. within Season ##########
+########## Compare Con vs. Muc within Season ##########
 
 # Separate by season
 adiv.wild <- adiv[which(adiv$Group == "Summer_Wild"),]
@@ -409,6 +409,8 @@ TukeyHSD(aov(shannon ~ Group, data = adiv))
   # Spring-Torpor = 0.2450932
   # Spring-IBA = 0.1219430
 
+
+
 ```
 
 
@@ -520,8 +522,12 @@ summary(aov(shannon ~ Group, data = adiv.lab))
   # p-value = 0.0932
 
 
+
+
+
+
 ```
-### Test only lab squirrels separated by content/mucosa for season - Alpha Diversity
+### Alpha Diversity - Lab squirrels separated by content/mucosa for group
 ```{r}
 adiv.lab <- data.frame(sample_data(physeq.lab))
 
@@ -593,6 +599,75 @@ TukeyHSD(aov(shannon ~ Group, data = adiv.lab.con))
 summary(aov(shannon ~ Group, data = adiv.lab.muc))
   # p-value = 0.744
 
+
+
+##### Alpha Diversity Box Plots #####
+
+adiv.combined <- rbind(adiv.lab.con, adiv.lab.muc)
+
+### Chao
+adiv.chao <- ggplot(adiv.combined, aes(x = Group, y = chao, fill = Group)) +
+  facet_grid(. ~ Sample_Type) +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15) +
+  scale_y_continuous(limits = c(0,2200), breaks = c(0, 550, 1100, 1650, 2200)) +
+  scale_x_discrete(breaks=c("Summer_Lab", "Torpor", "IBA", "Spring"), labels=c("Summer", "Torpor", "IBA", "Spring")) +
+  ylab("Chao Richness") +
+  scale_fill_manual(values = c("lightcoral", "royalblue3", "deepskyblue", "limegreen"),
+                    labels = c("Summer", "Torpor", "IBA", "Spring")) +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=18),
+        strip.text.x = element_text(face ="bold", size=18),
+        legend.title = element_text(face="bold", size=18),
+        panel.spacing = unit(0.5, "lines"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(face="bold", size=18),
+        axis.text.x = element_text(size=15),
+        axis.text.y = element_text(size=15),
+        legend.text = element_text(size=16))
+
+### Shannon
+adiv.shannon <- ggplot(adiv.combined, aes(x = Group, y = shannon, fill = Group)) +
+  facet_grid(. ~ Sample_Type) +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15) +
+  scale_y_continuous(limits = c(0,6), breaks = c(0, 1, 2, 3, 4, 5, 6)) +
+  scale_x_discrete(breaks=c("Summer_Lab", "Torpor", "IBA", "Spring"), labels=c("Summer", "Torpor", "IBA", "Spring")) +
+  ylab("Shannon Diversity Index\n") +
+  scale_fill_manual(values = c("lightcoral", "royalblue3", "deepskyblue", "limegreen"),
+                    labels = c("Summer", "Torpor", "IBA", "Spring")) +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=18),
+        strip.text.x = element_text(face ="bold", size=18),
+        legend.title = element_text(face="bold", size=18),
+        panel.spacing = unit(0.5, "lines"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(face="bold", size=18),
+        axis.text.x = element_text(size=15),
+        axis.text.y = element_text(size=15),
+        legend.text = element_text(size=16))
+
+
+### Combine plots
+tiff("adiv.tiff", width = 10, height = 9, units = "in", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=(grid.layout(4, 1, widths = c(18), heights = c(0.75,10,1,10)))))
+
+print(adiv.chao, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+print(adiv.shannon, vp=viewport(layout.pos.row=4, layout.pos.col=1))
+
+grid.text("A", x=unit(0.015, "npc"), y=unit(-0.5, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=22,fontface="bold"))
+grid.text("ns", x=unit(0.275, "npc"), y=unit(-1.89, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=15))
+grid.text("ns", x=unit(0.66, "npc"), y=unit(-1.89, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=15))
+
+grid.text("B", x=unit(0.014, "npc"), y=unit(-0.5, "npc"), vp=viewport(layout.pos.row=3, layout.pos.col=1),gp=gpar(fontsize=22,fontface="bold"))
+grid.text("ab            a              a             b", x=unit(0.265, "npc"), y=unit(-1.4, "npc"), vp=viewport(layout.pos.row=3, layout.pos.col=1), gp=gpar(fontsize=15))
+grid.text("ns", x=unit(0.66, "npc"), y=unit(-1.4, "npc"), vp=viewport(layout.pos.row=3, layout.pos.col=1), gp=gpar(fontsize=15))
+
+dev.off()
+
 ```
 ### Test only lab squirrels for group - Beta Diversity
 ```{r}
@@ -622,12 +697,18 @@ pairwise.adonis(as.matrix(bray.lab), sampdf.lab$Group, sim.method = "bray", p.ad
 ### Test only lab squirrels separated by content/mucosa for season - Beta Diversity
 ```{r}
 ### Bray NMDS
-nmds.lab.con <- ordinate(physeq=physeq.lab.con, method="NMDS", distance="bray")
-  # stress = 0.1090854   
-nmds.lab.muc <- ordinate(physeq=physeq.lab.muc, method="NMDS", distance="bray")
-  # stress = 0.2006364 
-plot_ordination(physeq=physeq.lab.con, ordination=nmds.lab.con, color="Group")
-plot_ordination(physeq=physeq.lab.muc, ordination=nmds.lab.muc, color="Group")
+#nmds.lab.con <- ordinate(physeq=physeq.lab.con, method="NMDS", distance="bray")
+  # stress = 0.1090854    
+#save(nmds.lab.con, file = "nmds.lab.con.RData")
+#nmds.lab.muc <- ordinate(physeq=physeq.lab.muc, method="NMDS", distance="bray")
+  # stress = 0.144648
+#save(nmds.lab.muc, file = "nmds.lab.muc.RData")
+
+load("nmds.lab.con.RData")
+load("nmds.lab.muc.RData")
+
+
+
 
 
 ### PERMANOVA
@@ -662,6 +743,70 @@ pairwise.adonis(as.matrix(bray.lab.muc), sampdf.lab.muc$Group, sim.method = "bra
   # IBA vs Torpor = 0.78183
   # IBA vs Spring = 0.05454
   # Torpor vs Spring = 0.07142857
+
+
+##### Plot NMDS
+
+# Content Ellipses
+elip.nmds.lab.con <- data.frame(MDS1 = nmds.lab.con$points[,1], MDS2 = nmds.lab.con$points[,2],
+                        Group = sample_data(physeq.lab.con)$Group)
+plot.new()
+elip.ord.lab.con <- ordiellipse(nmds.lab.con, sample_data(physeq.lab.con)$Group, display="sites", kind="se", conf=0.95, label=T)
+elip.lab.con.df <- data.frame()
+for(i in levels(elip.nmds.lab.con$Group)){
+  elip.lab.con.df <- rbind(elip.lab.con.df, cbind(as.data.frame(with(elip.nmds.lab.con[elip.nmds.lab.con$Group==i,],
+                                                     veganCovEllipse(elip.ord.lab.con[[i]]$cov,
+                                                                     elip.ord.lab.con[[i]]$center,
+                                                                     elip.ord.lab.con[[i]]$scale))),
+                                  group=i))
+}
+
+
+### Content NMDS
+plot_ordination(physeq=physeq.lab.con, ordination=nmds.lab.con, color="Group") +
+  scale_color_manual(values = c("lightcoral", "royalblue3", "deepskyblue", "limegreen"),
+                    labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  geom_point(size = 3) +
+  ggtitle("Content") +
+  geom_path(data=elip.lab.con.df, aes(x=NMDS1, y=NMDS2, color=group), size=1, linetype=1) +
+   theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(size=16),
+        axis.text.y = element_text(size=16),
+        axis.title.x = element_text(size=16, face="bold"),
+        axis.title.y = element_text(size=16, face="bold"),
+        legend.title = element_text(size=16, face="bold"),
+        legend.text = element_text(size=16),
+        plot.title = element_text(size=16, face="bold", hjust=0.5),
+        plot.margin = unit(c(1,1,1,1), "mm"),      # top, right, bottom, left
+        legend.margin=margin(0,0,0,0),
+        legend.box.margin=margin(-10,0,-10,-8)
+        )
+
+### Mucosa Ellipse
+elip.nmds.lab.muc <- data.frame(MDS1 = nmds.lab.muc$points[,1], MDS2 = nmds.lab.muc$points[,2],
+                        Group = sample_data(physeq.lab.muc)$Group)
+plot.new()
+elip.ord.lab.muc <- ordiellipse(nmds.lab.muc, sample_data(physeq.lab.muc)$Group, display="sites", kind="se", conf=0.95, label=T)
+elip.lab.muc.df <- data.frame()
+for(i in levels(elip.nmds.lab.muc$Group)){
+  elip.lab.muc.df <- rbind(elip.lab.muc.df, cbind(as.data.frame(with(elip.nmds.lab.muc[elip.nmds.lab.muc$Group==i,],
+                                                     veganCovEllipse(elip.ord.lab.muc[[i]]$cov,
+                                                                     elip.ord.lab.muc[[i]]$center,
+                                                                     elip.ord.lab.muc[[i]]$scale))),
+                                  group=i))
+}
+
+
+
+# Mucosa
+plot_ordination(physeq=physeq.lab.muc, ordination=nmds.lab.muc, color="Group") +
+  scale_fill_manual(values = c("lightcoral", "royalblue3", "deepskyblue", "limegreen"),
+                    labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  geom_point(size = 3) +
+  ggtitle("Mucosa")
+
+
 ```
 
 
@@ -752,10 +897,6 @@ ggplot(chow.adiv, aes(x=Group, y= invsimpson, fill = Group)) +
 #dev.off()
 ```
 
-### Load Phyloseq Object
-```{r}
-load("Physeq.RData")
-```
 
 ### Examine Summer Lab vs. Wild
 ```{r}
@@ -1058,132 +1199,7 @@ p$tab
 ```
 
 
-### Alpha Div
-```{r}
-adiv <- data.frame(sample_data(physeq.rem))
 
-
-# Coverage
-ggplot(adiv, aes(x=Group, y= coverage, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  xlab("Group") +
-  ylab("Coverage")
-
-
-### Chao
-# Color by group
-tiff("Chao.mdtp.tiff", width=9.1, height=5.5, units="in", res=600)
-ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  #scale_fill_manual(values=c("gray95", "dimgray") )+
-  xlab("Group") +
-  ylab("Chao Richness") +
-  theme(axis.text.x = element_text(size=13),
-        axis.text.y = element_text(size=13),
-        axis.title.x = element_text(size=20),
-        axis.title.y = element_text(size=20),
-        #strip.text.x = element_text(size=12),
-        #strip.text.y = element_text(size=12),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 16, face="bold"),
-        legend.text = element_text(size=16),
-        panel.grid.major = element_blank()
-        #panel.grid.minor = element_blank()
-        )
-dev.off()
-
-        
-        
-dev.off()
-# Color by group, facet by sample type
-tiff("Chao.facet.tiff", width=11, height=3.5, units="in", res=600)
-ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  #scale_fill_manual(values=c("gray95", "dimgray")) +
-  xlab("Group") +
-  ylab("Chao Richness")
-dev.off()
-
-# Test normality
-hist(adiv$chao, breaks=10)
-qqnorm(adiv$chao)
-qqline(adiv$chao)
-shapiro.test(adiv$chao)
-  # p-value = 6.315e-05
-  # Not Normal
-ks.test(adiv$chao, "pnorm", mean=mean(adiv$chao), sd=sd(adiv$chao))
-  # p-value = 0.4076
-  # Normal
-
-# Kruskal-Wallis
-kruskal.test(formula = chao ~ Group, data = adiv)
-  # p-value = 0.01262
-kruskalmc(resp = chao ~ Group, data = adiv)
-  # Significant:
-    # Summer_Wild-Spring
-kruskal.test(formula = chao ~ Group, data = adiv, subset=Diet=="Lab")
-  # p-value = 0.1209
-kruskal.test(formula = chao ~ Diet, data = adiv, subset=Season=="Summer")
-  # p-value = 0.0208
-
-
-
-
-### Shannon
-# Color by group
-ggplot(adiv, aes(x=Group, y=shannon, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  #scale_fill_manual(values=c("gray95", "dimgray")) +
-  xlab("Group") +
-  ylab("Shannon Diversity")
-# Color by group, facet by sample type
-ggplot(adiv, aes(x=Group, y=shannon, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  #scale_fill_manual(values=c("gray95", "dimgray")) +
-  xlab("Group") +
-  ylab("Shannon Diversity")
-
-# Test normality
-hist(adiv$shannon, breaks=10)
-qqnorm(adiv$shannon)
-qqline(adiv$shannon)
-shapiro.test(adiv$shannon)
-  # p-value = 0.3654
-  # Normal
-ks.test(adiv$shannon, "pnorm", mean=mean(adiv$shannon), sd=sd(adiv$shannon))
-  # p-value = 0.8523
-  # Normal
-
-# ANOVA
-summary(aov(shannon ~ Group, data=adiv))
-  # p-value = 0.00903
-TukeyHSD(aov(shannon ~ Group, data=adiv))
-  # Summer_Lab-Summer_Wild = 0.2076838
-  # Torpor-Summer_Wild = 0.1364256
-  # IBA-Summer_Wild = 0.2187595
-  # Spring-Summer_Wild = 0.0028812*
-  # Torpor-Summer_Lab = 0.9980816
-  # IBA-Summer_Lab = 0.9999930
-  # Spring-Summer_Lab = 0.1460725
-  # IBA-Torpor = 0.9953298
-  # Spring-Torpor = 0.2450932
-  # Spring-IBA = 0.1219430
-
-
-```
 
 
 ### Examine Phyla
@@ -1454,254 +1470,6 @@ anosim(bray, sampdf$Group, permutations = 1000)
 
 
 
-### Sex NMDS
-```{r}
-nmds <- ordinate(physeq=physeq.rem, method="NMDS", distance="bray")
-  # Stress = 0.102554
-
-plot_ordination(physeq=physeq.rem, ordination=nmds, color="Sex", shape="Sample_Type")
-
-sample_data(physeq.rem)$Elip <- paste(sample_data(physeq.rem)$Sex)
-elip.nmds <- data.frame(MDS1 = nmds$points[,1], MDS2 = nmds$points[,2],
-                        Sex = sample_data(physeq.rem)$Elip)
-plot.new()
-elip.ord <- ordiellipse(nmds, sample_data(physeq.rem)$Elip, display="sites", kind="se", conf=0.95, label=T)
-
-
-elip.df <- data.frame()
-for(i in levels(elip.nmds$Sex)){
-  elip.df <- rbind(elip.df, cbind(as.data.frame(with(elip.nmds[elip.nmds$Sex==i,],
-                                                     veganCovEllipse(elip.ord[[i]]$cov,
-                                                                     elip.ord[[i]]$center,
-                                                                     elip.ord[[i]]$scale))),
-                                  Sex=i))
-  
-}
-
-plot_ordination(physeq=physeq.rem, ordination=nmds, color="Sex") +
-  geom_path(data=elip.df, aes(x=NMDS1, y=NMDS2, colour=Sex), size=1, linetype=1)
-
-### Sex PERMANOVA
-sampdf <- data.frame(sample_data(physeq.rem))
-bray<- phyloseq::distance(physeq=physeq.rem, method="bray")
-adonis(bray~ Sex, data=sampdf)  
-  # p-value = 0.017
-beta.tax = betadisper(d=bray, group=sampdf$Sex)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.613
-
-# Content
-physeq.con <- subset_samples(physeq.rem, Sample_Type == "Content")
-sampdf <- data.frame(sample_data(physeq.con))
-bray<- phyloseq::distance(physeq=physeq.con, method="bray")
-adonis(bray~ Sex, data=sampdf)  
-  # p-value = 0.33
-beta.tax = betadisper(d=bray, group=sampdf$Sex)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.626
-
-# Mucosa
-physeq.muc <- subset_samples(physeq.rem, Sample_Type == "Mucosa")
-sampdf <- data.frame(sample_data(physeq.muc))
-bray<- phyloseq::distance(physeq=physeq.muc, method="bray")
-adonis(bray~ Sex, data=sampdf)  
-  # p-value = 0.74
-beta.tax = betadisper(d=bray, group=sampdf$Sex)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.951
-
-# Summer_Wild
-physeq.wil <- subset_samples(physeq.rem, Group == "Summer_Wild")
-sampdf <- data.frame(sample_data(physeq.wil))
-bray<- phyloseq::distance(physeq=physeq.wil, method="bray")
-adonis(bray~ Sex, data=sampdf)  
-  # p-value = 0.06667
-beta.tax = betadisper(d=bray, group=sampdf$Sex)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.0014
-
-# Summer_Lab
-physeq.lab <- subset_samples(physeq.rem, Group == "Summer_Lab")
-sampdf <- data.frame(sample_data(physeq.lab))
-bray<- phyloseq::distance(physeq=physeq.lab, method="bray")
-adonis(bray~ Sex, data=sampdf)  
-  # p-value = 0.012
-beta.tax = betadisper(d=bray, group=sampdf$Sex)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.041
-
-# Torpor
-physeq.tor <- subset_samples(physeq.rem, Group == "Torpor")
-sampdf <- data.frame(sample_data(physeq.tor))
-bray<- phyloseq::distance(physeq=physeq.tor, method="bray")
-adonis(bray~ Sex, data=sampdf)  
-  # p-value = 0.055
-beta.tax = betadisper(d=bray, group=sampdf$Sex)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.954
-
-# IBA
-physeq.iba <- subset_samples(physeq.rem, Group == "IBA")
-sampdf <- data.frame(sample_data(physeq.iba))
-bray<- phyloseq::distance(physeq=physeq.iba, method="bray")
-adonis(bray~ Sex, data=sampdf)  
-  # p-value = 0.065
-beta.tax = betadisper(d=bray, group=sampdf$Sex)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.46
-
-# Spring
-physeq.spr <- subset_samples(physeq.rem, Group == "Spring")
-sampdf <- data.frame(sample_data(physeq.spr))
-bray<- phyloseq::distance(physeq=physeq.spr, method="bray")
-adonis(bray~ Sex, data=sampdf)  
-  # p-value = 0.128
-beta.tax = betadisper(d=bray, group=sampdf$Sex)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.04
-
-# PERMANOVA BH Correction
-p.adjust(c(0.017, 0.33, 0.74, 0.06667, 0.012, 0.055, 0.065, 0.128), method="BH")
-  # All = 0.0680000
-  # Content = 0.3771429
-  # Mucosa = 0.7400000
-  # Summer_Wild = 0.1066720
-  # Summer_Lab = 0.0680000
-  # Torpor = 0.1066720
-  # IBA = 0.1066720
-  # Spring = 0.1706667
-
-p.adjust(c(0.017, 0.06667, 0.012, 0.055, 0.065, 0.128), method="BH")
-  # All = 0.051000
-  # Summer_Wild = 0.080004
-  # Summer_Lab = 0.051000
-  # Torpor = 0.080004
-  # IBA = 0.080004
-  # Spring = 0.128000
-       
-```
-
-
-### Bray-Curtis PCoA Ordination
-```{r}
-### Bray NMDS
-nmds <- ordinate(physeq=physeq.rem, method="NMDS", distance="bray")
-  # Stress = 0.102554
-
-plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sample_Type")
-
-bray.pcoa <- ordinate(physeq=physeq.rem, method="PCoA", distance="bray")
-plot_ordination(physeq=physeq.rem, ordination=bray.pcoa, axes=c(1,2), color="Group", shape="Sample_Type")
-
-
-
-plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group") +
-  geom_path(data=elip.df, aes(x=NMDS1, y=NMDS2, colour=group), size=1, linetype=1) +
-  guides(color=guide_legend(title="Group")) +
-  scale_color_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen"))
-
-
-
-
-
-
-sample_data(physeq.rem)$ElipPCoA <- paste(sample_data(physeq.rem)$Group)
-elip.pcoa <- data.frame(Axis1 = bray.pcoa$vectors[,1], Axis2 = bray.pcoa$vectors[,2],
-                        Group = sample_data(physeq.rem)$ElipPCoA)
-bray.pcoa.elip <- bray.pcoa
-bray.pcoa.elip <- bray.pcoa.elip$vectors[,-3:-41]
-  # ordiellipse can only work w/ 1 axes. If you have more than 2 (like in a PCoA), it won't work
-plot.new()
-elip.bray.pcoa.ord <- ordiellipse(bray.pcoa.elip, sample_data(physeq.rem)$ElipPCoA, display="sites", kind="se", conf=0.95, label=T)
-
-veganCovEllipse <- function(cov, center = c(0, 0), scale = 1, npoints = 100) {
-    theta <- (0:npoints) * 2 * pi/npoints
-    Circle <- cbind(cos(theta), sin(theta))
-    t(center + scale * t(Circle %*% chol(cov)))
-}
-
-elip.bray.pcoa.df <- data.frame()
-for(i in levels(elip.bray.pcoa.ord$Group)){
-  elip.bray.pcoa.df <- rbind(elip.bray.pcoa.df, cbind(as.data.frame(with(elip.pcoa[elip.pcoa$Group==i,],
-                                                     veganCovEllipse(elip.bray.pcoa.ord[[i]]$cov,
-                                                                     elip.bray.pcoa.ord[[i]]$center,
-                                                                     elip.bray.pcoaord[[i]]$scale))),
-                                  group=i))
-  
-}
-
-
-
-
-plot_ordination(physeq=physeq.rem, ordination=bray.pcoa, color="Group") +
-  geom_path(data=elip.bray.pcoa.df, aes(x=NMDS1, y=NMDS2, colour=group), size=1, linetype=1) +
-  guides(color=guide_legend(title="Group")) +
-  scale_color_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen"))
-
-
-### PERMANOVA
-sampdf <- data.frame(sample_data(physeq.rem))
-bray<- phyloseq::distance(physeq=physeq.rem, method="bray")
-adonis(bray~ Group, data=sampdf)
-  # p-value = 0.001
-beta.tax = betadisper(d=bray, group=sampdf$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.026
-adonis(bray~ Sample_Type, data=sampdf)
-  # p-value = 1
-beta.tax = betadisper(d=bray, group=sampdf$Sample_Type)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.192
-
-combos <- combn(x=levels(sampdf$Group), m=2)
-bray.pvals <- data.frame(rep(999,10))
-for( i in 1:ncol(combos)){
-  temp.physeq <- subset_samples(physeq.rem, Group%in% combos[,i])
-  temp.sampdf <- data.frame(sample_data(temp.physeq))
-  temp.bray <- phyloseq::distance(physeq=temp.physeq, method="bray")
-  test <- adonis(temp.bray ~ Group, data=temp.sampdf)
-  rownames(bray.pvals)[i] <- paste(combos[1,i], combos[2,i])
-  bray.pvals[i,1]<- test[[1]]$`Pr(>F)`[1]
-}
-colnames(bray.pvals) <- "pval"
-bray.pvals$Adj.bonf <- p.adjust(bray.pvals$pval, method="bonferroni")
-bray.pvals$Adj.BH <- p.adjust(bray.pvals$pval, method="BH")
-
-sampdf2 <- data.frame(sample_data(physeq.rem))
-combos2 <- combn(x=levels(sampdf2$Group), m=2)
-bray.pvals2 <- data.frame(rep(999,10))
-for( i in 1:ncol(combos2)){
-  temp.physeq2 <- subset_samples(physeq.rem, Group%in% combos2[,i])
-  temp.sampdf2 <- data.frame(sample_data(temp.physeq2))
-  temp.bray2 <- phyloseq::distance(physeq=temp.physeq2, method="bray")
-  test2 <- adonis(temp.bray2 ~ Group, data=temp.sampdf2)
-  rownames(bray.pvals2)[i] <- paste(combos2[1,i], combos2[2,i])
-  bray.pvals2[i,1]<- test2[[1]]$`Pr(>F)`[1]
-}
-colnames(bray.pvals2) <- "pval"
-bray.pvals2$Adj.bonf <- p.adjust(bray.pvals2$pval, method="bonferroni")
-bray.pvals2$Adj.BH <- p.adjust(bray.pvals2$pval, method="BH")
-
-
-
-sampdf <- data.frame(sample_data(physeq.rem))
-bray<- phyloseq::distance(physeq=physeq.rem, method="bray")
-adonis(bray~ Group, data=sampdf)
-
-#pulls out p-value:
-  test[[1]]$`Pr(>F)`[1]
-  #https://stackoverflow.com/questions/3366506/extract-p-value-from-aov?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-```
 
 
 
