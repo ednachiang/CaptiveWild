@@ -127,20 +127,7 @@ physeq.muc <- subset_samples(physeq.rem, Sample_Type == "Mucosa")
 ```
 ### Test content vs. mucosa - Alpha Diversity
 ```{r}
-### Alpha-Diversity
 adiv <- data.frame(sample_data(physeq.rem))
-
-# Total OTUs
-otu.tot <- data.frame(sample_names(physeq.rem))
-
-# Pull out # of OTUs for all samples
-otu.tot$Total_OTUs <- rep("NA", nrow(adiv))
-for(i in 1:nrow(otu.tot)){
-  otu.tot[i,2] <- length(which(otu_table(physeq.rem)[,i] != 0))
-}
-colnames(otu.tot) <- c("Sample", "Total_OTUs")
-otu.tot$Total_OTUs <- as.integer(otu.tot$Total_OTUs)
-adiv$Total_OTUs <- otu.tot$Total_OTUs
 
 ########## Compare Con vs. Muc. within Season ##########
 
@@ -150,98 +137,6 @@ adiv.sum <- adiv[which(adiv$Group == "Summer_Lab"),]
 adiv.tor <- adiv[which(adiv$Group == "Torpor"),]
 adiv.iba <- adiv[which(adiv$Group == "IBA"),]
 adiv.spr <- adiv[which(adiv$Group == "Spring"),]
-
-
-##### Total OTUs #####
-hist(adiv.wild$Total_OTUs, breaks=10)
-qqnorm(adiv.wild$Total_OTUs)
-qqline(adiv.wild$Total_OTUs)
-shapiro.test(adiv.wild$Total_OTUs)
-  # p-value = 0.5594
-  # Normal
-hist(adiv.sum$Total_OTUs, breaks=10)
-qqnorm(adiv.sum$Total_OTUs)
-qqline(adiv.sum$Total_OTUs)
-shapiro.test(adiv.sum$Total_OTUs)
-  # p-value = 0.1308
-  # Normal
-hist(adiv.tor$Total_OTUs, breaks=10)
-qqnorm(adiv.tor$Total_OTUs)
-qqline(adiv.tor$Total_OTUs)
-shapiro.test(adiv.tor$Total_OTUs)
-  # p-value = 0.9003
-  # Normal
-hist(adiv.iba$Total_OTUs, breaks=10)
-qqnorm(adiv.iba$Total_OTUs)
-qqline(adiv.iba$Total_OTUs)
-shapiro.test(adiv.iba$Total_OTUs)
-  # p-value = 0.3332
-  # Normal
-hist(adiv.spr$Total_OTUs, breaks=10)
-qqnorm(adiv.spr$Total_OTUs)
-qqline(adiv.spr$Total_OTUs)
-shapiro.test(adiv.spr$Total_OTUs)
-  # p-value = 0.627
-  # Normal
-
-### Wilcoxon & T-Test ###
-t.test(Total_OTUs ~ Sample_Type, data = adiv.wild)
-  # p-value = 0.4694
-t.test(Total_OTUs ~ Sample_Type, data = adiv.sum)
-  # p-value = 0.7782
-t.test(Total_OTUs ~ Sample_Type, data = adiv.tor)
-  # p-value = 0.7268
-t.test(Total_OTUs ~ Sample_Type, data = adiv.iba)
-  # p-value = 0.4543
-t.test(Total_OTUs ~ Sample_Type, data = adiv.spr)
-  # p-value = 0.383
-
-
-##### Bergerparker #####
-hist(adiv.wild$bergerparker, breaks=10)
-qqnorm(adiv.wild$bergerparker)
-qqline(adiv.wild$bergerparker)
-shapiro.test(adiv.wild$bergerparker)
-  # p-value = 0.03423
-  # Not Normal
-hist(adiv.sum$bergerparker, breaks=10)
-qqnorm(adiv.sum$bergerparker)
-qqline(adiv.sum$bergerparker)
-shapiro.test(adiv.sum$bergerparker)
-  # p-value = 0.06637
-  # Normal
-hist(adiv.tor$bergerparker, breaks=10)
-qqnorm(adiv.tor$bergerparker)
-qqline(adiv.tor$bergerparker)
-shapiro.test(adiv.tor$bergerparker)
-  # p-value = 0.2771
-  # Normal
-hist(adiv.iba$bergerparker, breaks=10)
-qqnorm(adiv.iba$bergerparker)
-qqline(adiv.iba$bergerparker)
-shapiro.test(adiv.iba$bergerparker)
-  # p-value = 0.01936
-  # Not Normal
-hist(adiv.spr$bergerparker, breaks=10)
-qqnorm(adiv.spr$bergerparker)
-qqline(adiv.spr$bergerparker)
-shapiro.test(adiv.spr$bergerparker)
-  # p-value = 0.07013
-  # Normal
-
-### Wilcoxon & T-Test ###
-wilcox.test(bergerparker ~ Sample_Type, data = adiv.wild)
-  # p-value = 0.4
-t.test(bergerparker ~ Sample_Type, data = adiv.sum)
-  # p-value = 0.2892
-t.test(bergerparker ~ Sample_Type, data = adiv.tor)
-  # p-value = 0.7082
-wilcox.test(bergerparker ~ Sample_Type, data = adiv.iba)
-  # p-value = 1
-t.test(bergerparker ~ Sample_Type, data = adiv.spr)
-  # p-value = 0.1997
-
-
 
 
 ##### Chao #####
@@ -334,52 +229,6 @@ t.test(shannon ~ Sample_Type, data = adiv.iba)
 t.test(shannon ~ Sample_Type, data = adiv.spr)
   # p-value = 0.1112
 
-
-
-##### Inverse Simpson #####
-hist(adiv.wild$invsimpson, breaks=10)
-qqnorm(adiv.wild$invsimpson)
-qqline(adiv.wild$invsimpson)
-shapiro.test(adiv.wild$invsimpson)
-  # p-value = 0.121
-  # Normal
-hist(adiv.sum$invsimpson, breaks=10)
-qqnorm(adiv.sum$invsimpson)
-qqline(adiv.sum$invsimpson)
-shapiro.test(adiv.sum$invsimpson)
-  # p-value = 0.06845
-  # Normal
-hist(adiv.tor$invsimpson, breaks=10)
-qqnorm(adiv.tor$invsimpson)
-qqline(adiv.tor$invsimpson)
-shapiro.test(adiv.tor$invsimpson)
-  # p-value = 0.08018
-  # Normal
-hist(adiv.iba$invsimpson, breaks=10)
-qqnorm(adiv.iba$invsimpson)
-qqline(adiv.iba$invsimpson)
-shapiro.test(adiv.iba$invsimpson)
-  # p-value = 0.01327
-  # Not Normal
-hist(adiv.spr$invsimpson, breaks=10)
-qqnorm(adiv.spr$invsimpson)
-qqline(adiv.spr$invsimpson)
-shapiro.test(adiv.spr$invsimpson)
-  # p-value = 0.7315
-  # Normal
-
-### Wilcoxon & T-Test ###
-t.test(invsimpson ~ Sample_Type, data = adiv.wild)
-  # p-value = 0.13
-t.test(invsimpson ~ Sample_Type, data = adiv.sum)
-  # p-value = 0.6881
-t.test(invsimpson ~ Sample_Type, data = adiv.tor)
-  # p-value = 0.5769
-wilcox.test(invsimpson ~ Sample_Type, data = adiv.iba)
-  # p-value = 0.6389
-t.test(invsimpson ~ Sample_Type, data = adiv.spr)
-  # p-value = 0.02737*
-
 ```
 
 
@@ -416,7 +265,7 @@ plot_ordination(physeq=physeq.spr, ordination=nmds.spr, color="Sample_Type", sha
 
 
 
-###### PERMANOVA - By Season ######
+###### PERMANOVA - By Season for Sample Type ######
 
 sampdf.wild <- data.frame(sample_data(physeq.wild))
 bray.wild <- phyloseq::distance(physeq = physeq.wild, method = "bray")
@@ -448,43 +297,6 @@ adonis(bray.spr ~ Sample_Type, data = sampdf.spr)
 ### Alpha-Diversity
 adiv <- data.frame(sample_data(physeq.rem))
 
-# Total OTUs
-otu.tot <- data.frame(sample_names(physeq.rem))
-
-# Pull out # of OTUs for all samples
-otu.tot$Total_OTUs <- rep("NA", nrow(adiv))
-for(i in 1:nrow(otu.tot)){
-  otu.tot[i,2] <- length(which(otu_table(physeq.rem)[,i] != 0))
-}
-colnames(otu.tot) <- c("Sample", "Total_OTUs")
-otu.tot$Total_OTUs <- as.integer(otu.tot$Total_OTUs)
-adiv$Total_OTUs <- otu.tot$Total_OTUs
-
-# Total OTUs by Sample Type & Season
-#tiff("totalOTUs.tiff", width = 17, height = 4, units="in", res = 600)
-ggplot(adiv, aes(x=Group, y=Total_OTUs, colour = Group)) +
-  geom_jitter(width=0.25, aes(colour = Group), size=3) + 
-  facet_grid(.~ Sample_Type) +
-  scale_colour_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  scale_y_continuous(limits=c(0,800), breaks=c(0,200,400,600,800), expand=c(0,0)) +
-  xlab("Group") +
-  ylab("Total OTUs") +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.text.x = element_text(size=13),
-        axis.text.y = element_text(size=13),
-        axis.title.x = element_text(size=20),
-        axis.title.y = element_text(size=20),
-        legend.title = element_text(size = 16, face="bold"),
-        legend.text = element_text(size=16),
-        strip.background = element_blank(),
-        strip.text = element_text(size=16),
-        )
-#dev.off()
-
-
-
-
 ### Separate content & mucosa
 physeq.con <- subset_samples(physeq.rem, Sample_Type == "Content")
 physeq.muc <- subset_samples(physeq.rem, Sample_Type == "Mucosa")
@@ -499,107 +311,6 @@ physeq.muc <- prune_taxa(rem, physeq.muc)
 ### Alpha-Diversity
 adiv.con <- data.frame(sample_data(physeq.con))
 adiv.muc <- data.frame(sample_data(physeq.muc))
-
-
-##### Total OTUs #####
-con.otu.tot <- data.frame(sample_names(physeq.con))
-muc.otu.tot <- data.frame(sample_names(physeq.muc))
-
-# Pull out # of OTUs for all samples
-con.otu.tot$Total_OTUs <- rep("NA", nrow(adiv.con))
-for(i in 1:nrow(con.otu.tot)){
-  con.otu.tot[i,2] <- length(which(otu_table(physeq.con)[,i] != 0))
-}
-muc.otu.tot$Total_OTUs <- rep("NA", nrow(adiv.muc))
-for(i in 1:nrow(muc.otu.tot)){
-  muc.otu.tot[i,2] <- length(which(otu_table(physeq.muc)[,i] != 0))
-}
-
-# Organize data
-colnames(con.otu.tot) <- c("Sample", "Total_OTUs")
-con.otu.tot$Total_OTUs <- as.integer(con.otu.tot$Total_OTUs)
-adiv.con$Total_OTUs <- con.otu.tot$Total_OTUs
-colnames(muc.otu.tot) <- c("Sample", "Total_OTUs")
-muc.otu.tot$Total_OTUs <- as.integer(muc.otu.tot$Total_OTUs)
-adiv.muc$Total_OTUs <- muc.otu.tot$Total_OTUs
-
-# Content Total OTUs by Season
-ggplot(adiv.con, aes(x=Group, y=Total_OTUs, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  xlab("Group") +
-  ylab("Total OTUs")
-
-# Mucosa Total OTUs by Season
-ggplot(adiv.muc, aes(x=Group, y=Total_OTUs, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  xlab("Group") +
-  ylab("Total OTUs")
-
-
-
-# Test normality
-hist(adiv.con$Total_OTUs, breaks=10)
-qqnorm(adiv.con$Total_OTUs)
-qqline(adiv.con$Total_OTUs)
-shapiro.test(adiv.con$Total_OTUs)
-  # p-value = 0.0006017
-  # Not Normal
-hist(adiv.muc$Total_OTUs, breaks=10)
-qqnorm(adiv.muc$Total_OTUs)
-qqline(adiv.muc$Total_OTUs)
-shapiro.test(adiv.muc$Total_OTUs)
-  # p-value = 8.546e-05
-  # Not Normal
-
-# Kruskal-Wallis
-kruskal.test(formula = Total_OTUs ~ Group, data = adiv.con)
-  # p-value = 0.01647
-kruskalmc(resp = Total_OTUs ~ Group, data = adiv.con)
-  # Summer_Wild - Torpor
-  # Summer_Wild - IBA
-kruskal.test(formula = Total_OTUs ~ Group, data = adiv.muc)
-  # p-value = 0.01147
-kruskalmc(resp = Total_OTUs ~ Group, data = adiv.muc)
-  # Summer_Wild - Torpor
-# Con/Muc combined
-kruskal.test(formula = Total_OTUs ~ Group, data = adiv)
-  # p-value = 2.23e-05
-kruskalmc(resp = Total_OTUs ~ Group, data = adiv)
-  # Summer_Wild-Torpor
-  # Summer_Wild-IBA
-  # Summer_Lab-Torpor
-
-
-
-##### Bergerparker #####
-hist(adiv.con$bergerparker, breaks=10)
-qqnorm(adiv.con$bergerparker)
-qqline(adiv.con$bergerparker)
-shapiro.test(adiv.con$bergerparker)
-  # p-value = 0.001237
-  # Not Normal
-hist(adiv.muc$bergerparker, breaks=10)
-qqnorm(adiv.muc$bergerparker)
-qqline(adiv.muc$bergerparker)
-shapiro.test(adiv.muc$bergerparker)
-  # p-value = 0.1207
-  # Normal, but for consistency I'll use kruskal-wallis
-
-# Kruskal-Wallis
-kruskal.test(formula = bergerparker ~ Group, data = adiv.con)
-  # p-value = 0.05871
-kruskalmc(resp = bergerparker ~ Group, data = adiv.con)
-  # Summer_Wild-Spring
-kruskal.test(formula = bergerparker ~ Group, data = adiv.muc)
-  # p-value = 0.9166
-# Con/muc combined
-kruskal.test(formula = bergerparker ~ Group, data = adiv)
-  # p-value = 0.1588
-
 
 
 
@@ -632,8 +343,7 @@ kruskalmc(resp = chao ~ Group, data = adiv)
 
 
 
-
-##### shannon #####
+##### Shannon #####
 hist(adiv.con$shannon, breaks=10)
 qqnorm(adiv.con$shannon)
 qqline(adiv.con$shannon)
@@ -659,7 +369,7 @@ TukeyHSD(aov(shannon ~ Group, data = adiv.con))
   # IBA-Summer_Lab = 0.8885960
   # Spring-Summer_Lab = 0.0832229
   # IBA-Torpor = 0.9961265
-  # Spring-Torpor = 0.0494151
+  # Spring-Torpor = 0.0494151*
   # Spring-IBA = 0.0263590*
 summary(aov(shannon ~ Group, data = adiv.muc))
   # p-value = 0.751
@@ -677,32 +387,6 @@ TukeyHSD(aov(shannon ~ Group, data = adiv))
   # Spring-Torpor = 0.2450932
   # Spring-IBA = 0.1219430
 
-
-
-##### Inverse Simpson #####
-hist(adiv.con$invsimpson, breaks=10)
-qqnorm(adiv.con$invsimpson)
-qqline(adiv.con$invsimpson)
-shapiro.test(adiv.con$invsimpson)
-  # p-value = 0.005803
-  # Not Normal
-hist(adiv.muc$invsimpson, breaks=10)
-qqnorm(adiv.muc$invsimpson)
-qqline(adiv.muc$invsimpson)
-shapiro.test(adiv.muc$invsimpson)
-  # p-value = 0.0001229
-  # Not Normal
-
-# Kruskal-Wallis
-kruskal.test(formula = invsimpson ~ Group, data = adiv.con)
-  # p-value = 0.02975
-kruskalmc(resp = invsimpson ~ Group, data = adiv.con)
-  # Summer_Wild-Spring
-kruskal.test(formula = invsimpson ~ Group, data = adiv.muc)
-  # p-value = 0.967
-# Con/muc combined
-kruskal.test(formula = invsimpson ~ Group, data = adiv)
-  # p-value = 0.1124
 
 
 
@@ -1151,7 +835,7 @@ pairwise.adonis(as.matrix(bray), sampdf$Group, sim.method = "bray", p.adjust.m =
   # Summer_Lab vs Spring = 0.07272
   # IBA vs Torpor = 0.32849
   # IBA vs Spring = 0.0002*
-  # Torpor vs SprinG = 0.0004857143*
+  # Torpor vs Spring = 0.0004857143*
 
  
 
