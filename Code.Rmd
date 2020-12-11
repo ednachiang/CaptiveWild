@@ -124,6 +124,9 @@ physeq.spr <- subset_samples(physeq.rem, Group == "Spring")
 # Separate by content/mucosa
 physeq.con <- subset_samples(physeq.rem, Sample_Type == "Content")
 physeq.muc <- subset_samples(physeq.rem, Sample_Type == "Mucosa")
+
+# Pull out only lab squirrels
+physeq.lab <- subset_samples(physeq.rem, Diet != "Wild")
 ```
 ### Test content vs. mucosa - Alpha Diversity
 ```{r}
@@ -240,7 +243,6 @@ nmds <- ordinate(physeq=physeq.rem, method="NMDS", distance="bray")
   # Stress = 0.1742581
 plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sample_Type") + facet_grid(.~Group)
 plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sex") + facet_grid(.~Group)
-
 
 ### Bray NMDS - By Season
 nmds.wild <- ordinate(physeq=physeq.wild, method="NMDS", distance="bray")
@@ -387,430 +389,7 @@ TukeyHSD(aov(shannon ~ Group, data = adiv))
   # Spring-Torpor = 0.2450932
   # Spring-IBA = 0.1219430
 
-
-
-
-
-
-
-
-
-
-### Summarize adiv
-adiv.sum <- adiv %>%
-  group_by(Group) %>%
-  summarize(#TotalOTUs_Mean = mean(Total_OTUs),
-            #TotalOTUs_Median = median(Total_OTUs),
-            #TotalOTUs_SD = sd(Total_OTUs),
-            #TotalOTUs_SE = (sd(Total_OTUs)/sqrt(length(Total_OTUs))),
-            #TotalOTUs_iqr = IQR(Total_OTUs),
-            Chao_Mean = mean(chao),
-            Chao_Median = median(chao),
-            Chao_SD = sd(chao),
-            Chao_SE = (sd(chao)/sqrt(length(chao))),
-            Chao_iqr = IQR(chao),
-            Shannon_Mean = mean(shannon),
-            Shannon_Median = median(shannon),
-            Shannon_SD = sd(shannon),
-            Shannon_SE = (sd(shannon)/sqrt(length(shannon))),
-            Shannon_iqr = IQR(shannon),
-            InvSimp_Mean = mean(invsimpson),
-            InvSimp_Median = median(invsimpson),
-            InvSimp_SD = sd(invsimpson),
-            InvSimp_SE = (sd(invsimpson)/sqrt(length(invsimpson))),
-            InvSimp_iqr = IQR(invsimpson))
-
-
-adiv.samptype.sum <- adiv %>%
-  group_by(Group, Sample_Type) %>%
-  summarize(TotalOTUs_Mean = mean(Total_OTUs),
-            TotalOTUs_Median = median(Total_OTUs),
-            TotalOTUs_SD = sd(Total_OTUs),
-            TotalOTUs_SE = (sd(Total_OTUs)/sqrt(length(Total_OTUs))),
-            TotalOTUs_iqr = IQR(Total_OTUs),
-            Chao_Mean = mean(chao),
-            Chao_Median = median(chao),
-            Chao_SD = sd(chao),
-            Chao_SE = (sd(chao)/sqrt(length(chao))),
-            Chao_iqr = IQR(chao),
-            Shannon_Mean = mean(shannon),
-            Shannon_Median = median(shannon),
-            Shannon_SD = sd(shannon),
-            Shannon_SE = (sd(shannon)/sqrt(length(shannon))),
-            Shannon_iqr = IQR(shannon),
-            InvSimp_Mean = mean(invsimpson),
-            InvSimp_Median = median(invsimpson),
-            InvSimp_SD = sd(invsimpson),
-            InvSimp_SE = (sd(invsimpson)/sqrt(length(invsimpson))),
-            InvSimp_iqr = IQR(invsimpson))
-
-
-
-
-
-### Chao
-# Color by group
-tiff("Chao.mdtp.tiff", width=9.1, height=5.5, units="in", res=600)
-ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  #scale_fill_manual(values=c("gray95", "dimgray") )+
-  xlab("Group") +
-  ylab("Chao Richness") +
-  theme(axis.text.x = element_text(size=13),
-        axis.text.y = element_text(size=13),
-        axis.title.x = element_text(size=20),
-        axis.title.y = element_text(size=20),
-        #strip.text.x = element_text(size=12),
-        #strip.text.y = element_text(size=12),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 16, face="bold"),
-        legend.text = element_text(size=16),
-        panel.grid.major = element_blank()
-        #panel.grid.minor = element_blank()
-        )
-dev.off()
-
-
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_text(size=12),
-        axis.title.x = element_text(size=18),
-        axis.title.y = element_text(size=18),
-        strip.text.x = element_text(size=13, face="bold"),
-        strip.text.y = element_text(size=13, face="bold"),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 14, face="bold"),
-        legend.text = element_text(size=13),
-        panel.grid.major = element_blank()
-        #panel.grid.minor = element_blank()
-        
-        
-dev.off()
-
-# Color by group, facet by sample type
-tiff("Chao.facet.tiff", width=11, height=3.5, units="in", res=600)
-ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  #scale_fill_manual(values=c("gray95", "dimgray")) +
-  xlab("Group") +
-  ylab("Chao Richness")
-dev.off()
-
-
-
-
-
-### Berger-Parker
-# Color by group
-ggplot(adiv, aes(x=Group, y=bergerparker, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  #scale_fill_manual(values=c("gray95", "dimgray") )+
-  xlab("Group") +
-  ylab("Berger-Parker")
-# Color by group, facet by sample type
-ggplot(adiv, aes(x=Group, y=bergerparker, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  #scale_fill_manual(values=c("gray95", "dimgray") )+
-  xlab("Group") +
-  ylab("Berger-Parker")
-
-
-
-### Shannon
-# Color by group
-ggplot(adiv, aes(x=Group, y=shannon, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  #scale_fill_manual(values=c("gray95", "dimgray")) +
-  xlab("Group") +
-  ylab("Shannon Diversity")
-# Color by group, facet by sample type
-ggplot(adiv, aes(x=Group, y=shannon, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  #scale_fill_manual(values=c("gray95", "dimgray")) +
-  xlab("Group") +
-  ylab("Shannon Diversity")
-
-### Inverse Simpson
-# Color by group
-tiff("InvSimp.tiff", width=6.5, height=3, units="in", res=600)
-ggplot(adiv, aes(x=Group, y= invsimpson, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  xlab("Group") +
-  ylab("Inverse Simpson Weighted Diversity")
-dev.off()
-# Color by group, facet by sample type
-tiff("InvSimp.facet.tiff", width=11, height=3, units="in", res=600)
-ggplot(adiv, aes(x=Group, y= invsimpson, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  xlab("Group") +
-  ylab("Inverse Simpson Weighted Diversity")
-dev.off()
-
-tiff("InvSimp.mdtp.tiff", width=8.5, height=4.75, units="in", res=600)
-ggplot(adiv, aes(x=Group, y= invsimpson, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  xlab("Group") +
-  ylab("Inverse Simpson Weighted Diversity") +
-    theme(axis.text.x = element_text(size=12),
-          axis.text.y = element_text(size=12),
-          axis.title.x = element_text(size=18),
-          axis.title.y = element_text(size=18),
-          #strip.text.x = element_text(size=12),
-          #strip.text.y = element_text(size=12),
-          panel.spacing=unit(1, "lines"),
-          legend.title = element_text(size = 16),
-          legend.text = element_text(size=14)
-    )
-dev.off()
-
-
-
-
-
-adiv.rem.combos <- combn(x=levels(adiv$Group), m=2)
-adiv.pvals <- data.frame(rep(999,10))
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv[group2,]
-  test <- wilcox.test(Total_OTUs ~ Group, data=temp.df)
-  adiv.pvals[i,1] <- test$p.value
-  rownames(adiv.pvals)[i] <- paste(adiv.rem.combos[1,i], adiv.rem.combos[2,i])
-}
-colnames(adiv.pvals) <- "otusum.pval"
-adiv.pvals$otusum.bonf <- p.adjust(adiv.pvals$otusum.pval, method="bonferroni")
-adiv.pvals$otusum.BH <- p.adjust(adiv.pvals$otusum.pval, method="BH")
-
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv[group2,]
-  test <- wilcox.test(chao ~ Group, data=temp.df)
-  adiv.pvals[i,4] <- test$p.value
-}
-colnames(adiv.pvals)[4] <- "chao.pval"
-adiv.pvals$chao.bonf <- p.adjust(adiv.pvals$chao.pval, method="bonferroni")
-adiv.pvals$chao.BH <- p.adjust(adiv.pvals$chao.pval, method="BH")
-
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv[group2,]
-  test <- wilcox.test(bergerparker ~ Group, data=temp.df)
-  adiv.pvals[i,7] <- test$p.value
-}
-colnames(adiv.pvals)[7] <- "bp.pval"
-adiv.pvals$bp.bonf <- p.adjust(adiv.pvals$bp.pval, method="bonferroni")
-adiv.pvals$bp.BH <- p.adjust(adiv.pvals$bp.pval, method="BH")
-
-aov.shannon.group <- aov(shannon ~ Group, data=adiv)
-tukey.shannon <- TukeyHSD(aov.shannon.group)
-adiv.pvals$shannon.tukey.pval<-tukey.shannon$Group[,4]
-
-           
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv[group2,]
-  test <- wilcox.test(invsimpson ~ Group, data=temp.df)
-  adiv.pvals[i,11] <- test$p.value
-}
-colnames(adiv.pvals)[11] <- "invsimp.pval"
-adiv.pvals$invsimp.bonf <- p.adjust(adiv.pvals$invsimp.pval, method="bonferroni")
-adiv.pvals$invsimp.BH <- p.adjust(adiv.pvals$invsimp.pval, method="BH")
-
-
-adiv.con <- adiv[which(adiv$Sample_Type=="Content"),]
-adiv.con.pvals <- data.frame(rep(999,10))
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.con$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.con$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.con[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.con[group2,]
-  test <- wilcox.test(Total_OTUs ~ Group, data=temp.df)
-  adiv.con.pvals[i,1] <- test$p.value
-  rownames(adiv.con.pvals)[i] <- paste(adiv.rem.combos[1,i], adiv.rem.combos[2,i])
-}
-colnames(adiv.con.pvals) <- "otusum.pval"
-adiv.con.pvals$otusum.bonf <- p.adjust(adiv.con.pvals$otusum.pval, method="bonferroni")
-adiv.con.pvals$otusum.BH <- p.adjust(adiv.con.pvals$otusum.pval, method="BH")
-
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.con$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.con$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.con[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.con[group2,]
-  test <- wilcox.test(chao ~ Group, data=temp.df)
-  adiv.con.pvals[i,4] <- test$p.value
-}
-colnames(adiv.con.pvals)[4] <- "chao.pval"
-adiv.con.pvals$chao.bonf <- p.adjust(adiv.con.pvals$chao.pval, method="bonferroni")
-adiv.con.pvals$chao.BH <- p.adjust(adiv.con.pvals$chao.pval, method="BH")
-
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.con$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.con$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.con[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.con[group2,]
-  test <- wilcox.test(bergerparker ~ Group, data=temp.df)
-  adiv.con.pvals[i,7] <- test$p.value
-}
-colnames(adiv.con.pvals)[7] <- "bp.pval"
-adiv.con.pvals$bp.bonf <- p.adjust(adiv.con.pvals$bp.pval, method="bonferroni")
-adiv.con.pvals$bp.BH <- p.adjust(adiv.con.pvals$bp.pval, method="BH")
-
-aov.shannon.group <- aov(shannon ~ Group, data=adiv.con)
-tukey.shannon <- TukeyHSD(aov.shannon.group)
-adiv.con.pvals$shannon.tukey.pval<-tukey.shannon$Group[,4]
-
-           
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.con$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.con$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.con[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.con[group2,]
-  test <- wilcox.test(invsimpson ~ Group, data=temp.df)
-  adiv.con.pvals[i,11] <- test$p.value
-}
-colnames(adiv.con.pvals)[11] <- "invsimp.pval"
-adiv.con.pvals$invsimp.bonf <- p.adjust(adiv.con.pvals$invsimp.pval, method="bonferroni")
-adiv.con.pvals$invsimp.BH <- p.adjust(adiv.con.pvals$invsimp.pval, method="BH")
-
-
-
-adiv.muc <- adiv[which(adiv$Sample_Type=="Content"),]
-adiv.muc.pvals <- data.frame(rep(999,10))
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.muc$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.muc$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.muc[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.muc[group2,]
-  test <- wilcox.test(Total_OTUs ~ Group, data=temp.df)
-  adiv.muc.pvals[i,1] <- test$p.value
-  rownames(adiv.muc.pvals)[i] <- paste(adiv.rem.combos[1,i], adiv.rem.combos[2,i])
-}
-colnames(adiv.muc.pvals) <- "otusum.pval"
-adiv.muc.pvals$otusum.bonf <- p.adjust(adiv.muc.pvals$otusum.pval, method="bonferroni")
-adiv.muc.pvals$otusum.BH <- p.adjust(adiv.muc.pvals$otusum.pval, method="BH")
-
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.muc$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.muc$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.muc[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.muc[group2,]
-  test <- wilcox.test(chao ~ Group, data=temp.df)
-  adiv.muc.pvals[i,4] <- test$p.value
-}
-colnames(adiv.muc.pvals)[4] <- "chao.pval"
-adiv.muc.pvals$chao.bonf <- p.adjust(adiv.muc.pvals$chao.pval, method="bonferroni")
-adiv.muc.pvals$chao.BH <- p.adjust(adiv.muc.pvals$chao.pval, method="BH")
-
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.muc$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.muc$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.muc[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.muc[group2,]
-  test <- wilcox.test(bergerparker ~ Group, data=temp.df)
-  adiv.muc.pvals[i,7] <- test$p.value
-}
-colnames(adiv.muc.pvals)[7] <- "bp.pval"
-adiv.muc.pvals$bp.bonf <- p.adjust(adiv.muc.pvals$bp.pval, method="bonferroni")
-adiv.muc.pvals$bp.BH <- p.adjust(adiv.muc.pvals$bp.pval, method="BH")
-
-aov.shannon.group <- aov(shannon ~ Group, data=adiv.muc)
-tukey.shannon <- TukeyHSD(aov.shannon.group)
-adiv.muc.pvals$shannon.tukey.pval<-tukey.shannon$Group[,4]
-
-           
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.muc$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.muc$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.muc[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.muc[group2,]
-  test <- wilcox.test(invsimpson ~ Group, data=temp.df)
-  adiv.muc.pvals[i,11] <- test$p.value
-}
-colnames(adiv.muc.pvals)[11] <- "invsimp.pval"
-adiv.muc.pvals$invsimp.bonf <- p.adjust(adiv.muc.pvals$invsimp.pval, method="bonferroni")
-adiv.muc.pvals$invsimp.BH <- p.adjust(adiv.muc.pvals$invsimp.pval, method="BH")
-
-
-adiv.pvals[11:20,] <- adiv.con.pvals
-adiv.pvals[21:30,] <- adiv.muc.pvals
-rows <- rownames(adiv.con.pvals)
-for (i in 1:length(rows)){
-  rows[i] <- paste(rows[i], "Content")
-}
-rownames(adiv.pvals)[11:20] <- rows
-rows <- rownames(adiv.muc.pvals)
-for (i in 1:length(rows)){
-  rows[i] <- paste(rows[i], "Mucosa")
-}
-rownames(adiv.pvals)[21:30] <- rows
-
-adiv.pvals <- adiv.pvals[,-7:-9]
-
-
-adiv.group <- data.frame(rep(999,5))
-for(i in 1:5){
-  gro <- levels(adiv$Group)[i]
-  adiv.temp <- adiv[which(adiv$Group==gro),]
-  test <- wilcox.test(Total_OTUs ~ Sample_Type, data=adiv.temp)
-  adiv.group[i,1] <- test$p.value
-  test <- wilcox.test(chao ~ Sample_Type, data=adiv.temp)
-  adiv.group[i,2] <- test$p.value
-  test <- wilcox.test(bergerparker ~ Sample_Type, data=adiv.temp)
-  adiv.group[i,3] <- test$p.value
-  test <- t.test(shannon ~ Sample_Type, data=adiv.temp)
-  adiv.group[i,4] <- test$p.value
-  test <- wilcox.test(invsimpson ~ Sample_Type, data=adiv.temp)
-  adiv.group[i,5] <- test$p.value
-}
-rownames(adiv.group) <- levels(adiv$Group)
-colnames(adiv.group) <- c("otusum.pval", "chao.pval", "bp.pval", "shannon.pval", "invsimp.pval")
-adiv.group$otusum.bonf <- p.adjust(adiv.group$otusum.pval, method="bonferroni")
-adiv.group$otusum.BH <- p.adjust(adiv.group$otusum.pval, method="BH")
-adiv.group$chao.bonf <- p.adjust(adiv.group$chao.pval, method="bonferroni")
-adiv.group$chao.BH <- p.adjust(adiv.group$chao.pval, method="BH")
-adiv.group$bp.bonf <- p.adjust(adiv.group$bp.pval, method="bonferroni")
-adiv.group$bp.BH <- p.adjust(adiv.group$bp.pval, method="BH")
-adiv.group$shannon.bonf <- p.adjust(adiv.group$shannon.pval, method="bonferroni")
-adiv.group$shannon.BH <- p.adjust(adiv.group$shannon.pval, method="BH")
-adiv.group$invsimp.bonf <- p.adjust(adiv.group$invsimp.pval, method="bonferroni")
-adiv.group$invsimp.BH <- p.adjust(adiv.group$invsimp.pval, method="BH")
-
-
-adiv.muc.pvals$invsimp.bonf <- p.adjust(adiv.muc.pvals$invsimp.pval, method="bonferroni")
-adiv.muc.pvals$invsimp.BH <- p.adjust(adiv.muc.pvals$invsimp.pval, method="BH")
-
 ```
-
 
 
 ### Test content & mucosa separately for season - Beta Diversity
@@ -880,32 +459,179 @@ pairwise.adonis(as.matrix(bray.muc), sampdf.muc$Group, sim.method = "bray", p.ad
   # IBA vs Torpor = 0.8
   # IBA vs Spring = 0.05576
   # Torpor vs Spring = 0.07936508
-
-
-
-
-
-
-sampdf.sum <- data.frame(sample_data(physeq.sum))
-bray.sum <- phyloseq::distance(physeq = physeq.sum, method = "bray")
-adonis(bray.sum ~ Sample_Type, data = sampdf.sum)
-  # p-value = 0.983
-
-sampdf.tor <- data.frame(sample_data(physeq.tor))
-bray.tor <- phyloseq::distance(physeq = physeq.tor, method = "bray")
-adonis(bray.tor ~ Sample_Type, data = sampdf.tor)
-  # p-value = 0.93
-
-sampdf.iba <- data.frame(sample_data(physeq.iba))
-bray.iba <- phyloseq::distance(physeq = physeq.iba, method = "bray")
-adonis(bray.iba ~ Sample_Type, data = sampdf.iba)
-  # p-value = 0.973
-
-sampdf.spr <- data.frame(sample_data(physeq.spr))
-bray.spr <- phyloseq::distance(physeq = physeq.spr, method = "bray")
-adonis(bray.spr ~ Sample_Type, data = sampdf.spr)
-  # p-value = 0.9
 ```
+### Test only lab squirrels for season - Alpha Diversity
+```{r}
+adiv.lab <- data.frame(sample_data(physeq.lab))
+
+# Remove empty taxa
+# All taxa have > 10 reads
+#rem <- names(which(taxa_sums(physeq.lab) > 10))
+#physeq.lab.rem <- prune_taxa(rem, physeq.lab)
+
+
+
+##### Chao #####
+hist(adiv.lab$chao, breaks=10)
+qqnorm(adiv.lab$chao)
+qqline(adiv.lab$chao)
+shapiro.test(adiv.lab$chao)
+  # p-value = 0.0001635
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = chao ~ Group, data = adiv.lab)
+  # p-value = 0.1209
+
+
+
+##### Shannon #####
+hist(adiv.lab$shannon, breaks=10)
+qqnorm(adiv.lab$shannon)
+qqline(adiv.lab$shannon)
+shapiro.test(adiv.lab$shannon)
+  # p-value = 0.7015
+  # Normal
+
+# ANOVA
+summary(aov(shannon ~ Group, data = adiv.lab))
+  # p-value = 0.0932
+
+
+```
+### Test only lab squirrels separated by content/mucosa for season - Alpha Diversity
+```{r}
+adiv.lab <- data.frame(sample_data(physeq.lab))
+
+
+### Separate content & mucosa
+physeq.lab.con <- subset_samples(physeq.lab, Sample_Type == "Content")
+physeq.lab.muc <- subset_samples(physeq.lab, Sample_Type == "Mucosa")
+
+# Remove empty taxa
+rem <- names(which(taxa_sums(physeq.lab.con) > 10))
+physeq.lab.con <- prune_taxa(rem, physeq.lab.con)
+rem <- names(which(taxa_sums(physeq.lab.muc) > 10))
+physeq.lab.muc <- prune_taxa(rem, physeq.lab.muc)
+
+
+### Alpha-Diversity
+adiv.lab.con <- data.frame(sample_data(physeq.lab.con))
+adiv.lab.muc <- data.frame(sample_data(physeq.lab.muc))
+
+
+
+##### Chao #####
+hist(adiv.lab.con$chao, breaks=10)
+qqnorm(adiv.lab.con$chao)
+qqline(adiv.lab.con$chao)
+shapiro.test(adiv.lab.con$chao)
+  # p-value = 0.2104
+  # Normal
+hist(adiv.lab.muc$chao, breaks=10)
+qqnorm(adiv.lab.muc$chao)
+qqline(adiv.lab.muc$chao)
+shapiro.test(adiv.lab.muc$chao)
+  # p-value = 9.925e-05
+  # Not Normal
+
+# Kruskal-Wallis
+summary(aov(formula = chao ~ Group, data = adiv.lab.con))
+  # p-value = 0.208
+kruskal.test(formula = chao ~ Group, data = adiv.lab.muc)
+  # p-value = 0.1849
+
+
+
+
+##### Shannon #####
+hist(adiv.lab.con$shannon, breaks=10)
+qqnorm(adiv.lab.con$shannon)
+qqline(adiv.lab.con$shannon)
+shapiro.test(adiv.lab.con$shannon)
+  # p-value = 0.5944
+  # Normal
+hist(adiv.lab.muc$shannon, breaks=10)
+qqnorm(adiv.lab.muc$shannon)
+qqline(adiv.lab.muc$shannon)
+shapiro.test(adiv.lab.muc$shannon)
+  # p-value = 0.5848
+  # Normal
+
+# ANOVA
+summary(aov(shannon ~ Group, data = adiv.lab.con))
+  # p-value = 0.0314
+TukeyHSD(aov(shannon ~ Group, data = adiv.lab.con))
+  # Torpor-Summer_Lab = 0.9585678
+  # IBA-Summer_Lab = 0.8229425
+  # Spring-Summer_Lab = 0.0792214
+  # IBA-Torpor = 0.9859815
+  # Spring-Torpor = 0.0490387*
+  # Spring-IBA = 0.0276141*
+summary(aov(shannon ~ Group, data = adiv.lab.muc))
+  # p-value = 0.744
+
+```
+### Test only lab squirrels for group - Beta Diversity
+```{r}
+### Bray NMDS
+nmds.lab <- ordinate(physeq=physeq.lab, method="NMDS", distance="bray")
+  # Stress = 0.1413397
+plot_ordination(physeq=physeq.lab, ordination=nmds, color="Group", shape="Sample_Type") 
+  
+###### PERMANOVA - By Season for Sample Type ######
+sampdf.lab <- data.frame(sample_data(physeq.lab))
+bray.lab <- phyloseq::distance(physeq = physeq.lab, method = "bray")
+adonis(bray.lab ~ Group, data = sampdf.lab)
+  # p-value = 0.001
+pairwise.adonis(as.matrix(bray.lab), sampdf.lab$Group, sim.method = "bray", p.adjust.m = "fdr")
+  # Summer_Lab vs IBA = 0.000030*
+  # Summer_Lab vs Torpor = 0.000030*
+  # Summer_Lab vs Spring = 0.063456
+  # IBA vs Torpor = 0.344260
+  # IBA vs Spring = 0.000380*
+  # Torpor vs Spring = 0.000495*
+
+```
+### Test only lab squirrels separated by content/mucosa for season - Beta Diversity
+```{r}
+### Bray NMDS
+nmds.lab.con <- ordinate(physeq=physeq.lab.con, method="NMDS", distance="bray")
+  # stress = 0.1090854   
+nmds.lab.muc <- ordinate(physeq=physeq.lab.muc, method="NMDS", distance="bray")
+  # stress = 0.2006364 
+plot_ordination(physeq=physeq.lab.con, ordination=nmds.lab.con, color="Group")
+plot_ordination(physeq=physeq.lab.muc, ordination=nmds.lab.muc, color="Group")
+
+
+### PERMANOVA
+sampdf.lab.con <- data.frame(sample_data(physeq.lab.con))
+bray.lab.con <- phyloseq::distance(physeq = physeq.lab.con, method = "bray")
+adonis(bray.lab.con ~ Group, data = sampdf.lab.con)
+  # p-value = 0.001
+pairwise.adonis(as.matrix(bray.lab.con), sampdf.lab.con$Group, sim.method = "bray", p.adjust.m = "fdr")
+  # Summer_Lab vs IBA = 0.00834*
+  # Summer_Lab vs Torpor = 0.01848*
+  # Summer_Lab vs Spring = 0.56781
+  # IBA vs Torpor = 0.79393
+  # IBA vs Spring = 0.02678571*
+  # Torpor vs Spring = 0.02678571*
+
+sampdf.lab.muc <- data.frame(sample_data(physeq.lab.muc))
+bray.lab.muc <- phyloseq::distance(physeq = physeq.lab.muc, method = "bray")
+adonis(bray.lab.muc ~ Group, data = sampdf.lab.muc)
+  # p-value = 0.002
+pairwise.adonis(as.matrix(bray.lab.muc), sampdf.lab.muc$Group, sim.method = "bray", p.adjust.m = "fdr")
+  # Summer_Lab vs IBA = 0.01776*
+  # Summer_Lab vs Torpor = 0.02451*
+  # Summer_Lab vs Spring = 0.78183
+  # IBA vs Torpor = 0.78183
+  # IBA vs Spring = 0.05454
+  # Torpor vs Spring = 0.07142857
+```
+
+
+
 ### Chow
 ```{r}
 physeq.chow <- subset_samples(physeq, Sample_Type == "Chow")
@@ -1312,157 +1038,6 @@ ggplot(adiv, aes(x=Group, y= coverage, fill = Group)) +
   xlab("Group") +
   ylab("Coverage")
 
-# Total OTUs
-# Make the original, unnormalized phyloseq object
-shared = "mothur_output/final.shared"
-taxonomy = "mothur_output/final.taxonomy"
-mothurdata = import_mothur(
-  mothur_shared_file = shared,
-  mothur_constaxonomy_file = taxonomy)
-tax_table(mothurdata) <- cbind(tax_table(mothurdata), 
-                               row.names(tax_table(mothurdata)))
-colnames(tax_table(mothurdata)) <- 
-  c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
-# Read in metadata
-meta <- read.csv("metadata.csv")
-colnames(meta)[1] <- "Sample"
-otu.tot <- data.frame(sample_names(mothurdata))
-# Pull out # of OTUs from all samples
-otu.tot$Total_OTUs <- rep("NA", 77)
-for(i in 1:77){
-  otu.tot[i,2] <- length(which(otu_table(mothurdata)[,i] != 0))
-}
-# Pull out the data from just the samples we kept
-keep <- data.frame(rep("NA",47))
-keep[,2] <- rep("NA", 47)
-for(i in 1:47){
-  x <- which(otu.tot$sample_names.mothurdata. == sample_names(physeq.rem)[i])
-  keep[i,2] <- otu.tot[x,2]
-}
-keep[,1] <- sample_names(physeq.rem)
-colnames(keep) <- c("Sample", "Total_OTUs")
-keep$Total_OTUs <- as.integer(keep$Total_OTUs)
-adiv$Total_OTUs <- keep$Total_OTUs
-
-# Color by group
-tiff("Total_OTUs.tiff", width=6.5, height=3.5, units="in", res=600)
-ggplot(adiv, aes(x=Group, y=Total_OTUs, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Sample_Type) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  #scale_fill_manual(values=c("gray95", "dimgray")) +
-  xlab("Group") +
-  ylab("Total OTUs")
-dev.off()
-
-# Color by group, facet by sample type
-#tiff("Total_OTUs.tiff", width=11, height=3.5, units="in", res=600)
-ggplot(adiv, aes(x=Group, y=Total_OTUs, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  #scale_fill_manual(values=c("gray95", "dimgray")) +
-  xlab("Group") +
-  ylab("Total OTUs")
-#dev.off()
-
-# Color by sample type, facet by group
-ggplot(adiv, aes(x=Sample_Type, y=Total_OTUs, fill = Sample_Type)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Group) +
-  #scale_fill_manual(values=c("gray95", "dimgray")) +
-  xlab("Sample Type") +
-  ylab("Total OTUs")
-
-# Test normality
-hist(otusum$Total_OTUs, breaks=10)
-qqnorm(otusum$Total_OTUs)
-qqline(otusum$Total_OTUs)
-shapiro.test(otusum$Total_OTUs)
-  # p-value = 1.276e-06
-  # p-value = 3.505e-07
-ks.test(otusum$Total_OTUs, "pnorm", mean=mean(otusum$Total_OTUs), sd=sd(otusum$Total_OTUs))
-  # p-value = 0.01574
-  # p-value = 0.0112
-
-# Kruskal-Wallis
-kruskal.test(formula = Total_OTUs ~ Group, data = otusum)
-  # p-value = 7.987e-05
-  # p-value = 8.832e-06
-kruskalmc(resp = Total_OTUs ~ Group, data = otusum)
-  # Significant:
-    # Summer_Wild-Torpor
-    # Summer_Wild-IBA
-    # Summer_Lab-IBA
-kruskal.test(formula = Total_OTUs ~ Group, data = otusum, subset=Diet=="Lab")
-  # p-value = 0.004659
-  # p-value = 0.004648
-kruskal.test(formula = Total_OTUs ~ Sample_Type, data = otusum)
-  # p-value = 0.4302
-  # p-value = 0.4259
-kruskal.test(formula = Total_OTUs ~ Diet, data = otusum)
-  # p-value = 8.811e-05
-  # p-value = 9.359e-05
-kruskal.test(formula = Total_OTUs ~ Diet, data = otusum, subset=Season=="Summer")
-  # p-value = 0.009111
-wilcox.test(Total_OTUs ~ Diet, data=otusum)
-  # p-value = 0.0001003
-
-
-### Summarize adiv
-adiv.sum <- adiv %>%
-  group_by(Group) %>%
-  summarize(#TotalOTUs_Mean = mean(Total_OTUs),
-            #TotalOTUs_Median = median(Total_OTUs),
-            #TotalOTUs_SD = sd(Total_OTUs),
-            #TotalOTUs_SE = (sd(Total_OTUs)/sqrt(length(Total_OTUs))),
-            #TotalOTUs_iqr = IQR(Total_OTUs),
-            Chao_Mean = mean(chao),
-            Chao_Median = median(chao),
-            Chao_SD = sd(chao),
-            Chao_SE = (sd(chao)/sqrt(length(chao))),
-            Chao_iqr = IQR(chao),
-            Shannon_Mean = mean(shannon),
-            Shannon_Median = median(shannon),
-            Shannon_SD = sd(shannon),
-            Shannon_SE = (sd(shannon)/sqrt(length(shannon))),
-            Shannon_iqr = IQR(shannon),
-            InvSimp_Mean = mean(invsimpson),
-            InvSimp_Median = median(invsimpson),
-            InvSimp_SD = sd(invsimpson),
-            InvSimp_SE = (sd(invsimpson)/sqrt(length(invsimpson))),
-            InvSimp_iqr = IQR(invsimpson))
-
-
-adiv.samptype.sum <- adiv %>%
-  group_by(Group, Sample_Type) %>%
-  summarize(TotalOTUs_Mean = mean(Total_OTUs),
-            TotalOTUs_Median = median(Total_OTUs),
-            TotalOTUs_SD = sd(Total_OTUs),
-            TotalOTUs_SE = (sd(Total_OTUs)/sqrt(length(Total_OTUs))),
-            TotalOTUs_iqr = IQR(Total_OTUs),
-            Chao_Mean = mean(chao),
-            Chao_Median = median(chao),
-            Chao_SD = sd(chao),
-            Chao_SE = (sd(chao)/sqrt(length(chao))),
-            Chao_iqr = IQR(chao),
-            Shannon_Mean = mean(shannon),
-            Shannon_Median = median(shannon),
-            Shannon_SD = sd(shannon),
-            Shannon_SE = (sd(shannon)/sqrt(length(shannon))),
-            Shannon_iqr = IQR(shannon),
-            InvSimp_Mean = mean(invsimpson),
-            InvSimp_Median = median(invsimpson),
-            InvSimp_SD = sd(invsimpson),
-            InvSimp_SE = (sd(invsimpson)/sqrt(length(invsimpson))),
-            InvSimp_iqr = IQR(invsimpson))
-
-
-
-
 
 ### Chao
 # Color by group
@@ -1521,99 +1096,22 @@ hist(adiv$chao, breaks=10)
 qqnorm(adiv$chao)
 qqline(adiv$chao)
 shapiro.test(adiv$chao)
-  # p-value = 1.736e-05
-  # p-value = 3.96e-05
+  # p-value = 6.315e-05
+  # Not Normal
 ks.test(adiv$chao, "pnorm", mean=mean(adiv$chao), sd=sd(adiv$chao))
-  # p-value = 0.2134
-  # p-value = 0.335
+  # p-value = 0.4076
+  # Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = chao ~ Group, data = adiv)
-  # p-value = 0.02779
-  # p-value = 0.01146
+  # p-value = 0.01262
 kruskalmc(resp = chao ~ Group, data = adiv)
   # Significant:
-    # Summer-Spring
+    # Summer_Wild-Spring
 kruskal.test(formula = chao ~ Group, data = adiv, subset=Diet=="Lab")
-  # p-value = 0.119
-  # p-value = 0.1177
-kruskal.test(formula = chao ~ Sample_Type, data = adiv)
-  # p-value = 0.1792
-  # p-value = 0.2279
-kruskal.test(formula = chao ~ Diet, data = adiv)
-  # p-value = 0.004116
+  # p-value = 0.1209
 kruskal.test(formula = chao ~ Diet, data = adiv, subset=Season=="Summer")
   # p-value = 0.0208
-wilcox.test(chao ~ Diet, data=adiv)
-  # p-value = 0.002454
-kruskal.test(formula = chao ~ Sex, data = adiv)
-  # p-value = 0.2632
-kruskal.test(formula = chao ~ Sex, data = adiv, subset=Diet=="Lab")
-  # p-value = 0.3634
-kruskal.test(formula = chao ~ Sex, data = adiv, subset=Group=="Summer_Lab")
-  # p-value = 0.5708
-kruskal.test(formula = chao ~ Sex, data = adiv, subset=Group=="Torpor")
-  # p-value = 0.8312
-kruskal.test(formula = chao ~ Sex, data = adiv, subset=Group=="IBA")
-  # p-value = 0.5677
-kruskal.test(formula = chao ~ Sex, data = adiv, subset=Group=="Spring")
-  # p-value = 0.4386
-
-
-
-
-### Berger-Parker
-# Color by group
-ggplot(adiv, aes(x=Group, y=bergerparker, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  #scale_fill_manual(values=c("gray95", "dimgray") )+
-  xlab("Group") +
-  ylab("Berger-Parker")
-# Color by group, facet by sample type
-ggplot(adiv, aes(x=Group, y=bergerparker, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  #scale_fill_manual(values=c("gray95", "dimgray") )+
-  xlab("Group") +
-  ylab("Berger-Parker")
-
-# Test normality
-hist(adiv$bergerparker, breaks=10)
-qqnorm(adiv$bergerparker)
-qqline(adiv$bergerparker)
-shapiro.test(adiv$bergerparker)
-  # p-value = 2.924e-05
-ks.test(adiv$bergerparker, "pnorm", mean=mean(adiv$bergerparker), sd=sd(adiv$bergerparker))
-  # p-value = 0.351
-
-# Kruskal-Wallis
-kruskal.test(formula = bergerparker ~ Group, data = adiv)
-  # p-value = 0.4087
-kruskal.test(formula = bergerparker ~ Group, data = adiv, subset=Diet=="Lab")
-  # p-value = 0.7487
-kruskal.test(formula = bergerparker ~ Sample_Type, data = adiv)
-  # p-value = 0.594
-kruskal.test(formula = bergerparker ~ Diet, data = adiv)
-  # p-value = 0.03825
-kruskal.test(formula = bergerparker ~ Diet, data = adiv, subset=Season=="Summer")
-  # p-value = 0.1317
-wilcox.test(bergerparker ~ Diet, data=adiv)
-  # p-value = 0.03743
-kruskal.test(formula = bergerparker ~ Sex, data = adiv)
-  # p-value = 0.3438
-kruskal.test(formula = bergerparker ~ Sex, data = adiv, subset=Diet=="Lab")
-  # p-value = 0.2396
-kruskal.test(formula = bergerparker ~ Sex, data = adiv, subset=Group=="Summer_Lab")
-  # p-value = 0.4497
-kruskal.test(formula = bergerparker ~ Sex, data = adiv, subset=Group=="Torpor")
-  # p-value = 1
-kruskal.test(formula = bergerparker ~ Sex, data = adiv, subset=Group=="IBA")
-  # p-value = 0.06329
-kruskal.test(formula = bergerparker ~ Sex, data = adiv, subset=Group=="Spring")
-  # p-value = 1
 
 
 
@@ -1641,323 +1139,26 @@ hist(adiv$shannon, breaks=10)
 qqnorm(adiv$shannon)
 qqline(adiv$shannon)
 shapiro.test(adiv$shannon)
-  # p-value = 0.3431
+  # p-value = 0.3654
+  # Normal
 ks.test(adiv$shannon, "pnorm", mean=mean(adiv$shannon), sd=sd(adiv$shannon))
-  # p-value = 0.9152
+  # p-value = 0.8523
+  # Normal
 
 # ANOVA
 summary(aov(shannon ~ Group, data=adiv))
-  # p-value = 0.0501
-t.test(shannon ~ Sample_Type, data=adiv)
-  # p-value = 0.8445
-t.test(shannon ~ Diet, data=adiv)
-  # p-value = 0.02371
-summary(aov(shannon ~ Sex, data=adiv))
-  # p-value = 0.718
-
-
-### Inverse Simpson
-# Color by group
-tiff("InvSimp.tiff", width=6.5, height=3, units="in", res=600)
-ggplot(adiv, aes(x=Group, y= invsimpson, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  xlab("Group") +
-  ylab("Inverse Simpson Weighted Diversity")
-dev.off()
-# Color by group, facet by sample type
-tiff("InvSimp.facet.tiff", width=11, height=3, units="in", res=600)
-ggplot(adiv, aes(x=Group, y= invsimpson, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  xlab("Group") +
-  ylab("Inverse Simpson Weighted Diversity")
-dev.off()
-
-tiff("InvSimp.mdtp.tiff", width=8.5, height=4.75, units="in", res=600)
-ggplot(adiv, aes(x=Group, y= invsimpson, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen")) +
-  xlab("Group") +
-  ylab("Inverse Simpson Weighted Diversity") +
-    theme(axis.text.x = element_text(size=12),
-          axis.text.y = element_text(size=12),
-          axis.title.x = element_text(size=18),
-          axis.title.y = element_text(size=18),
-          #strip.text.x = element_text(size=12),
-          #strip.text.y = element_text(size=12),
-          panel.spacing=unit(1, "lines"),
-          legend.title = element_text(size = 16),
-          legend.text = element_text(size=14)
-    )
-dev.off()
-
-# Test normality
-hist(adiv$invsimpson, breaks=10)
-qqnorm(adiv$invsimpson)
-qqline(adiv$invsimpson)
-shapiro.test(adiv$invsimpson)
-  # p-value = 6.667e-06
-ks.test(adiv$invsimpson, "pnorm", mean=mean(adiv$invsimpson), sd=sd(adiv$invsimpson))
-  # p-value = 0.02063
-
-# Kruskal-Wallis
-kruskal.test(formula = invsimpson ~ Group, data = adiv)
-  # p-value = 0.3059
-kruskal.test(formula = invsimpson ~ Group, data = adiv, subset=Diet=="Lab")
-  # p-value = 0.6151
-kruskal.test(formula = invsimpson ~ Sample_Type, data = adiv)
-  # p-value = 0.7817
-kruskal.test(formula = invsimpson ~ Diet, data = adiv)
-  # p-value = 0.02565
-kruskal.test(formula = invsimpson ~ Diet, data = adiv, subset=Season=="Summer")
-  # p-value = 0.08753
-wilcox.test(invsimpson ~ Diet, data=adiv)
-  # p-value = 0.0239
-kruskal.test(formula = invsimpson ~ Sex, data = adiv)
-  # p-value = 0.2725
-kruskal.test(formula = invsimpson ~ Sex, data = adiv, subset=Diet=="Lab")
-  # p-value = 0.1995
-kruskal.test(formula = invsimpson ~ Sex, data = adiv, subset=Group=="Summer_Lab")
-  # p-value = 0.4497
-kruskal.test(formula = invsimpson ~ Sex, data = adiv, subset=Group=="Torpor")
-  # p-value = 0.5224
-kruskal.test(formula = invsimpson ~ Sex, data = adiv, subset=Group=="IBA")
-  # p-value = 0.2531
-kruskal.test(formula = invsimpson ~ Sex, data = adiv, subset=Group=="Spring")
-  # p-value = 1
-
-
-
-
-
-adiv.rem.combos <- combn(x=levels(adiv$Group), m=2)
-adiv.pvals <- data.frame(rep(999,10))
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv[group2,]
-  test <- wilcox.test(Total_OTUs ~ Group, data=temp.df)
-  adiv.pvals[i,1] <- test$p.value
-  rownames(adiv.pvals)[i] <- paste(adiv.rem.combos[1,i], adiv.rem.combos[2,i])
-}
-colnames(adiv.pvals) <- "otusum.pval"
-adiv.pvals$otusum.bonf <- p.adjust(adiv.pvals$otusum.pval, method="bonferroni")
-adiv.pvals$otusum.BH <- p.adjust(adiv.pvals$otusum.pval, method="BH")
-
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv[group2,]
-  test <- wilcox.test(chao ~ Group, data=temp.df)
-  adiv.pvals[i,4] <- test$p.value
-}
-colnames(adiv.pvals)[4] <- "chao.pval"
-adiv.pvals$chao.bonf <- p.adjust(adiv.pvals$chao.pval, method="bonferroni")
-adiv.pvals$chao.BH <- p.adjust(adiv.pvals$chao.pval, method="BH")
-
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv[group2,]
-  test <- wilcox.test(bergerparker ~ Group, data=temp.df)
-  adiv.pvals[i,7] <- test$p.value
-}
-colnames(adiv.pvals)[7] <- "bp.pval"
-adiv.pvals$bp.bonf <- p.adjust(adiv.pvals$bp.pval, method="bonferroni")
-adiv.pvals$bp.BH <- p.adjust(adiv.pvals$bp.pval, method="BH")
-
-aov.shannon.group <- aov(shannon ~ Group, data=adiv)
-tukey.shannon <- TukeyHSD(aov.shannon.group)
-adiv.pvals$shannon.tukey.pval<-tukey.shannon$Group[,4]
-
-           
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv[group2,]
-  test <- wilcox.test(invsimpson ~ Group, data=temp.df)
-  adiv.pvals[i,11] <- test$p.value
-}
-colnames(adiv.pvals)[11] <- "invsimp.pval"
-adiv.pvals$invsimp.bonf <- p.adjust(adiv.pvals$invsimp.pval, method="bonferroni")
-adiv.pvals$invsimp.BH <- p.adjust(adiv.pvals$invsimp.pval, method="BH")
-
-
-adiv.con <- adiv[which(adiv$Sample_Type=="Content"),]
-adiv.con.pvals <- data.frame(rep(999,10))
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.con$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.con$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.con[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.con[group2,]
-  test <- wilcox.test(Total_OTUs ~ Group, data=temp.df)
-  adiv.con.pvals[i,1] <- test$p.value
-  rownames(adiv.con.pvals)[i] <- paste(adiv.rem.combos[1,i], adiv.rem.combos[2,i])
-}
-colnames(adiv.con.pvals) <- "otusum.pval"
-adiv.con.pvals$otusum.bonf <- p.adjust(adiv.con.pvals$otusum.pval, method="bonferroni")
-adiv.con.pvals$otusum.BH <- p.adjust(adiv.con.pvals$otusum.pval, method="BH")
-
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.con$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.con$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.con[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.con[group2,]
-  test <- wilcox.test(chao ~ Group, data=temp.df)
-  adiv.con.pvals[i,4] <- test$p.value
-}
-colnames(adiv.con.pvals)[4] <- "chao.pval"
-adiv.con.pvals$chao.bonf <- p.adjust(adiv.con.pvals$chao.pval, method="bonferroni")
-adiv.con.pvals$chao.BH <- p.adjust(adiv.con.pvals$chao.pval, method="BH")
-
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.con$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.con$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.con[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.con[group2,]
-  test <- wilcox.test(bergerparker ~ Group, data=temp.df)
-  adiv.con.pvals[i,7] <- test$p.value
-}
-colnames(adiv.con.pvals)[7] <- "bp.pval"
-adiv.con.pvals$bp.bonf <- p.adjust(adiv.con.pvals$bp.pval, method="bonferroni")
-adiv.con.pvals$bp.BH <- p.adjust(adiv.con.pvals$bp.pval, method="BH")
-
-aov.shannon.group <- aov(shannon ~ Group, data=adiv.con)
-tukey.shannon <- TukeyHSD(aov.shannon.group)
-adiv.con.pvals$shannon.tukey.pval<-tukey.shannon$Group[,4]
-
-           
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.con$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.con$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.con[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.con[group2,]
-  test <- wilcox.test(invsimpson ~ Group, data=temp.df)
-  adiv.con.pvals[i,11] <- test$p.value
-}
-colnames(adiv.con.pvals)[11] <- "invsimp.pval"
-adiv.con.pvals$invsimp.bonf <- p.adjust(adiv.con.pvals$invsimp.pval, method="bonferroni")
-adiv.con.pvals$invsimp.BH <- p.adjust(adiv.con.pvals$invsimp.pval, method="BH")
-
-
-
-adiv.muc <- adiv[which(adiv$Sample_Type=="Content"),]
-adiv.muc.pvals <- data.frame(rep(999,10))
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.muc$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.muc$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.muc[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.muc[group2,]
-  test <- wilcox.test(Total_OTUs ~ Group, data=temp.df)
-  adiv.muc.pvals[i,1] <- test$p.value
-  rownames(adiv.muc.pvals)[i] <- paste(adiv.rem.combos[1,i], adiv.rem.combos[2,i])
-}
-colnames(adiv.muc.pvals) <- "otusum.pval"
-adiv.muc.pvals$otusum.bonf <- p.adjust(adiv.muc.pvals$otusum.pval, method="bonferroni")
-adiv.muc.pvals$otusum.BH <- p.adjust(adiv.muc.pvals$otusum.pval, method="BH")
-
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.muc$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.muc$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.muc[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.muc[group2,]
-  test <- wilcox.test(chao ~ Group, data=temp.df)
-  adiv.muc.pvals[i,4] <- test$p.value
-}
-colnames(adiv.muc.pvals)[4] <- "chao.pval"
-adiv.muc.pvals$chao.bonf <- p.adjust(adiv.muc.pvals$chao.pval, method="bonferroni")
-adiv.muc.pvals$chao.BH <- p.adjust(adiv.muc.pvals$chao.pval, method="BH")
-
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.muc$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.muc$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.muc[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.muc[group2,]
-  test <- wilcox.test(bergerparker ~ Group, data=temp.df)
-  adiv.muc.pvals[i,7] <- test$p.value
-}
-colnames(adiv.muc.pvals)[7] <- "bp.pval"
-adiv.muc.pvals$bp.bonf <- p.adjust(adiv.muc.pvals$bp.pval, method="bonferroni")
-adiv.muc.pvals$bp.BH <- p.adjust(adiv.muc.pvals$bp.pval, method="BH")
-
-aov.shannon.group <- aov(shannon ~ Group, data=adiv.muc)
-tukey.shannon <- TukeyHSD(aov.shannon.group)
-adiv.muc.pvals$shannon.tukey.pval<-tukey.shannon$Group[,4]
-
-           
-for(i in 1:ncol(adiv.rem.combos)){
-  group1 <- which(adiv.muc$Group == adiv.rem.combos[1,i])
-  group2 <- which(adiv.muc$Group == adiv.rem.combos[2,i])
-  temp.df <- adiv.muc[group1,]
-  temp.df[(nrow(temp.df)+1):(nrow(temp.df)+length(group2)),] <- adiv.muc[group2,]
-  test <- wilcox.test(invsimpson ~ Group, data=temp.df)
-  adiv.muc.pvals[i,11] <- test$p.value
-}
-colnames(adiv.muc.pvals)[11] <- "invsimp.pval"
-adiv.muc.pvals$invsimp.bonf <- p.adjust(adiv.muc.pvals$invsimp.pval, method="bonferroni")
-adiv.muc.pvals$invsimp.BH <- p.adjust(adiv.muc.pvals$invsimp.pval, method="BH")
-
-
-adiv.pvals[11:20,] <- adiv.con.pvals
-adiv.pvals[21:30,] <- adiv.muc.pvals
-rows <- rownames(adiv.con.pvals)
-for (i in 1:length(rows)){
-  rows[i] <- paste(rows[i], "Content")
-}
-rownames(adiv.pvals)[11:20] <- rows
-rows <- rownames(adiv.muc.pvals)
-for (i in 1:length(rows)){
-  rows[i] <- paste(rows[i], "Mucosa")
-}
-rownames(adiv.pvals)[21:30] <- rows
-
-adiv.pvals <- adiv.pvals[,-7:-9]
-
-
-adiv.group <- data.frame(rep(999,5))
-for(i in 1:5){
-  gro <- levels(adiv$Group)[i]
-  adiv.temp <- adiv[which(adiv$Group==gro),]
-  test <- wilcox.test(Total_OTUs ~ Sample_Type, data=adiv.temp)
-  adiv.group[i,1] <- test$p.value
-  test <- wilcox.test(chao ~ Sample_Type, data=adiv.temp)
-  adiv.group[i,2] <- test$p.value
-  test <- wilcox.test(bergerparker ~ Sample_Type, data=adiv.temp)
-  adiv.group[i,3] <- test$p.value
-  test <- t.test(shannon ~ Sample_Type, data=adiv.temp)
-  adiv.group[i,4] <- test$p.value
-  test <- wilcox.test(invsimpson ~ Sample_Type, data=adiv.temp)
-  adiv.group[i,5] <- test$p.value
-}
-rownames(adiv.group) <- levels(adiv$Group)
-colnames(adiv.group) <- c("otusum.pval", "chao.pval", "bp.pval", "shannon.pval", "invsimp.pval")
-adiv.group$otusum.bonf <- p.adjust(adiv.group$otusum.pval, method="bonferroni")
-adiv.group$otusum.BH <- p.adjust(adiv.group$otusum.pval, method="BH")
-adiv.group$chao.bonf <- p.adjust(adiv.group$chao.pval, method="bonferroni")
-adiv.group$chao.BH <- p.adjust(adiv.group$chao.pval, method="BH")
-adiv.group$bp.bonf <- p.adjust(adiv.group$bp.pval, method="bonferroni")
-adiv.group$bp.BH <- p.adjust(adiv.group$bp.pval, method="BH")
-adiv.group$shannon.bonf <- p.adjust(adiv.group$shannon.pval, method="bonferroni")
-adiv.group$shannon.BH <- p.adjust(adiv.group$shannon.pval, method="BH")
-adiv.group$invsimp.bonf <- p.adjust(adiv.group$invsimp.pval, method="bonferroni")
-adiv.group$invsimp.BH <- p.adjust(adiv.group$invsimp.pval, method="BH")
-
-
-adiv.muc.pvals$invsimp.bonf <- p.adjust(adiv.muc.pvals$invsimp.pval, method="bonferroni")
-adiv.muc.pvals$invsimp.BH <- p.adjust(adiv.muc.pvals$invsimp.pval, method="BH")
-
-
+  # p-value = 0.00903
+TukeyHSD(aov(shannon ~ Group, data=adiv))
+  # Summer_Lab-Summer_Wild = 0.2076838
+  # Torpor-Summer_Wild = 0.1364256
+  # IBA-Summer_Wild = 0.2187595
+  # Spring-Summer_Wild = 0.0028812*
+  # Torpor-Summer_Lab = 0.9980816
+  # IBA-Summer_Lab = 0.9999930
+  # Spring-Summer_Lab = 0.1460725
+  # IBA-Torpor = 0.9953298
+  # Spring-Torpor = 0.2450932
+  # Spring-IBA = 0.1219430
 
 
 ```
