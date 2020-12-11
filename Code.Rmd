@@ -271,28 +271,48 @@ plot_ordination(physeq=physeq.spr, ordination=nmds.spr, color="Sample_Type", sha
 
 sampdf.wild <- data.frame(sample_data(physeq.wild))
 bray.wild <- phyloseq::distance(physeq = physeq.wild, method = "bray")
-adonis(bray.wild ~ Sample_Type, data = sampdf.wild)
+beta.tax = betadisper(d=bray.wild, group=sampdf.wild$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.9013889
+adonis(bray.wild ~ Sample_Type, data = sampdf.wild, permutations = 9999)
   # p-value = 0.7
 
 sampdf.sum <- data.frame(sample_data(physeq.sum))
 bray.sum <- phyloseq::distance(physeq = physeq.sum, method = "bray")
-adonis(bray.sum ~ Sample_Type, data = sampdf.sum)
-  # p-value = 0.973
+beta.tax = betadisper(d=bray.sum, group=sampdf.sum$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.321
+adonis(bray.sum ~ Sample_Type, data = sampdf.sum, permutations = 9999)
+  # p-value = 0.9792
 
 sampdf.tor <- data.frame(sample_data(physeq.tor))
 bray.tor <- phyloseq::distance(physeq = physeq.tor, method = "bray")
-adonis(bray.tor ~ Sample_Type, data = sampdf.tor)
-  # p-value = 0.941
+beta.tax = betadisper(d=bray.tor, group=sampdf.tor$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.737
+adonis(bray.tor ~ Sample_Type, data = sampdf.tor, permutations = 9999)
+  # p-value = 0.9442
 
 sampdf.iba <- data.frame(sample_data(physeq.iba))
 bray.iba <- phyloseq::distance(physeq = physeq.iba, method = "bray")
-adonis(bray.iba ~ Sample_Type, data = sampdf.iba)
-  # p-value = 0.951
+beta.tax = betadisper(d=bray.iba, group=sampdf.iba$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.795
+adonis(bray.iba ~ Sample_Type, data = sampdf.iba, permutations = 9999)
+  # p-value = 0.9598
 
 sampdf.spr <- data.frame(sample_data(physeq.spr))
 bray.spr <- phyloseq::distance(physeq = physeq.spr, method = "bray")
-adonis(bray.spr ~ Sample_Type, data = sampdf.spr)
-  # p-value = 0.9
+beta.tax = betadisper(d=bray.spr, group=sampdf.spr$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.008333
+anosim(bray.spr, sampdf.spr$Sample_Type, permutations = 1000)
+  # p-value = 1
 ```
 ### Test content & mucosa separately for season - Alpha Diversity
 ```{r}
@@ -402,19 +422,13 @@ plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group")
 ### Combined PERMANOVA
 sampdf <- data.frame(sample_data(physeq.rem))
 bray <- phyloseq::distance(physeq = physeq.rem, method = "bray")
-adonis(bray ~ Group, data = sampdf)
-  # 0.001
-pairwise.adonis(as.matrix(bray), sampdf$Group, sim.method = "bray", p.adjust.m = "fdr")
-  # Summer_Wild vs Summer_Lab = 0.000175*
-  # Summer_Wild vs IBA = 0.000175*
-  # Summer_Wild vs Torpor = 0.0002*
-  # Summer_Wild vs Spring = 0.0025375*
-  # Summer_Lab vs IBA = 0.00005*
-  # Summer_Lab vs Torpor = 0.00005*
-  # Summer_Lab vs Spring = 0.07272
-  # IBA vs Torpor = 0.32849
-  # IBA vs Spring = 0.0002*
-  # Torpor vs Spring = 0.0004857143*
+beta.tax = betadisper(d=bray, group=sampdf$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.015
+anosim(bray, sampdf$Group, permutations = 1000)
+  # p-value = 0.000999
+
 
  
 
@@ -430,8 +444,12 @@ plot_ordination(physeq=physeq.muc, ordination=nmds.muc, color="Group")
 ### PERMANOVA
 sampdf.con <- data.frame(sample_data(physeq.con))
 bray.con <- phyloseq::distance(physeq = physeq.con, method = "bray")
-adonis(bray.con ~ Group, data = sampdf.con)
-  # p-value = 0.001
+beta.tax = betadisper(d=bray.con, group=sampdf.con$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.183
+adonis(bray.con ~ Group, data = sampdf.con, permutations = 9999)
+  # p-value = 1e-04
 pairwise.adonis(as.matrix(bray.con), sampdf.con$Group, sim.method = "bray", p.adjust.m = "fdr")
   # Summer_Wild vs Summer_Lab = 0.03685714*
   # Summer_Wild vs IBA = 0.0297619*
@@ -446,6 +464,10 @@ pairwise.adonis(as.matrix(bray.con), sampdf.con$Group, sim.method = "bray", p.ad
 
 sampdf.muc <- data.frame(sample_data(physeq.muc))
 bray.muc <- phyloseq::distance(physeq = physeq.muc, method = "bray")
+beta.tax = betadisper(d=bray.muc, group=sampdf.muc$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.103
 adonis(bray.muc ~ Group, data = sampdf.muc)
   # p-value = 0.001
 pairwise.adonis(as.matrix(bray.muc), sampdf.muc$Group, sim.method = "bray", p.adjust.m = "fdr")
@@ -582,8 +604,12 @@ plot_ordination(physeq=physeq.lab, ordination=nmds, color="Group", shape="Sample
 ###### PERMANOVA - By Season for Sample Type ######
 sampdf.lab <- data.frame(sample_data(physeq.lab))
 bray.lab <- phyloseq::distance(physeq = physeq.lab, method = "bray")
-adonis(bray.lab ~ Group, data = sampdf.lab)
-  # p-value = 0.001
+beta.tax = betadisper(d=bray.lab, group=sampdf.lab$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.067
+adonis(bray.lab ~ Group, data = sampdf.lab, permutations = 9999)
+  # p-value = 0.0001
 pairwise.adonis(as.matrix(bray.lab), sampdf.lab$Group, sim.method = "bray", p.adjust.m = "fdr")
   # Summer_Lab vs IBA = 0.000030*
   # Summer_Lab vs Torpor = 0.000030*
@@ -607,7 +633,11 @@ plot_ordination(physeq=physeq.lab.muc, ordination=nmds.lab.muc, color="Group")
 ### PERMANOVA
 sampdf.lab.con <- data.frame(sample_data(physeq.lab.con))
 bray.lab.con <- phyloseq::distance(physeq = physeq.lab.con, method = "bray")
-adonis(bray.lab.con ~ Group, data = sampdf.lab.con)
+beta.tax = betadisper(d=bray.lab.con, group=sampdf.lab.con$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.446
+adonis(bray.lab.con ~ Group, data = sampdf.lab.con, permutations = 9999)
   # p-value = 0.001
 pairwise.adonis(as.matrix(bray.lab.con), sampdf.lab.con$Group, sim.method = "bray", p.adjust.m = "fdr")
   # Summer_Lab vs IBA = 0.00834*
@@ -619,8 +649,12 @@ pairwise.adonis(as.matrix(bray.lab.con), sampdf.lab.con$Group, sim.method = "bra
 
 sampdf.lab.muc <- data.frame(sample_data(physeq.lab.muc))
 bray.lab.muc <- phyloseq::distance(physeq = physeq.lab.muc, method = "bray")
-adonis(bray.lab.muc ~ Group, data = sampdf.lab.muc)
-  # p-value = 0.002
+beta.tax = betadisper(d=bray.lab.muc, group=sampdf.lab.muc$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.14
+adonis(bray.lab.muc ~ Group, data = sampdf.lab.muc, permutations = 9999)
+  # p-value = 0.0017
 pairwise.adonis(as.matrix(bray.lab.muc), sampdf.lab.muc$Group, sim.method = "bray", p.adjust.m = "fdr")
   # Summer_Lab vs IBA = 0.01776*
   # Summer_Lab vs Torpor = 0.02451*
@@ -1064,18 +1098,6 @@ ggplot(adiv, aes(x=Group, y=chao, fill = Group)) +
         )
 dev.off()
 
-
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_text(size=12),
-        axis.title.x = element_text(size=18),
-        axis.title.y = element_text(size=18),
-        strip.text.x = element_text(size=13, face="bold"),
-        strip.text.y = element_text(size=13, face="bold"),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 14, face="bold"),
-        legend.text = element_text(size=13),
-        panel.grid.major = element_blank()
-        #panel.grid.minor = element_blank()
         
         
 dev.off()
@@ -1421,83 +1443,13 @@ dev.off()
 ### PERMANOVA
 sampdf <- data.frame(sample_data(physeq.rem))
 bray<- phyloseq::distance(physeq=physeq.rem, method="bray")
-adonis(bray~ Group, data=sampdf)
-  # p-value = 0.001
 beta.tax = betadisper(d=bray, group=sampdf$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.026
-adonis(bray~ Sample_Type, data=sampdf)
-  # p-value = 1
-beta.tax = betadisper(d=bray, group=sampdf$Sample_Type)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.192
-adonis(bray~ Group*Sex*Sample_Type, data=sampdf)
-  # Group
-    # p-value = 0.001    
-    # R2 = 0.27974
-  # Sex
-    # p-value = 0.005
-    # R2 = 0.03814
-  # Sample_Type
-    # p-value = 0.998
-    # R2 = 0.00721
-  # Group:Sex
-    # p-value = 0.001
-    # R2 = 0.13012
-  # Group:Sample_Type
-    # p-value = 1.000
-    # R2 = 0.02178
-  # Sex:Sample_Type
-    # p-value = 1.000
-    # R2 = 0.00402
-  # Group:Sex:Sample_Type
-    # p-value = 1.000
-    # R2 = 0.01351
-  # Residuals
-    # R2 = 0.50549
+  # p-value = 0.006
+anosim(bray, sampdf$Group, permutations = 1000)
+# p-value = 0.000999
 
-
-
-combos <- combn(x=levels(sampdf$Group), m=2)
-bray.pvals <- data.frame(rep(999,10))
-for( i in 1:ncol(combos)){
-  temp.physeq <- subset_samples(physeq.rem, Group%in% combos[,i])
-  temp.sampdf <- data.frame(sample_data(temp.physeq))
-  temp.bray <- phyloseq::distance(physeq=temp.physeq, method="bray")
-  test <- adonis(temp.bray ~ Group, data=temp.sampdf)
-  rownames(bray.pvals)[i] <- paste(combos[1,i], combos[2,i])
-  bray.pvals[i,1]<- test[[1]]$`Pr(>F)`[1]
-}
-colnames(bray.pvals) <- "pval"
-bray.pvals$Adj.bonf <- p.adjust(bray.pvals$pval, method="bonferroni")
-bray.pvals$Adj.BH <- p.adjust(bray.pvals$pval, method="BH")
-
-sampdf2 <- data.frame(sample_data(physeq.rem))
-combos2 <- combn(x=levels(sampdf2$Group), m=2)
-bray.pvals2 <- data.frame(rep(999,10))
-for( i in 1:ncol(combos2)){
-  temp.physeq2 <- subset_samples(physeq.rem, Group%in% combos2[,i])
-  temp.sampdf2 <- data.frame(sample_data(temp.physeq2))
-  temp.bray2 <- phyloseq::distance(physeq=temp.physeq2, method="bray")
-  test2 <- adonis(temp.bray2 ~ Group, data=temp.sampdf2)
-  rownames(bray.pvals2)[i] <- paste(combos2[1,i], combos2[2,i])
-  bray.pvals2[i,1]<- test2[[1]]$`Pr(>F)`[1]
-}
-colnames(bray.pvals2) <- "pval"
-bray.pvals2$Adj.bonf <- p.adjust(bray.pvals2$pval, method="bonferroni")
-bray.pvals2$Adj.BH <- p.adjust(bray.pvals2$pval, method="BH")
-
-
-
-sampdf <- data.frame(sample_data(physeq.rem))
-bray<- phyloseq::distance(physeq=physeq.rem, method="bray")
-adonis(bray~ Group, data=sampdf)
-
-#pulls out p-value:
-  test[[1]]$`Pr(>F)`[1]
-  #https://stackoverflow.com/questions/3366506/extract-p-value-from-aov?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 ```
 
 
