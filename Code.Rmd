@@ -133,7 +133,7 @@ physeq.lab <- subset_samples(physeq.rem, Diet != "Wild")
 ```{r}
 adiv <- data.frame(sample_data(physeq.rem))
 
-########## Compare Con vs. Muc within Season ##########
+########## Compare Con vs. Muc within Group ##########
 
 # Separate by season
 adiv.wild <- adiv[which(adiv$Group == "Summer_Wild"),]
@@ -245,7 +245,7 @@ nmds <- ordinate(physeq=physeq.rem, method="NMDS", distance="bray")
 plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sample_Type") + facet_grid(.~Group)
 plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sex") + facet_grid(.~Group)
 
-### Bray NMDS - By Season
+### Bray NMDS - By Group
 nmds.wild <- ordinate(physeq=physeq.wild, method="NMDS", distance="bray")
   # stress = 0.1499987 
 plot_ordination(physeq=physeq.wild, ordination=nmds.wild, color="Sample_Type", shape="Sample_Type")
@@ -268,7 +268,7 @@ plot_ordination(physeq=physeq.spr, ordination=nmds.spr, color="Sample_Type", sha
 
 
 
-###### PERMANOVA - By Season for Sample Type ######
+###### PERMANOVA - By Group for Sample Type ######
 
 sampdf.wild <- data.frame(sample_data(physeq.wild))
 bray.wild <- phyloseq::distance(physeq = physeq.wild, method = "bray")
