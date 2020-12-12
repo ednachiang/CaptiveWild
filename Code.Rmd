@@ -278,33 +278,37 @@ p$tab
   # p-value = 0.9013889
 adonis(bray.wild ~ Sample_Type, data = sampdf.wild, permutations = 9999)
   # p-value = 0.7
+  # R2 = 0.3548
 
 sampdf.sum <- data.frame(sample_data(physeq.sum))
 bray.sum <- phyloseq::distance(physeq = physeq.sum, method = "bray")
 beta.tax = betadisper(d=bray.sum, group=sampdf.sum$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.321
+  # p-value = 0.628
 adonis(bray.sum ~ Sample_Type, data = sampdf.sum, permutations = 9999)
-  # p-value = 0.9792
+  # p-value = 0.9967
+  # R2 = 0.01754
 
 sampdf.tor <- data.frame(sample_data(physeq.tor))
 bray.tor <- phyloseq::distance(physeq = physeq.tor, method = "bray")
 beta.tax = betadisper(d=bray.tor, group=sampdf.tor$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.737
+  # p-value = 0.755
 adonis(bray.tor ~ Sample_Type, data = sampdf.tor, permutations = 9999)
-  # p-value = 0.9442
+  # p-value = 0.9429
+  # R2 = 0.0332
 
 sampdf.iba <- data.frame(sample_data(physeq.iba))
 bray.iba <- phyloseq::distance(physeq = physeq.iba, method = "bray")
 beta.tax = betadisper(d=bray.iba, group=sampdf.iba$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.795
+  # p-value = 0.79
 adonis(bray.iba ~ Sample_Type, data = sampdf.iba, permutations = 9999)
-  # p-value = 0.9598
+  # p-value = 0.9654
+  # R2 = 0.02039
 
 sampdf.spr <- data.frame(sample_data(physeq.spr))
 bray.spr <- phyloseq::distance(physeq = physeq.spr, method = "bray")
@@ -314,6 +318,7 @@ p$tab
   # p-value = 0.008333
 anosim(bray.spr, sampdf.spr$Sample_Type, permutations = 1000)
   # p-value = 1
+  # R = -0.4167
 ```
 ### Alpha Diversity - Lab squirrels
 ```{r}
@@ -468,7 +473,7 @@ pushViewport(viewport(layout=(grid.layout(1,1))))
 
 print(nmds.lab.plot, vp=viewport(layout.pos.row=1, layout.pos.col=1))
 
-grid.text("stress = 0.141", x=unit(0.6, "npc"), y=unit(0.17, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=9))
+grid.text("stress = 0.141", x=unit(0.85, "npc"), y=unit(0.17, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=9))
 
 #dev.off()
 
@@ -622,6 +627,7 @@ chao.sum <- ggplot(adiv.sum, aes(x = Habitat, y = chao, fill = Habitat)) +
   scale_y_continuous(limits = c(0,2050), breaks = c(0, 500, 1000, 1500, 2000)) +
   ylab("Chao Richness") +
   scale_fill_manual(values = c("brown2", "lightcoral")) +
+  labs(fill = "Group") +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
@@ -643,6 +649,7 @@ shannon.sum <- ggplot(adiv.sum, aes(x = Habitat, y = shannon, fill = Habitat)) +
   scale_y_continuous(limits = c(2.5, 6), breaks = c(2.5, 3.2, 3.9, 4.6, 5.3, 6.0)) +
   ylab("Shannon Diversity Index") +
   scale_fill_manual(values = c("brown2", "lightcoral")) +
+  labs("Group") +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
@@ -669,8 +676,10 @@ grid.text("(B)", x=unit(0.03, "npc"), y=unit(0.974, "npc"), vp=viewport(layout.p
 
 grid.text("a                  b", x=unit(0.435, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=12))
 grid.text("ns", x=unit(0.435, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2), gp=gpar(fontsize=12))
-
 #dev.off()
+
+
+
 
 ###### Examine Phyla ######
 # Merge samples with the same taxonomic rank
@@ -846,6 +855,79 @@ p$tab
 
 
 
+### Beta Diversity - Wild vs. Lab
+```{r}
+# Subset summer samples
+physeq.sum <- subset_samples(physeq.rem, Season == "Summer")
+
+### Bray NMDS
+#nmds.sum <- ordinate(physeq=physeq.sum, method="NMDS", distance="bray")
+  # Stress = 0.05705866
+#save(nmds.sum, file = "nmds.sum.RData")
+load("nmds.lab.RData")
+
+
+### PERMANOVA
+sampdf.sum <- data.frame(sample_data(physeq.sum))
+bray.sum <- phyloseq::distance(physeq = physeq.sum, method = "bray")
+beta.tax = betadisper(d=bray.sum, group=sampdf.sum$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.002
+anosim(bray.sum, sampdf.sum$Group, permutations = 1000)
+  # p-value = 0.000999
+  # R2 = 0.6165
+
+
+##### Plot
+
+# Ellipses
+elip.nmds.sum <- data.frame(MDS1 = nmds.sum$points[,1], MDS2 = nmds.sum$points[,2],
+                        Group = sample_data(physeq.sum)$Group)
+plot.new()
+elip.ord.sum <- ordiellipse(nmds.sum, sample_data(physeq.sum)$Group, display="sites", kind="se", conf=0.95, label=T)
+elip.sum.df <- data.frame()
+for(i in levels(elip.nmds.sum$Group)){
+  elip.sum.df <- rbind(elip.sum.df, cbind(as.data.frame(with(elip.nmds.sum[elip.nmds.sum$Group==i,],
+                                                     veganCovEllipse(elip.ord.sum[[i]]$cov,
+                                                                     elip.ord.sum[[i]]$center,
+                                                                     elip.ord.sum[[i]]$scale))),
+                                  group=i))
+}
+
+# Ordination
+nmds.sum.plot <- plot_ordination(physeq=physeq.sum, ordination=nmds.sum, color="Group") +
+  scale_color_manual(values = c("brown2", "lightcoral"),
+                    labels = c("Wild", "Captive")) +
+  labs(color = "Group") +
+  geom_point(size = 2) +
+  geom_path(data=elip.sum.df, aes(x=NMDS1, y=NMDS2, color=group), size=1, linetype=1) +
+   theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(size=16),
+        axis.text.y = element_text(size=16),
+        axis.title.x = element_text(size=16, face="bold"),
+        axis.title.y = element_text(size=16, face="bold"),
+        legend.title = element_text(size=16, face="bold"),
+        legend.text = element_text(size=16),
+        plot.title = element_text(size=16, face="bold", hjust=0.5),
+        plot.margin = unit(c(1,1,1,1), "mm"),      # top, right, bottom, left
+        legend.margin=margin(0,0,0,0),
+        legend.box.margin=margin(-10,0,-10,-8)
+        )
+
+
+# Save plot
+#tiff("nmds.sum.tiff", width=5, height=3.5, units="in", res=600)
+grid.newpage()
+pushViewport(viewport(layout=(grid.layout(1,1))))
+print(nmds.sum.plot, vp=viewport(layout.pos.row=1, layout.pos.col=1))
+grid.text("stress = 0.057", x=unit(0.865, "npc"), y=unit(0.17, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=9))
+#dev.off()
+
+
+
+```
 ### Examine Phyla
 ```{r}
 # Merge samples with the same taxonomic rank
