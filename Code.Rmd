@@ -352,7 +352,8 @@ summary(aov(shannon ~ Group, data = adiv.lab))
 
 ### Chao
 adiv.chao <- ggplot(adiv.lab, aes(x = Group, y = chao, fill = Group)) +
-  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15) +
+  geom_boxplot(position = position_dodge(1), outlier.shape = NA) +
+  geom_jitter(size=2, width = 0.2) +
   scale_y_continuous(limits = c(0,2200), breaks = c(0, 550, 1100, 1650, 2200)) +
   scale_x_discrete(breaks=c("Summer_Lab", "Torpor", "IBA", "Spring"), labels=c("Summer", "Torpor", "IBA", "Spring")) +
   ylab("Chao Richness") +
@@ -371,9 +372,12 @@ adiv.chao <- ggplot(adiv.lab, aes(x = Group, y = chao, fill = Group)) +
         axis.text.y = element_text(size=13),
         legend.text = element_text(size=14))
 
+
+
 ### Shannon
 adiv.shannon <- ggplot(adiv.lab, aes(x = Group, y = shannon, fill = Group)) +
-  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15) +
+  geom_boxplot(position = position_dodge(1), outlier.shape = NA) +
+  geom_jitter(size=2, width = 0.2) +
   scale_y_continuous(limits = c(0,6), breaks = c(0, 1, 2, 3, 4, 5, 6)) +
   scale_x_discrete(breaks=c("Summer_Lab", "Torpor", "IBA", "Spring"), labels=c("Summer", "Torpor", "IBA", "Spring")) +
   ylab("Shannon Diversity Index\n") +
@@ -392,6 +396,9 @@ adiv.shannon <- ggplot(adiv.lab, aes(x = Group, y = shannon, fill = Group)) +
         axis.text.y = element_text(size=13),
         legend.text = element_text(size=14))
 
+
+
+
 ### Combine plots
 #tiff("adiv.lab.tiff", width = 11, height = 3.5, units = "in", res = 600)
 grid.newpage()
@@ -399,8 +406,8 @@ pushViewport(viewport(layout=(grid.layout(1,2))))
 print(adiv.chao, vp=viewport(layout.pos.row=1, layout.pos.col=1))
 print(adiv.shannon, vp=viewport(layout.pos.row=1, layout.pos.col=2))
 
-grid.text("A", x=unit(0.03, "npc"), y=unit(0.974, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=16,fontface="bold"))
-grid.text("B", x=unit(0.03, "npc"), y=unit(0.974, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),gp=gpar(fontsize=16,fontface="bold"))
+grid.text("(A)", x=unit(0.025, "npc"), y=unit(0.974, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=15,fontface="bold"))
+grid.text("(B)", x=unit(0.025, "npc"), y=unit(0.974, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),gp=gpar(fontsize=15,fontface="bold"))
 
 grid.text("ns", x=unit(0.44, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=12))
 grid.text("ns", x=unit(0.45, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2), gp=gpar(fontsize=12))
@@ -572,9 +579,44 @@ ggplot(chow.adiv, aes(x=Group, y= invsimpson, fill = Group)) +
 ```
 
 
-### Examine Summer Lab vs. Wild
+### Alpha Diversity - Wild vs. Lab
 ```{r}
-sum.physeq <- subset_samples(physeq.rem, Season == "Summer")
+# Subset summer samples
+physeq.sum <- subset_samples(physeq.rem, Season == "Summer")
+
+# Alpha diversity
+adiv.sum <- data.frame(sample_data(sum.physeq))
+
+### Chao
+hist(adiv.sum$chao, breaks=10)
+qqnorm(adiv.sum$chao)
+qqline(adiv.sum$chao)
+shapiro.test(adiv.sum$chao)
+  # p-value = 0.01554
+  # Not Normal
+kruskal.test(formula = chao ~ Diet, data = adiv.sum)
+  # p-value = 0.0208
+
+
+### Shannon
+# Test normality
+hist(adiv.sum$shannon, breaks=10)
+qqnorm(adiv.sum$shannon)
+qqline(adiv.sum$shannon)
+shapiro.test(adiv.sum$shannon)
+  # p-value = 0.2649
+summary(aov(shannon ~ Diet, data = adiv.sum))
+  # p-value = 0.0543
+
+
+
+
+
+
+
+
+
+
 
 ###### Examine Phyla ######
 # Merge samples with the same taxonomic rank
@@ -594,20 +636,12 @@ sum.phy.df$Phylum[which(is.na(sum.phy.df$Phylum))] <- rep("Unclassified",18)
 sum.phy.sum <- sum.phy.df %>%
   group_by(Diet, Sample_Type, Phylum) %>%
   summarize(Mean = mean(Abundance),
-            Median = median(Abundance),
             SD = sd(Abundance),
-            SE = (sd(Abundance)/(sqrt(length(Abundance)))),
-            iqr = IQR(Abundance))
-
-# Calculate IQR limits
-sum.phy.sum$iqr.min <- sum.phy.sum$Median - 0.5*sum.phy.sum$iqr
-sum.phy.sum[which(sum.phy.sum$iqr.min < 0),10] <- 0
-  # Any IQR min < 0, change to 0 (otherwise error bar won't plot)
-sum.phy.sum$iqr.max <- sum.phy.sum$Median + 0.5*sum.phy.sum$iqr
+            SE = se(Abundance))
 
 
 ### Barplot ###
-ggplot(sum.phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
+ggplot(sum.phy.sum, aes(x=Phylum, y=Mean, fill=Phylum)) +
   geom_bar(stat="identity", color="black") +
   geom_errorbar(aes(ymax=Mean + SE, ymin=Mean - SE), width=0.25) +
   facet_grid(Diet ~ Sample_Type) +
@@ -616,61 +650,6 @@ ggplot(sum.phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
   ylab("Mean Relative Abundance for Phyla > 1%") +
   theme(axis.text.x = element_blank())
 
-
-###### Alpha-Diversity ######
-sum.adiv <- data.frame(sample_data(sum.physeq))
-
-sum.adiv.con <- sum.adiv[which(sum.adiv$Sample_Type=="Content"),]
-sum.adiv.muc <- sum.adiv[which(sum.adiv$Sample_Type=="Mucosa"),]
-sum.adiv.lab <- sum.adiv[which(sum.adiv$Diet=="Lab"),]
-sum.adiv.wil <- sum.adiv[which(sum.adiv$Diet=="Wild"),]
-
-# Total OTUs
-# Make the original, unnormalized phyloseq object
-
-sum.otu.tot <- data.frame(sample_names(sum.physeq))
-# Pull out # of OTUs from all samples
-sum.otu.tot$Total_OTUs <- rep("NA", 17)
-for(i in 1:17){
-  sum.otu.tot[i,2] <- length(which(otu_table(sum.physeq)[,i] != 0))
-}
-colnames(sum.otu.tot) <- c("Sample", "Total_OTUs")
-sum.otu.tot$Total_OTUs <- as.integer(sum.otu.tot$Total_OTUs)
-sum.otusum <- sum.adiv
-sum.otusum$Total_OTUs <- sum.otu.tot$Total_OTUs
-
-# Color by group
-ggplot(sum.otusum, aes(x=Diet, y=Total_OTUs, fill = Diet)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  scale_fill_manual(values=c("brown2", "lightcoral")) +
-  xlab("Group") +
-  ylab("Total OTUs")
-
-# Test normality
-hist(sum.otusum$Total_OTUs, breaks=10)
-qqnorm(sum.otusum$Total_OTUs)
-qqline(sum.otusum$Total_OTUs)
-shapiro.test(sum.otusum$Total_OTUs)
-  # p-value = 0.0071
-  # Not normal
-ks.test(sum.otusum$Total_OTUs, "pnorm", mean=mean(sum.otusum$Total_OTUs), sd=sd(sum.otusum$Total_OTUs))
-  # p-value = 0.1352
-
-# Wilcoxon
-wilcox.test(Total_OTUs ~ Diet, data=sum.otusum)
-  # p-value = 0.0001616
-wilcox.test(Total_OTUs ~ Diet, data=sum.otusum, subset=Sample_Type=="Content")
-  # p-value = 0.01667
-wilcox.test(Total_OTUs ~ Diet, data=sum.otusum, subset=Sample_Type=="Mucosa")
-  # p-value = 0.05714
-wilcox.test(Total_OTUs ~ Sample_Type, data=sum.otusum)
-  # p-value = 0.8868
-wilcox.test(Total_OTUs ~ Sample_Type, data=sum.otusum, subset=Diet=="Lab")
-  # p-value = 0.7879
-wilcox.test(Total_OTUs ~ Sample_Type, data=sum.otusum, subset=Diet=="Wild")
-  # p-value = 1
 
 
 
@@ -683,69 +662,6 @@ ggplot(sum.adiv, aes(x=Diet, y=chao, fill = Diet)) +
   scale_fill_manual(values=c("brown2", "lightcoral") )+
   xlab("Diet") +
   ylab("Chao Richness")
-
-# Test normality
-hist(sum.adiv$chao, breaks=10)
-qqnorm(sum.adiv$chao)
-qqline(sum.adiv$chao)
-shapiro.test(sum.adiv$chao)
-  # p-value = 0.01554
-  # Not normal
-ks.test(sum.adiv$chao, "pnorm", mean=mean(sum.adiv$chao), sd=sd(sum.adiv$chao))
-  # p-value = 0.6185
-
-# Wilcoxon
-wilcox.test(chao ~ Diet, data=sum.adiv)
-  # p-value = 0.0202
-wilcox.test(chao ~ Diet, data=sum.adiv, subset=Sample_Type=="Content")
-  # p-value = 0.01667
-wilcox.test(chao ~ Diet, data=sum.adiv, subset=Sample_Type=="Mucosa")
-  # p-value = 0.8571
-wilcox.test(chao ~ Sample_Type, data=sum.adiv)
-  # p-value = 0.9623
-wilcox.test(chao ~ Sample_Type, data=sum.adiv, subset=Diet=="Lab")
-  # p-value = 0.7879
-wilcox.test(chao ~ Sample_Type, data=sum.adiv, subset=Diet=="Wild")
-  # p-value = 0.4
-
-
-
-
-
-
-### Berger-Parker
-ggplot(sum.adiv, aes(x=Diet, y=bergerparker, fill = Diet)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  scale_fill_manual(values=c("brown2", "lightcoral") )+
-  xlab("Diet") +
-  ylab("Berger-Parker")
-
-# Test normality
-hist(sum.adiv$bergerparker, breaks=10)
-qqnorm(sum.adiv$bergerparker)
-qqline(sum.adiv$bergerparker)
-shapiro.test(sum.adiv$bergerparker)
-  # p-value = 0.008697
-ks.test(sum.adiv$bergerparker, "pnorm", mean=mean(sum.adiv$bergerparker), sd=sd(sum.adiv$bergerparker))
-  # p-value = 0.4016
-
-# Wilcoxon
-wilcox.test(bergerparker ~ Diet, data=sum.adiv)
-  # p-value = 0.149
-wilcox.test(bergerparker ~ Diet, data=sum.adiv, subset=Sample_Type=="Content")
-  # p-value = 0.03333
-wilcox.test(bergerparker ~ Diet, data=sum.adiv, subset=Sample_Type=="Mucosa")
-  # p-value = 0.8571
-wilcox.test(bergerparker ~ Sample_Type, data=sum.adiv)
-  # p-value = 0.9623
-wilcox.test(bergerparker ~ Sample_Type, data=sum.adiv, subset=Diet=="Lab")
-  # p-value = 0.6485
-wilcox.test(bergerparker ~ Sample_Type, data=sum.adiv, subset=Diet=="Wild")
-  # p-value = 0.4
-
-
 
 
 
