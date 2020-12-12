@@ -348,7 +348,7 @@ summary(aov(shannon ~ Group, data = adiv.lab))
 
 
 
-###### Dot plots ######
+###### Boxplots ######
 
 ### Chao
 adiv.chao <- ggplot(adiv.lab, aes(x = Group, y = chao, fill = Group)) +
@@ -378,7 +378,7 @@ adiv.chao <- ggplot(adiv.lab, aes(x = Group, y = chao, fill = Group)) +
 adiv.shannon <- ggplot(adiv.lab, aes(x = Group, y = shannon, fill = Group)) +
   geom_boxplot(position = position_dodge(1), outlier.shape = NA) +
   geom_jitter(size=2, width = 0.2) +
-  scale_y_continuous(limits = c(0,6), breaks = c(0, 1, 2, 3, 4, 5, 6)) +
+  scale_y_continuous(limits = c(1,6), breaks = c(1, 2, 3, 4, 5, 6)) +
   scale_x_discrete(breaks=c("Summer_Lab", "Torpor", "IBA", "Spring"), labels=c("Summer", "Torpor", "IBA", "Spring")) +
   ylab("Shannon Diversity Index\n") +
   scale_fill_manual(values = c("lightcoral", "royalblue3", "deepskyblue", "limegreen"),
@@ -586,6 +586,10 @@ physeq.sum <- subset_samples(physeq.rem, Season == "Summer")
 
 # Alpha diversity
 adiv.sum <- data.frame(sample_data(sum.physeq))
+adiv.sum$Habitat <- adiv.sum$Diet
+adiv.sum$Habitat <- ordered(adiv.sum$Habitat, levels=c("Wild", "Captive"))
+adiv.sum$Habitat[(adiv.sum$Diet == "Lab")] <- "Captive"
+
 
 ### Chao
 hist(adiv.sum$chao, breaks=10)
@@ -609,14 +613,64 @@ summary(aov(shannon ~ Diet, data = adiv.sum))
   # p-value = 0.0543
 
 
+###### Boxplots ######
+
+### Chao
+chao.sum <- ggplot(adiv.sum, aes(x = Habitat, y = chao, fill = Habitat)) +
+  geom_boxplot(position = position_dodge(1), outlier.shape = NA) +
+  geom_jitter(size=2, width = 0.2) +
+  scale_y_continuous(limits = c(0,2050), breaks = c(0, 500, 1000, 1500, 2000)) +
+  ylab("Chao Richness") +
+  scale_fill_manual(values = c("brown2", "lightcoral")) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=16),
+        strip.text.x = element_text(face ="bold", size=16),
+        legend.title = element_text(face="bold", size=16),
+        panel.spacing = unit(0.5, "lines"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(face="bold", size=16),
+        axis.text.x = element_text(size=13),
+        axis.text.y = element_text(size=13),
+        legend.text = element_text(size=14))
 
 
+### Shannon
+shannon.sum <- ggplot(adiv.sum, aes(x = Habitat, y = shannon, fill = Habitat)) +
+  geom_boxplot(position = position_dodge(1), outlier.shape = NA) +
+  geom_jitter(size=2, width = 0.25) +
+  scale_y_continuous(limits = c(2.5, 6), breaks = c(2.5, 3.2, 3.9, 4.6, 5.3, 6.0)) +
+  ylab("Shannon Diversity Index") +
+  scale_fill_manual(values = c("brown2", "lightcoral")) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=16),
+        strip.text.x = element_text(face ="bold", size=16),
+        legend.title = element_text(face="bold", size=16),
+        panel.spacing = unit(0.5, "lines"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(face="bold", size=16),
+        axis.text.x = element_text(size=13),
+        axis.text.y = element_text(size=13),
+        legend.text = element_text(size=14))
 
 
+### Combine plots
+#tiff("adiv.sum.tiff", width = 8.5, height = 3.5, units = "in", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=(grid.layout(1,2))))
+print(chao.sum, vp=viewport(layout.pos.row=1, layout.pos.col=1))
+print(shannon.sum, vp=viewport(layout.pos.row=1, layout.pos.col=2))
 
+grid.text("(A)", x=unit(0.031, "npc"), y=unit(0.974, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=15,fontface="bold"))
+grid.text("(B)", x=unit(0.03, "npc"), y=unit(0.974, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),gp=gpar(fontsize=15,fontface="bold"))
 
+grid.text("a                  b", x=unit(0.435, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=12))
+grid.text("ns", x=unit(0.435, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2), gp=gpar(fontsize=12))
 
-
+#dev.off()
 
 ###### Examine Phyla ######
 # Merge samples with the same taxonomic rank
