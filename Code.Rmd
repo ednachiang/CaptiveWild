@@ -347,7 +347,63 @@ summary(aov(shannon ~ Group, data = adiv.lab))
 
 
 
+###### Boxplots ######
 
+### Chao
+adiv.chao <- ggplot(adiv.lab, aes(x = Group, y = chao, fill = Group)) +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15) +
+  scale_y_continuous(limits = c(0,2200), breaks = c(0, 550, 1100, 1650, 2200)) +
+  scale_x_discrete(breaks=c("Summer_Lab", "Torpor", "IBA", "Spring"), labels=c("Summer", "Torpor", "IBA", "Spring")) +
+  ylab("Chao Richness") +
+  scale_fill_manual(values = c("lightcoral", "royalblue3", "deepskyblue", "limegreen"),
+                    labels = c("Summer", "Torpor", "IBA", "Spring")) +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=16),
+        strip.text.x = element_text(face ="bold", size=16),
+        legend.title = element_text(face="bold", size=16),
+        panel.spacing = unit(0.5, "lines"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(face="bold", size=16),
+        axis.text.x = element_text(size=13),
+        axis.text.y = element_text(size=13),
+        legend.text = element_text(size=14))
+
+### Shannon
+adiv.shannon <- ggplot(adiv.lab, aes(x = Group, y = shannon, fill = Group)) +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15) +
+  scale_y_continuous(limits = c(0,6), breaks = c(0, 1, 2, 3, 4, 5, 6)) +
+  scale_x_discrete(breaks=c("Summer_Lab", "Torpor", "IBA", "Spring"), labels=c("Summer", "Torpor", "IBA", "Spring")) +
+  ylab("Shannon Diversity Index\n") +
+  scale_fill_manual(values = c("lightcoral", "royalblue3", "deepskyblue", "limegreen"),
+                    labels = c("Summer", "Torpor", "IBA", "Spring")) +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=16),
+        strip.text.x = element_text(face ="bold", size=16),
+        legend.title = element_text(face="bold", size=16),
+        panel.spacing = unit(0.5, "lines"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(face="bold", size=16),
+        axis.text.x = element_text(size=13),
+        axis.text.y = element_text(size=13),
+        legend.text = element_text(size=14))
+
+### Combine plots
+tiff("adiv.tiff", width = 11, height = 3.5, units = "in", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=(grid.layout(1,2))))
+print(adiv.chao, vp=viewport(layout.pos.row=1, layout.pos.col=1))
+print(adiv.shannon, vp=viewport(layout.pos.row=1, layout.pos.col=2))
+
+grid.text("A", x=unit(0.03, "npc"), y=unit(0.974, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=16,fontface="bold"))
+grid.text("B", x=unit(0.03, "npc"), y=unit(0.974, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),gp=gpar(fontsize=16,fontface="bold"))
+
+grid.text("ns", x=unit(0.44, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=12))
+grid.text("ns", x=unit(0.45, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2), gp=gpar(fontsize=12))
+dev.off()
 
 
 ```
