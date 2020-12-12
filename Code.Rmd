@@ -347,7 +347,7 @@ summary(aov(shannon ~ Group, data = adiv.lab))
 
 
 
-###### Boxplots ######
+###### Dot plots ######
 
 ### Chao
 adiv.chao <- ggplot(adiv.lab, aes(x = Group, y = chao, fill = Group)) +
