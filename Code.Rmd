@@ -80,7 +80,7 @@ max(sample_sums(mothurdata))
 ```
 
 
-### Interim Phyloseq Object
+### Phyloseq Object
 ```{r}
 meta <- read.csv("metadata2.csv")
 colnames(meta)[1] <- "Sample"
@@ -629,44 +629,270 @@ plot_heatmap(physeq.lab.simp.sig, sample.label = "Group", taxa.order = c("Otu001
 ```
 
 
+### Examine Phyla - Wild vs. Lab
+```{r}
+### Phyla in Wild
+rem <- names(which(taxa_sums(physeq.wild) > 10))
+physeq.wild.trim <- prune_taxa(rem, physeq.wild)
+
+
+### Phyla in Summer Lab
+rem <- names(which(taxa_sums(physeq.sum) > 10))
+physeq.sum.trim <- prune_taxa(rem, physeq.sum)
+
+
+
+
+
+
+###### Examine Phyla ######
+# Merge samples with the same taxonomic rank
+sum.goodphy <- tax_glom(physeq.sum, taxrank="Phylum")
+
+# Transform each merged phylum count to rel abund
+sum.phy.ra <- transform_sample_counts(sum.goodphy, function(x){(x/sum(x))*100})
+
+# Create rank abundance of phyla
+barplot(sort(taxa_sums(sum.phy.ra),TRUE)[1:20]/nsamples(sum.phy.ra),las=2,cex.axis=.7)
+
+# Summarize data
+sum.phy.df <- psmelt(sum.phy.ra)
+sum.phy.df$Phylum <- ordered(sum.phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes","Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Elusimicrobia"))
+sum.phy.df$Phylum[which(is.na(sum.phy.df$Phylum))] <- rep("Unclassified",18)
+sum.phy.sum <- sum.phy.df %>%
+  group_by(Diet, Sample_Type, Phylum) %>%
+  summarize(Mean = mean(Abundance),
+            SD = sd(Abundance),
+            SE = se(Abundance))
+
+
+
+
+
+# Summarize data
+phy.df <- psmelt(phy99)
+phy.df$Phylum <- ordered(phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia"))
+phy.df$Phylum[which(is.na(phy.df$Phylum))] <- rep("Unclassified",18)
+phy.sum <- phy.df %>%
+  group_by(Group, Sample_Type, Phylum) %>%
+  summarize(Mean = mean(Abundance),
+            Median = median(Abundance),
+            SD = sd(Abundance),
+            SE = (sd(Abundance)/(sqrt(length(Abundance)))),
+            iqr = IQR(Abundance))
+
+
+
+
+
+
+
+
+
+### Barplot ###
+ggplot(sum.phy.sum, aes(x=Phylum, y=Mean, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  geom_errorbar(aes(ymax=Mean + SE, ymin=Mean - SE), width=0.25) +
+  facet_grid(Diet ~ Sample_Type) +
+  scale_fill_brewer(palette="Set1") +
+  xlab("Phyla") +
+  ylab("Mean Relative Abundance for Phyla > 1%") +
+  theme(axis.text.x = element_blank())
+
+
+
+# Calculate IQR limits
+phy.sum$iqr.min <- phy.sum$Median - 0.5*phy.sum$iqr
+phy.sum[which(phy.sum$iqr.min < 0),10] <- 0
+  # Any IQR min < 0, change to 0 (otherwise error bar won't plot)
+phy.sum$iqr.max <- phy.sum$Median + 0.5*phy.sum$iqr
+
+
+### Barplot ###
+tiff("Phyla.prelim.tiff", width=12, height=3.5, units="in", res=600)
+ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
+  facet_grid(Sample_Type ~ Group) +
+  scale_fill_brewer(palette="Set1") +
+  xlab("Phyla") +
+  ylab("Median Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
+  theme(axis.text.x = element_blank(),
+        #axis.title.x = element_text(size=10),
+        #axis.title.y = element_text(size=10),
+        #strip.text.x = element_text(size=8),
+        #strip.text.y = element_text(size=8),
+        panel.spacing=unit(1, "lines")#,
+        #legend.title = element_text(size = 8),
+        #legend.text = element_text(size=8)
+        )
+dev.off()
+
+#tiff("Phyla3.tiff", width=13, height=8, units="in", res=600)
+ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
+  facet_grid(Sample_Type ~ Group) +
+  scale_fill_brewer(palette="Set1") +
+  xlab("Phyla") +
+  ylab("Median Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
+  theme(axis.text.x = element_blank(),
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        strip.text.x = element_text(size=14),
+        strip.text.y = element_text(size=14),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size=12),
+        axis.text.y = element_text(size=12))
+#dev.off()
+
+tiff("Phyla.mdtp.tiff", width=9.8, height=5.9, units="in", res=600)
+ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
+  facet_grid(Sample_Type ~ Group) +
+  scale_fill_brewer(palette="Set1") +
+  xlab("Phyla") +
+  ylab("Median Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size=14),
+        axis.title.x = element_text(size=18),
+        axis.title.y = element_text(size=18),
+        strip.text.x = element_text(size=13, face="bold"),
+        strip.text.y = element_text(size=13, face="bold"),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 14, face="bold"),
+        legend.text = element_text(size=13),
+        panel.grid.major = element_blank()
+        #panel.grid.minor = element_blank()
+        )
+dev.off()
+
+tiff("Phyla.mdtp2.tiff", width=9.7, height=5.9, units="in", res=600)
+ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
+  facet_grid(Sample_Type ~ Group) +
+  scale_fill_brewer(palette="Set1") +
+  xlab("Phyla") +
+  ylab("Median Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size=14),
+        axis.title.x = element_text(size=18),
+        axis.title.y = element_text(size=18),
+        strip.text.x = element_text(size=16, face="bold"),
+        strip.text.y = element_text(size=16, face="bold"),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 16),
+        legend.text = element_text(size=14),
+        panel.grid.major = element_blank()
+        #panel.grid.minor = element_blank()
+        )
+dev.off()
+
+# Pull out otu table to test phyla
+phy.num <- as.numeric(otu_table(phy99))
+
+# Test normality
+hist(phy.num, breaks=10)
+qqnorm(phy.num)
+qqline(phy.num)
+shapiro.test(phy.num)
+  # p-value < 2.2e-16
+ks.test(phy.num, "pnorm", mean=mean(phy.num), sd=sd(phy.num))
+  # p-value < 2.2e-16
+
+# Get ready for stats
+sampdf <- data.frame(sample_data(phy99))
+sampdf$Relative_Abundance <- otu_table(phy99)
+
+
+### Examine Sex
+# Summarize data
+phy.df <- psmelt(phy99)
+phy.df$Phylum <- ordered(phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia"))
+phy.df$Phylum[which(is.na(phy.df$Phylum))] <- rep("Unclassified",18)
+phy.sex <- phy.df %>%
+  group_by(Group, Sex, Sample_Type, Phylum) %>%
+  summarize(Mean = mean(Abundance),
+            Median = median(Abundance),
+            SD = sd(Abundance),
+            SE = (sd(Abundance)/(sqrt(length(Abundance)))),
+            iqr = IQR(Abundance))
+
+# Calculate IQR limits
+phy.sex$iqr.min <- phy.sum$Median - 0.5*phy.sum$iqr
+phy.sex[which(phy.sum$iqr.min < 0),10] <- 0
+  # Any IQR min < 0, change to 0 (otherwise error bar won't plot)
+phy.sex$iqr.max <- phy.sum$Median + 0.5*phy.sum$iqr
+
+# Plot
+ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
+  facet_grid(Sample_Type ~ Group) +
+  scale_fill_brewer(palette="Set1") +
+  xlab("Phyla") +
+  ylab("Median Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
+  theme(axis.text.x = element_blank(),
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        strip.text.x = element_text(size=14),
+        strip.text.y = element_text(size=14),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size=12),
+        axis.text.y = element_text(size=12))
+```
+
+
+
+
+
 ### Alpha Diversity - Wild vs. Lab
 ```{r}
 # Subset summer samples
-physeq.sum <- subset_samples(physeq.rem, Season == "Summer")
+physeq.sum.diet <- subset_samples(physeq.rem, Season == "Summer")
 
 # Alpha diversity
-adiv.sum <- data.frame(sample_data(sum.physeq))
-adiv.sum$Habitat <- adiv.sum$Diet
-adiv.sum$Habitat <- ordered(adiv.sum$Habitat, levels=c("Wild", "Captive"))
-adiv.sum$Habitat[(adiv.sum$Diet == "Lab")] <- "Captive"
+adiv.sum.diet <- data.frame(sample_data(physeq.sum.diet))
+adiv.sum.diet$Habitat <- adiv.sum.diet$Diet
+adiv.sum.diet$Habitat <- ordered(adiv.sum.diet$Habitat, levels=c("Wild", "Captive"))
+adiv.sum.diet$Habitat[(adiv.sum.diet$Diet == "Lab")] <- "Captive"
 
 
 ### Chao
-hist(adiv.sum$chao, breaks=10)
-qqnorm(adiv.sum$chao)
-qqline(adiv.sum$chao)
-shapiro.test(adiv.sum$chao)
+hist(adiv.sum.diet$chao, breaks=10)
+qqnorm(adiv.sum.diet$chao)
+qqline(adiv.sum.diet$chao)
+shapiro.test(adiv.sum.diet$chao)
   # p-value = 0.01554
   # Not Normal
-kruskal.test(formula = chao ~ Diet, data = adiv.sum)
+kruskal.test(formula = chao ~ Diet, data = adiv.sum.diet)
   # p-value = 0.0208
 
 
 ### Shannon
 # Test normality
-hist(adiv.sum$shannon, breaks=10)
-qqnorm(adiv.sum$shannon)
-qqline(adiv.sum$shannon)
-shapiro.test(adiv.sum$shannon)
+hist(adiv.sum.diet$shannon, breaks=10)
+qqnorm(adiv.sum.diet$shannon)
+qqline(adiv.sum.diet$shannon)
+shapiro.test(adiv.sum.diet$shannon)
   # p-value = 0.2649
-summary(aov(shannon ~ Diet, data = adiv.sum))
+summary(aov(shannon ~ Diet, data = adiv.sum.diet))
   # p-value = 0.0543
 
 
 ###### Boxplots ######
 
 ### Chao
-chao.sum <- ggplot(adiv.sum, aes(x = Habitat, y = chao, fill = Habitat)) +
+chao.sum <- ggplot(adiv.sum.diet, aes(x = Habitat, y = chao, fill = Habitat)) +
   geom_boxplot(position = position_dodge(1), outlier.shape = NA) +
   geom_jitter(size=2, width = 0.2) +
   scale_y_continuous(limits = c(0,2050), breaks = c(0, 500, 1000, 1500, 2000)) +
@@ -688,7 +914,7 @@ chao.sum <- ggplot(adiv.sum, aes(x = Habitat, y = chao, fill = Habitat)) +
 
 
 ### Shannon
-shannon.sum <- ggplot(adiv.sum, aes(x = Habitat, y = shannon, fill = Habitat)) +
+shannon.sum <- ggplot(adiv.sum.diet, aes(x = Habitat, y = shannon, fill = Habitat)) +
   geom_boxplot(position = position_dodge(1), outlier.shape = NA) +
   geom_jitter(size=2, width = 0.25) +
   scale_y_continuous(limits = c(2.5, 6), breaks = c(2.5, 3.2, 3.9, 4.6, 5.3, 6.0)) +
@@ -724,176 +950,6 @@ grid.text("ns", x=unit(0.435, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.po
 #dev.off()
 
 
-
-
-###### Examine Phyla ######
-# Merge samples with the same taxonomic rank
-sum.goodphy <- tax_glom(sum.physeq, taxrank="Phylum")
-
-# Transform each merged phylum count to rel abund
-sum.phy99 <- transform_sample_counts(sum.goodphy, function(x){(x/sum(x))*100})
-
-# Remove any phyla with <1% rel abund
-sum.phy99 <- prune_taxa(taxa_sums(sum.phy99) > 1, sum.phy99)
-
-
-# Summarize data
-sum.phy.df <- psmelt(sum.phy99)
-sum.phy.df$Phylum <- ordered(sum.phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes","Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Elusimicrobia"))
-sum.phy.df$Phylum[which(is.na(sum.phy.df$Phylum))] <- rep("Unclassified",18)
-sum.phy.sum <- sum.phy.df %>%
-  group_by(Diet, Sample_Type, Phylum) %>%
-  summarize(Mean = mean(Abundance),
-            SD = sd(Abundance),
-            SE = se(Abundance))
-
-
-### Barplot ###
-ggplot(sum.phy.sum, aes(x=Phylum, y=Mean, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  geom_errorbar(aes(ymax=Mean + SE, ymin=Mean - SE), width=0.25) +
-  facet_grid(Diet ~ Sample_Type) +
-  scale_fill_brewer(palette="Set1") +
-  xlab("Phyla") +
-  ylab("Mean Relative Abundance for Phyla > 1%") +
-  theme(axis.text.x = element_blank())
-
-
-
-
-
-### Chao
-ggplot(sum.adiv, aes(x=Diet, y=chao, fill = Diet)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  scale_fill_manual(values=c("brown2", "lightcoral") )+
-  xlab("Diet") +
-  ylab("Chao Richness")
-
-
-
-### Shannon
-ggplot(sum.adiv, aes(x=Diet, y=shannon, fill = Diet)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  scale_fill_manual(values=c("brown2", "lightcoral")) +
-  xlab("Group") +
-  ylab("Shannon Diversity")
-
-# Test normality
-hist(sum.adiv$shannon, breaks=10)
-qqnorm(sum.adiv$shannon)
-qqline(sum.adiv$shannon)
-shapiro.test(sum.adiv$shannon)
-  # p-value = 0.2649
-ks.test(sum.adiv$shannon, "pnorm", mean=mean(sum.adiv$shannon), sd=sd(sum.adiv$shannon))
-  # p-value = 0.6198
-
-# Wilcoxon
-t.test(shannon ~ Diet, data=sum.adiv)
-  # p-value = 0.05814
-t.test(shannon ~ Diet, data=sum.adiv.con)
-  # p-value = 0.003129
-t.test(shannon ~ Diet, data=sum.adiv.muc)
-  # p-value = 0.9498
-t.test(shannon ~ Sample_Type, data=sum.adiv)
-  # p-value = 0.9695
-t.test(shannon ~ Sample_Type, data=sum.adiv.lab)
-  # p-value = 0.3654
-t.test(shannon ~ Sample_Type, data=sum.adiv.wil)
-  # p-value = 0.1508
-
-# Inverse Simpson
-ggplot(sum.adiv, aes(x=Diet, y= invsimpson, fill = Diet)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  facet_grid(.~Sample_Type) +
-  scale_fill_manual(values=c("brown2", "lightcoral")) +
-  xlab("Diet") +
-  ylab("Inverse Simpson Diversity")
-
-# Test normality
-hist(sum.adiv$invsimpson, breaks=10)
-qqnorm(sum.adiv$invsimpson)
-qqline(sum.adiv$invsimpson)
-shapiro.test(sum.adiv$invsimpson)
-  # p-value = 0.01727
-ks.test(sum.adiv$invsimpson, "pnorm", mean=mean(sum.adiv$invsimpson), sd=sd(sum.adiv$invsimpson))
-  # p-value = 0.2989
-
-# Wilcoxon
-wilcox.test(invsimpson ~ Diet, data=sum.adiv)
-  # p-value = 0.09825
-wilcox.test(invsimpson ~ Diet, data=sum.adiv, subset=Sample_Type=="Content")
-  # p-value = 0.01667
-wilcox.test(invsimpson ~ Diet, data=sum.adiv, subset=Sample_Type=="Mucosa")
-  # p-value = 0.8571
-wilcox.test(invsimpson ~ Sample_Type, data=sum.adiv)
-  # p-value = 0.8125
-wilcox.test(invsimpson ~ Sample_Type, data=sum.adiv, subset=Diet=="Lab")
-  # p-value = 0.6485
-wilcox.test(invsimpson ~ Sample_Type, data=sum.adiv, subset=Diet=="Wild")
-  # p-value = 0.2
-
-
-###### Bray-Curtis ######
-### Bray NMDS
-sum.nmds <- ordinate(physeq=sum.physeq, method="NMDS", distance="bray")
-  # stress = 0.07623348
-
-plot_ordination(physeq=sum.physeq, ordination=sum.nmds, color="Diet", shape="Sample_Type")
-
-# https://stackoverflow.com/questions/13794419/plotting-ordiellipse-function-from-vegan-package-onto-nmds-plot-created-in-ggplo
-
-sample_data(sum.physeq)$Elip <- paste(sample_data(sum.physeq)$Diet, sample_data(sum.physeq)$Sample_Type)
-elip.sum.nmds <- data.frame(MDS1 = sum.nmds$points[,1], MDS2 = sum.nmds$points[,2],
-                        Group = sample_data(sum.physeq)$Elip)
-plot.new()
-elip.sum.ord <- ordiellipse(sum.nmds, sample_data(sum.physeq)$Elip, display="sites", kind="se", conf=0.95, label=T)
-
-veganCovEllipse <- function(cov, center = c(0, 0), scale = 1, npoints = 100) {
-    theta <- (0:npoints) * 2 * pi/npoints
-    Circle <- cbind(cos(theta), sin(theta))
-    t(center + scale * t(Circle %*% chol(cov)))
-}
-
-elip.sum.df <- data.frame()
-for(i in levels(elip.sum.nmds$Group)){
-  elip.sum.df <- rbind(elip.sum.df, cbind(as.data.frame(with(elip.sum.nmds[elip.sum.nmds$Group==i,],
-                                                     veganCovEllipse(elip.sum.ord[[i]]$cov,
-                                                                     elip.sum.ord[[i]]$center,
-                                                                     elip.sum.ord[[i]]$scale))),
-                                  group=i))
-  
-}
-
-
-
-
-plot_ordination(physeq=sum.physeq, ordination=sum.nmds, color="Elip") +
-  geom_path(data=elip.sum.df, aes(x=NMDS1, y=NMDS2, colour=group), size=1, linetype=1) +
-  guides(color=guide_legend(title="Group")) +
-  scale_color_manual(values=c("darkgoldenrod", "darkgoldenrod1", "brown2", "lightcoral"))
-
-
-
-### PERMANOVA
-sum.sampdf <- data.frame(sample_data(sum.physeq))
-sum.bray<- phyloseq::distance(physeq=sum.physeq, method="bray")
-adonis(sum.bray~ Diet, data=sum.sampdf)
-  # p-value = 0.001
-beta.tax = betadisper(d=sum.bray, group=sum.sampdf$Diet)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.002
-adonis(sum.bray~ Sample_Type, data=sum.sampdf)
-  # p-value = 0.996
-beta.tax = betadisper(d=sum.bray, group=sum.sampdf$Sample_Type)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.656
 ```
 
 
@@ -903,18 +959,18 @@ p$tab
 ### Beta Diversity - Wild vs. Lab
 ```{r}
 # Subset summer samples
-physeq.sum <- subset_samples(physeq.rem, Season == "Summer")
+physeq.sum.diet <- subset_samples(physeq.rem, Season == "Summer")
 
 ### Bray NMDS
 #nmds.sum <- ordinate(physeq=physeq.sum, method="NMDS", distance="bray")
   # Stress = 0.05705866
 #save(nmds.sum, file = "nmds.sum.RData")
-load("nmds.lab.RData")
+load("nmds.sum.RData")
 
 
 ### PERMANOVA
-sampdf.sum <- data.frame(sample_data(physeq.sum))
-bray.sum <- phyloseq::distance(physeq = physeq.sum, method = "bray")
+sampdf.sum <- data.frame(sample_data(physeq.sum.diet))
+bray.sum <- phyloseq::distance(physeq = physeq.sum.diet, method = "bray")
 beta.tax = betadisper(d=bray.sum, group=sampdf.sum$Group)
 p <- permutest(beta.tax)
 p$tab
@@ -928,9 +984,9 @@ anosim(bray.sum, sampdf.sum$Group, permutations = 1000)
 
 # Ellipses
 elip.nmds.sum <- data.frame(MDS1 = nmds.sum$points[,1], MDS2 = nmds.sum$points[,2],
-                        Group = sample_data(physeq.sum)$Group)
+                        Group = sample_data(physeq.sum.diet)$Group)
 plot.new()
-elip.ord.sum <- ordiellipse(nmds.sum, sample_data(physeq.sum)$Group, display="sites", kind="se", conf=0.95, label=T)
+elip.ord.sum <- ordiellipse(nmds.sum, sample_data(physeq.sum.diet)$Group, display="sites", kind="se", conf=0.95, label=T)
 elip.sum.df <- data.frame()
 for(i in levels(elip.nmds.sum$Group)){
   elip.sum.df <- rbind(elip.sum.df, cbind(as.data.frame(with(elip.nmds.sum[elip.nmds.sum$Group==i,],
@@ -941,7 +997,7 @@ for(i in levels(elip.nmds.sum$Group)){
 }
 
 # Ordination
-nmds.sum.plot <- plot_ordination(physeq=physeq.sum, ordination=nmds.sum, color="Group") +
+nmds.sum.plot <- plot_ordination(physeq=physeq.sum.diet, ordination=nmds.sum, color="Group") +
   scale_color_manual(values = c("brown2", "lightcoral"),
                     labels = c("Wild", "Captive")) +
   labs(color = "Group") +
@@ -976,7 +1032,7 @@ grid.text("stress = 0.057", x=unit(0.865, "npc"), y=unit(0.17, "npc"), vp=viewpo
 ### Simper - Wild vs. Lab
 ```{r}
 # Change Group names to be compatible (no "_")
-physeq.sum.simp <- physeq.sum
+physeq.sum.simp <- physeq.sum.diet
 
 #simper.pretty(data.frame(otu_table(physeq.sum.simp)),
               data.frame(sample_data(physeq.sum.simp)),
@@ -992,13 +1048,13 @@ sum.simper <- read.csv("diet_clean_simper.csv")
                taxonomy = data.frame(tax_table(physeq.sum.simp)))
 sum.simper.kw <- read.csv("diet_krusk_simper.csv")
 for(i in 1:nrow(sum.simper.kw)){
-  save <- which(rownames(data.frame(tax_table(physeq.sum))) == sum.simper.kw$OTU[i])
+  save <- which(rownames(data.frame(tax_table(physeq.sum.diet))) == sum.simper.kw$OTU[i])
   sum.simper.kw$Taxonomy[i] <-
-    paste(data.frame(tax_table(physeq.sum))[save,2], "-",
-          data.frame(tax_table(physeq.sum))[save,3], "-",
-          data.frame(tax_table(physeq.sum))[save,4], "-",
-          data.frame(tax_table(physeq.sum))[save,5], "-",
-          data.frame(tax_table(physeq.sum))[save,6])
+    paste(data.frame(tax_table(physeq.sum.diet))[save,2], "-",
+          data.frame(tax_table(physeq.sum.diet))[save,3], "-",
+          data.frame(tax_table(physeq.sum.diet))[save,4], "-",
+          data.frame(tax_table(physeq.sum.diet))[save,5], "-",
+          data.frame(tax_table(physeq.sum.diet))[save,6])
 }
 #write.table(sum.simper.kw, "diet_krusk_simper.csv", sep=",")
 
@@ -1006,7 +1062,7 @@ for(i in 1:nrow(sum.simper.kw)){
 ### Simper Heatmap - Wild vs. Lab
 ```{r}
 # Subset sig OTUs
-physeq.sum.simp.ra <- transform_sample_counts(physeq.sum, function(x){(x/sum(x))*100})
+physeq.sum.simp.ra <- transform_sample_counts(physeq.sum.diet, function(x){(x/sum(x))*100})
 physeq.sum.simp.sig <- subset_taxa(physeq.sum.simp.ra, Species == "Otu00062" |
                                      Species == "Otu00091" | Species == "Otu00159" |
                                      Species == "Otu00116" | Species == "Otu00037" |
@@ -1178,185 +1234,6 @@ ggplot(chow.adiv, aes(x=Group, y= invsimpson, fill = Group)) +
   ylab("Inverse Simpson Weighted Diversity")
 #dev.off()
 ```
-
-
-
-### Examine Phyla
-```{r}
-# Merge samples with the same taxonomic rank
-goodphy <- tax_glom(physeq.rem, taxrank="Phylum")
-
-# Transform each merged phylum count to rel abund
-phy99 <- transform_sample_counts(goodphy, function(x){(x/sum(x))*100})
-
-# Remove any phyla with <1% rel abund
-phy99 <- prune_taxa(taxa_sums(phy99) > 1, phy99)
-
-# Create rank abundance of phyla
-barplot(sort(taxa_sums(phy99),TRUE)[1:20]/nsamples(phy99),las=2,cex.axis=.7)
-
-# Summarize data
-phy.df <- psmelt(phy99)
-phy.df$Phylum <- ordered(phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia"))
-phy.df$Phylum[which(is.na(phy.df$Phylum))] <- rep("Unclassified",18)
-phy.sum <- phy.df %>%
-  group_by(Group, Sample_Type, Phylum) %>%
-  summarize(Mean = mean(Abundance),
-            Median = median(Abundance),
-            SD = sd(Abundance),
-            SE = (sd(Abundance)/(sqrt(length(Abundance)))),
-            iqr = IQR(Abundance))
-
-# Calculate IQR limits
-phy.sum$iqr.min <- phy.sum$Median - 0.5*phy.sum$iqr
-phy.sum[which(phy.sum$iqr.min < 0),10] <- 0
-  # Any IQR min < 0, change to 0 (otherwise error bar won't plot)
-phy.sum$iqr.max <- phy.sum$Median + 0.5*phy.sum$iqr
-
-
-### Barplot ###
-tiff("Phyla.prelim.tiff", width=12, height=3.5, units="in", res=600)
-ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
-  facet_grid(Sample_Type ~ Group) +
-  scale_fill_brewer(palette="Set1") +
-  xlab("Phyla") +
-  ylab("Median Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
-  theme(axis.text.x = element_blank(),
-        #axis.title.x = element_text(size=10),
-        #axis.title.y = element_text(size=10),
-        #strip.text.x = element_text(size=8),
-        #strip.text.y = element_text(size=8),
-        panel.spacing=unit(1, "lines")#,
-        #legend.title = element_text(size = 8),
-        #legend.text = element_text(size=8)
-        )
-dev.off()
-
-#tiff("Phyla3.tiff", width=13, height=8, units="in", res=600)
-ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
-  facet_grid(Sample_Type ~ Group) +
-  scale_fill_brewer(palette="Set1") +
-  xlab("Phyla") +
-  ylab("Median Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
-  theme(axis.text.x = element_blank(),
-        axis.title.x = element_text(size=20),
-        axis.title.y = element_text(size=20),
-        strip.text.x = element_text(size=14),
-        strip.text.y = element_text(size=14),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 14),
-        legend.text = element_text(size=12),
-        axis.text.y = element_text(size=12))
-#dev.off()
-
-tiff("Phyla.mdtp.tiff", width=9.8, height=5.9, units="in", res=600)
-ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
-  facet_grid(Sample_Type ~ Group) +
-  scale_fill_brewer(palette="Set1") +
-  xlab("Phyla") +
-  ylab("Median Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_text(size=14),
-        axis.title.x = element_text(size=18),
-        axis.title.y = element_text(size=18),
-        strip.text.x = element_text(size=13, face="bold"),
-        strip.text.y = element_text(size=13, face="bold"),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 14, face="bold"),
-        legend.text = element_text(size=13),
-        panel.grid.major = element_blank()
-        #panel.grid.minor = element_blank()
-        )
-dev.off()
-
-tiff("Phyla.mdtp2.tiff", width=9.7, height=5.9, units="in", res=600)
-ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
-  facet_grid(Sample_Type ~ Group) +
-  scale_fill_brewer(palette="Set1") +
-  xlab("Phyla") +
-  ylab("Median Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_text(size=14),
-        axis.title.x = element_text(size=18),
-        axis.title.y = element_text(size=18),
-        strip.text.x = element_text(size=16, face="bold"),
-        strip.text.y = element_text(size=16, face="bold"),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 16),
-        legend.text = element_text(size=14),
-        panel.grid.major = element_blank()
-        #panel.grid.minor = element_blank()
-        )
-dev.off()
-
-# Pull out otu table to test phyla
-phy.num <- as.numeric(otu_table(phy99))
-
-# Test normality
-hist(phy.num, breaks=10)
-qqnorm(phy.num)
-qqline(phy.num)
-shapiro.test(phy.num)
-  # p-value < 2.2e-16
-ks.test(phy.num, "pnorm", mean=mean(phy.num), sd=sd(phy.num))
-  # p-value < 2.2e-16
-
-# Get ready for stats
-sampdf <- data.frame(sample_data(phy99))
-sampdf$Relative_Abundance <- otu_table(phy99)
-
-
-### Examine Sex
-# Summarize data
-phy.df <- psmelt(phy99)
-phy.df$Phylum <- ordered(phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia"))
-phy.df$Phylum[which(is.na(phy.df$Phylum))] <- rep("Unclassified",18)
-phy.sex <- phy.df %>%
-  group_by(Group, Sex, Sample_Type, Phylum) %>%
-  summarize(Mean = mean(Abundance),
-            Median = median(Abundance),
-            SD = sd(Abundance),
-            SE = (sd(Abundance)/(sqrt(length(Abundance)))),
-            iqr = IQR(Abundance))
-
-# Calculate IQR limits
-phy.sex$iqr.min <- phy.sum$Median - 0.5*phy.sum$iqr
-phy.sex[which(phy.sum$iqr.min < 0),10] <- 0
-  # Any IQR min < 0, change to 0 (otherwise error bar won't plot)
-phy.sex$iqr.max <- phy.sum$Median + 0.5*phy.sum$iqr
-
-# Plot
-ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
-  facet_grid(Sample_Type ~ Group) +
-  scale_fill_brewer(palette="Set1") +
-  xlab("Phyla") +
-  ylab("Median Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
-  theme(axis.text.x = element_blank(),
-        axis.title.x = element_text(size=20),
-        axis.title.y = element_text(size=20),
-        strip.text.x = element_text(size=14),
-        strip.text.y = element_text(size=14),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 14),
-        legend.text = element_text(size=12),
-        axis.text.y = element_text(size=12))
-```
-
 
 
 
