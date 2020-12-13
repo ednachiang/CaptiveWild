@@ -632,80 +632,231 @@ plot_heatmap(physeq.lab.simp.sig, sample.label = "Group", taxa.order = c("Otu001
 ### Examine Phyla - Wild vs. Lab
 ```{r}
 ### Phyla in Wild
-rem <- names(which(taxa_sums(physeq.wild) > 10))
-physeq.wild.trim <- prune_taxa(rem, physeq.wild)
-
+#physeq.wild.phy <- tax_glom(physeq.wild, taxrank = "Phylum")
+#physeq.wild.phy.ra <- transform_sample_counts(physeq.wild.phy, function(x){(x/sum(x))*100})
+#rem <- names(which(taxa_sums(physeq.wild) > 10))
+#physeq.wild.trim <- prune_taxa(rem, physeq.wild)
+#physeq.wild.ra <- transform_sample_counts(physeq.wild.trim, function(x){(x/sum(x))*100})
+#wild.taxa.sum <- taxa_sums(physeq.wild.ra)
+#wild.taxa.sum <- sort(wild.taxa.sum, decreasing = T)
 
 ### Phyla in Summer Lab
-rem <- names(which(taxa_sums(physeq.sum) > 10))
-physeq.sum.trim <- prune_taxa(rem, physeq.sum)
-
-
-
-
-
-
-###### Examine Phyla ######
-# Merge samples with the same taxonomic rank
-sum.goodphy <- tax_glom(physeq.sum, taxrank="Phylum")
-
-# Transform each merged phylum count to rel abund
-sum.phy.ra <- transform_sample_counts(sum.goodphy, function(x){(x/sum(x))*100})
+#physeq.sum.phy <- tax_glom(physeq.sum, taxrank = "Phylum")
+#physeq.sum.phy.ra <- transform_sample_counts(physeq.sum.phy, function(x){(x/sum(x))*100})
+#rem <- names(which(taxa_sums(physeq.sum) > 10))
+#physeq.sum.trim <- prune_taxa(rem, physeq.sum)
+#physeq.sum.ra <- transform_sample_counts(physeq.sum.trim, function(x){(x/sum(x))*100})
+#sum.taxa.sum <- taxa_sums(physeq.sum.ra)
+#sum.taxa.sum <- sort(sum.taxa.sum, decreasing = T)
 
 # Create rank abundance of phyla
-barplot(sort(taxa_sums(sum.phy.ra),TRUE)[1:20]/nsamples(sum.phy.ra),las=2,cex.axis=.7)
+#barplot(sort(taxa_sums(physeq.wild.phy.ra),TRUE)[1:20]/nsamples(physeq.wild.phy.ra),las=2,cex.axis=.7)
+  # Firmicutes, Bacteroidetes, Cyano, Verruco, Unclassified, Proteobacteria, Tenericutes, Elusimicrobia, Actinobacteria Spirochaetae
+#barplot(sort(taxa_sums(physeq.sum.phy.ra),TRUE)[1:20]/nsamples(physeq.sum.phy.ra),las=2,cex.axis=.7)
+  # Firmicutes, Bacteroidetes, Verrucomicrobia, Proteobacteria, Unclassified, Tenericutes, Cyanobacteria, Actinobacteria, Elusimicrobia, Spirochaetae
+
+# Subset summer samples
+physeq.sum.diet <- subset_samples(physeq.rem, Season == "Summer")
+physeq.diet.phy <- tax_glom(physeq.sum.diet, taxrank = "Phylum")
+physeq.diet.phy.ra <- transform_sample_counts(physeq.diet.phy, function(x){(x/sum(x))*100})
 
 # Summarize data
-sum.phy.df <- psmelt(sum.phy.ra)
-sum.phy.df$Phylum <- ordered(sum.phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes","Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Elusimicrobia"))
-sum.phy.df$Phylum[which(is.na(sum.phy.df$Phylum))] <- rep("Unclassified",18)
-sum.phy.sum <- sum.phy.df %>%
-  group_by(Diet, Sample_Type, Phylum) %>%
+diet.phy.df <- psmelt(physeq.diet.phy.ra)
+diet.phy.df$Phylum <- ordered(diet.phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes", "Cyanobacteria", "Verrucomicrobia", "Unclassified", "Proteobacteria", "Tenericutes", "Elusimicrobia", "Actinobacteria", "Spirochaetae"))
+diet.phy.df$Phylum[which(is.na(diet.phy.df$Phylum))] <- rep("Unclassified", length(which(is.na(diet.phy.df$Phylum))))
+diet.phy.sum <- diet.phy.df %>%
+  group_by(Phylum, Group) %>%
   summarize(Mean = mean(Abundance),
             SD = sd(Abundance),
             SE = se(Abundance))
-
-
-
-
-
-# Summarize data
-phy.df <- psmelt(phy99)
-phy.df$Phylum <- ordered(phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia"))
-phy.df$Phylum[which(is.na(phy.df$Phylum))] <- rep("Unclassified",18)
-phy.sum <- phy.df %>%
-  group_by(Group, Sample_Type, Phylum) %>%
-  summarize(Mean = mean(Abundance),
-            Median = median(Abundance),
-            SD = sd(Abundance),
-            SE = (sd(Abundance)/(sqrt(length(Abundance)))),
-            iqr = IQR(Abundance))
-
-
-
-
-
-
-
+wild <- which(diet.phy.sum$Group == "Summer_Wild")
+lab <- which(diet.phy.sum$Group == "Summer_Lab")
+diet.phy.sum$Group <- ordered(diet.phy.sum$Group, levels=c("Wild", "Captive"))
+diet.phy.sum$Group[wild] <- rep("Wild", length(wild))
+diet.phy.sum$Group[lab] <- rep("Captive", length(lab))
 
 
 ### Barplot ###
-ggplot(sum.phy.sum, aes(x=Phylum, y=Mean, fill=Phylum)) +
+ggplot(diet.phy.sum, aes(x=Phylum, y=Mean, fill=Phylum)) +
   geom_bar(stat="identity", color="black") +
   geom_errorbar(aes(ymax=Mean + SE, ymin=Mean - SE), width=0.25) +
-  facet_grid(Diet ~ Sample_Type) +
+  facet_grid(Group ~ .) +
   scale_fill_brewer(palette="Set1") +
   xlab("Phyla") +
-  ylab("Mean Relative Abundance for Phyla > 1%") +
+  ylab("Mean Relative Abundance for Phyla") +
   theme(axis.text.x = element_blank())
 
 
 
-# Calculate IQR limits
-phy.sum$iqr.min <- phy.sum$Median - 0.5*phy.sum$iqr
-phy.sum[which(phy.sum$iqr.min < 0),10] <- 0
-  # Any IQR min < 0, change to 0 (otherwise error bar won't plot)
-phy.sum$iqr.max <- phy.sum$Median + 0.5*phy.sum$iqr
+
+
+
+
+### Firmicutes
+fir.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Firmicutes")
+fir.df <- data.frame(sample_data(fir.phy))
+fir.df$RelAbund <- t(data.frame(otu_table(fir.phy)))
+
+# Test normality
+hist(fir.df$RelAbund, breaks=10)
+qqnorm(fir.df$RelAbund)
+qqline(fir.df$RelAbund)
+shapiro.test(fir.df$RelAbund)
+  # p-value = 0.2635
+  # Normal
+
+t.test(RelAbund ~ Group, data=fir.df)
+  # p-value = 0.9019
+
+
+### Bacteroidetes
+bac.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Bacteroidetes")
+bac.df <- data.frame(sample_data(bac.phy))
+bac.df$RelAbund <- t(data.frame(otu_table(bac.phy)))
+
+# Test normality
+hist(bac.df$RelAbund, breaks=10)
+qqnorm(bac.df$RelAbund)
+qqline(bac.df$RelAbund)
+shapiro.test(bac.df$RelAbund)
+  # p-value = 0.4768
+  # Normal
+
+t.test(RelAbund ~ Group, data=bac.df)
+  # p-value = 0.4279
+
+
+
+### Cyanobacteria
+cya.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Cyanobacteria")
+cya.df <- data.frame(sample_data(cya.phy))
+cya.df$RelAbund <- t(data.frame(otu_table(cya.phy)))
+
+# Test normality
+hist(cya.df$RelAbund, breaks=10)
+qqnorm(cya.df$RelAbund)
+qqline(cya.df$RelAbund)
+shapiro.test(cya.df$RelAbund)
+  # p-value = 0.01417
+  # Not Normal
+
+# correct = F to address error ("cannot compute exact p-value with ties"
+# http://courses.atlas.illinois.edu/spring2016/STAT/STAT200/RProgramming/NonParametricStats.html
+wilcox.test(RelAbund ~ Group, data=cya.df, correct=F, alternative = "greater")
+  # p-value = 0.0004523
+
+
+### Verrucomicrobia
+ver.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Verrucomicrobia")
+ver.df <- data.frame(sample_data(ver.phy))
+ver.df$RelAbund <- t(data.frame(otu_table(ver.phy)))
+
+# Test normality
+hist(ver.df$RelAbund, breaks=10)
+qqnorm(ver.df$RelAbund)
+qqline(ver.df$RelAbund)
+shapiro.test(ver.df$RelAbund)
+  # p-value = 1.939e-06
+  # Not Normal
+
+wilcox.test(RelAbund ~ Group, data=ver.df)
+  # p-value = 0.7325
+
+
+### Proteobacteria
+pro.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Proteobacteria")
+pro.df <- data.frame(sample_data(pro.phy))
+pro.df$RelAbund <- t(data.frame(otu_table(pro.phy)))
+
+# Test normality
+hist(pro.df$RelAbund, breaks=10)
+qqnorm(pro.df$RelAbund)
+qqline(pro.df$RelAbund)
+shapiro.test(pro.df$RelAbund)
+  # p-value = 0.04623
+  # Not Normal
+
+wilcox.test(RelAbund ~ Group, data=pro.df)
+  # p-value = 0.2161
+
+
+### Tenericutes
+ten.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Tenericutes")
+ten.df <- data.frame(sample_data(ten.phy))
+ten.df$RelAbund <- t(data.frame(otu_table(ten.phy)))
+
+# Test normality
+hist(ten.df$RelAbund, breaks=10)
+qqnorm(ten.df$RelAbund)
+qqline(ten.df$RelAbund)
+shapiro.test(ten.df$RelAbund)
+  # p-value = 0.01142
+  # Not Normal
+
+wilcox.test(RelAbund ~ Group, data=ten.df, correct=F)
+  # p-value = 0.266
+
+
+### Elusimicrobia
+elu.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Elusimicrobia")
+elu.df <- data.frame(sample_data(elu.phy))
+elu.df$RelAbund <- t(data.frame(otu_table(elu.phy)))
+
+# Test normality
+hist(elu.df$RelAbund, breaks=10)
+qqnorm(elu.df$RelAbund)
+qqline(elu.df$RelAbund)
+shapiro.test(elu.df$RelAbund)
+  # p-value = 1.174e-05
+  # Not Normal
+
+wilcox.test(RelAbund ~ Group, data=elu.df, alternative = "greater")
+  # p-value = 0.01258
+
+
+### Actinobacteria
+act.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Actinobacteria")
+act.df <- data.frame(sample_data(act.phy))
+act.df$RelAbund <- t(data.frame(otu_table(act.phy)))
+
+# Test normality
+hist(act.df$RelAbund, breaks=10)
+qqnorm(act.df$RelAbund)
+qqline(act.df$RelAbund)
+shapiro.test(act.df$RelAbund)
+  # p-value = 0.02768
+  # Not Normal
+
+wilcox.test(RelAbund ~ Group, data=act.df)
+  # p-value = 0.2561
+
+
+### Spirochaetae
+spi.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Spirochaetae")
+spi.df <- data.frame(sample_data(spi.phy))
+spi.df$RelAbund <- t(data.frame(otu_table(spi.phy)))
+
+# Test normality
+hist(spi.df$RelAbund, breaks=10)
+qqnorm(spi.df$RelAbund)
+qqline(spi.df$RelAbund)
+shapiro.test(spi.df$RelAbund)
+  # p-value = 2.031e-07
+  # Not Normal
+
+wilcox.test(RelAbund ~ Group, data=spi.df, alternative = "greater")
+  # p-value = 0.02978
+
+
+
+
+
+
+
+
+
+
+
 
 
 ### Barplot ###
@@ -812,43 +963,6 @@ sampdf <- data.frame(sample_data(phy99))
 sampdf$Relative_Abundance <- otu_table(phy99)
 
 
-### Examine Sex
-# Summarize data
-phy.df <- psmelt(phy99)
-phy.df$Phylum <- ordered(phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia"))
-phy.df$Phylum[which(is.na(phy.df$Phylum))] <- rep("Unclassified",18)
-phy.sex <- phy.df %>%
-  group_by(Group, Sex, Sample_Type, Phylum) %>%
-  summarize(Mean = mean(Abundance),
-            Median = median(Abundance),
-            SD = sd(Abundance),
-            SE = (sd(Abundance)/(sqrt(length(Abundance)))),
-            iqr = IQR(Abundance))
-
-# Calculate IQR limits
-phy.sex$iqr.min <- phy.sum$Median - 0.5*phy.sum$iqr
-phy.sex[which(phy.sum$iqr.min < 0),10] <- 0
-  # Any IQR min < 0, change to 0 (otherwise error bar won't plot)
-phy.sex$iqr.max <- phy.sum$Median + 0.5*phy.sum$iqr
-
-# Plot
-ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
-  facet_grid(Sample_Type ~ Group) +
-  scale_fill_brewer(palette="Set1") +
-  xlab("Phyla") +
-  ylab("Median Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
-  theme(axis.text.x = element_blank(),
-        axis.title.x = element_text(size=20),
-        axis.title.y = element_text(size=20),
-        strip.text.x = element_text(size=14),
-        strip.text.y = element_text(size=14),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 14),
-        legend.text = element_text(size=12),
-        axis.text.y = element_text(size=12))
 ```
 
 
