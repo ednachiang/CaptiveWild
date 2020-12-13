@@ -497,90 +497,135 @@ pairwise.adonis(as.matrix(bray.lab), sampdf.lab$Group, sim.method = "bray", p.ad
   # Torpor vs Spring = 0.000495*
 
 ```
-### Chow
+### Simper - Lab squirrels
 ```{r}
-physeq.chow <- subset_samples(physeq, Sample_Type == "Chow")
-chow.phy <- tax_glom(physeq.chow, taxrank="Phylum")
-chow.phy99 <- transform_sample_counts(chow.phy, function(x){(x/sum(x))*100})
-chow.phy99 <- prune_taxa(taxa_sums(chow.phy99) > 1, chow.phy99)
-
-barplot(sort(taxa_sums(chow.phy99),TRUE)[1:20],las=2,cex.axis=.7)
-
-chow.df <- psmelt(chow.phy99)
-chow.df$Phylum <- ordered(chow.df$Phylum, levels=c("Proteobacteria", "Firmicutes", "Bacteroidetes", "Actinobacteria"))
-
-#tiff("Chow.tiff", width=5, height=5, units="in", res=600)
-ggplot(chow.df, aes(x=Phylum, y=Abundance, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  scale_fill_manual(values=c("#984ea3", "#e41a1c", "#377eb8", "#f781bf")) +
-  xlab("Phyla") +
-  ylab("Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,65),expand=c(0,0)) +
-  theme(axis.text.x = element_blank(),
-        axis.title.x = element_text(size=14),
-        axis.title.y = element_text(size=14),
-        strip.text.x = element_text(size=12),
-        strip.text.y = element_text(size=12),
-        panel.spacing=unit(1, "lines"))
-#dev.off()
+# Change Group names to be compatible (no "_")
+physeq.simp <- physeq.lab
+rename.samp <- data.frame(sample_data(physeq.simp))
+rename.lab <- which(data.frame(sample_data(physeq.simp))$Group == "Summer_Lab")
+levels(rename.samp$Group) <- c("Summer", "Torpor", "IBA", "Spring")
+rename.samp$Sex <- ordered(rename.samp$Sex, levels=c("Female","Male"))
+physeq.simp <- merge_phyloseq(otu_table(physeq.rem), sample_data(rename.samp), tax_table(physeq.rem))
 
 
-#tiff("Chow.mdtp.tiff", width=8, height=6, units="in", res=300)
-ggplot(chow.df, aes(x=Phylum, y=Abundance, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  scale_fill_manual(values=c("#984ea3", "#e41a1c", "#377eb8", "#f781bf")) +
-  xlab("Phyla") +
-  ylab("Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,65),expand=c(0,0)) +
-  theme(axis.text.x = element_blank(),
+# Group
+#simper.pretty(data.frame(otu_table(physeq.simp)),
+              data.frame(sample_data(physeq.simp)),
+              c("Group"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='lab_group')
+lab.group.simper <- read.csv("lab_group_clean_simper.csv")
+#kruskal.pretty(data.frame(otu_table(physeq.simp)),
+               data.frame(sample_data(physeq.simp)),
+               csv = lab.group.simper,
+               c("Group"),
+               output_name = 'lab_group',
+               taxonomy = data.frame(tax_table(physeq.simp)))
+lab.group.simper.kw <- read.csv("lab_group_krusk_simper.csv")
+for(i in 1:nrow(lab.group.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(physeq.simp))) == lab.group.simper.kw$OTU[i])
+  lab.group.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(physeq.simp))[save,2], "-",
+          data.frame(tax_table(physeq.simp))[save,3], "-",
+          data.frame(tax_table(physeq.simp))[save,4], "-",
+          data.frame(tax_table(physeq.simp))[save,5], "-",
+          data.frame(tax_table(physeq.simp))[save,6])
+}
+#write.table(lab.group.simper.kw, "lab_group_krusk_simper.csv", sep=",")
+
+
+
+
+```
+### Simper Heatmap - Lab squirrels
+```{r}
+# Subset sig OTUs
+physeq.lab.simp.ra <- transform_sample_counts(physeq.simp, function(x){(x/sum(x))*100})
+physeq.lab.simp.sig <- subset_taxa(physeq.lab.simp.ra, Species == "Otu00037" | 
+                                     Species == "Otu00016" | Species == "Otu00032" | 
+                                     Species == "Otu00001" | Species == "Otu00009" |
+                                     Species == "Otu00045" | Species == "Otu00144")
+
+# Create tax table
+lab.simp.sig.tax <- data.frame(tax_table(physeq.lab.simp.sig))
+lab.simp.sig.tax$Name <- c("Akkermansia", "Prevotellaceae", "Bacteroides", "Lachnospiraceae", "Lactobacillus", "Lactobacillus", "Lachnospiraceae")
+lab.simp.sig.tax <- tax_table(lab.simp.sig.tax)
+taxa_names(lab.simp.sig.tax) <- taxa_names(physeq.lab.simp.sig)
+
+# Create otu table
+lab.simp.sig.df <- psmelt(physeq.lab.simp.sig)
+lab.simp.sig.sum <- lab.simp.sig.df %>%
+  group_by(OTU, Group) %>%
+  summarize(Mean = mean(Abundance),
+            SD = sd(Abundance),
+            SE = se(Abundance))
+lab.simp.heatmap <- data.frame(matrix(NA,nrow = length(unique(lab.simp.sig.sum$OTU)), ncol = 8))
+colnames(lab.simp.heatmap) <- c("OTU", "Summer", "Torpor", "IBA", "Spring", "Taxonomy", "Significance", "Name")
+rownames(lab.simp.heatmap) <- unique(lab.simp.sig.sum$OTU)
+lab.simp.heatmap$OTU <- unique(lab.simp.sig.sum$OTU)
+for(i in 1:nrow(lab.simp.sig.sum)){
+  otu <- lab.simp.sig.sum$OTU[i]
+  group <- lab.simp.sig.sum$Group[i]
+  ra <- lab.simp.sig.sum$Mean[i]
+  
+  row <- which(lab.simp.heatmap$OTU == otu)
+  col <- which(colnames(lab.simp.heatmap) == group)
+  
+  lab.simp.heatmap[row, col] <- ra
+}
+lab.simp.heatmap$Taxonomy <- c("Verrucomicrobia - Verrucomicrobiae - Verrucomicrobiales - Verrucomicrobiaceae - Akkermansia", "Bacteroidetes - Bacteroidia - Bacteroidales - Prevotellaceae - Prevotellaceae_unclassified", "Bacteroidetes - Bacteroidia - Bacteroidales - Bacteroidaceae - Bacteroides", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified", "Firmicutes - Bacilli - Lactobacillales - Lactobacillaceae - Lactobacillus", "Firmicutes - Bacilli - Lactobacillales - Lactobacillaceae - Lactobacillus", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified")
+lab.simp.heatmap$Significance <- c("IS", "PS_PT_PI", "TS", "ST_SI", "ST_SI_SP", "PT_PI", "PI")
+lab.simp.heatmap$Name = c("Akkermansia", "Prevotellaceae", "Bacteroides", "Lachnospiraceae", "Lactobacillus", "Lactobacillus", "Lachnospiraceae")
+lab.simp.heatmap <- lab.simp.heatmap[,-1]
+lab.simp.heatmap <- lab.simp.heatmap[,-5:-7]
+
+# Create sample data
+lab.simp.heatmap.sampdat <- data.frame(c("Summer", "Torpor", "IBA", "Spring"))
+colnames(lab.simp.heatmap.sampdat) <- "Group"
+rownames(lab.simp.heatmap.sampdat) <- lab.simp.heatmap.sampdat$Group
+
+# Create phyloseq object for simper heatmap
+physeq.lab.simp.sig <- merge_phyloseq(otu_table(lab.simp.heatmap, taxa_are_rows=T), lab.simp.sig.tax, sample_data(lab.simp.heatmap.sampdat))
+sample_data(physeq.lab.simp.sig)$Group <- ordered(sample_data(physeq.lab.simp.sig)$Group, levels=c("Summer", "Torpor", "IBA", "Spring"))
+
+
+##### Plot Heatmap #####
+#tiff("lab.bact.heatmap.tiff", width = 8, height = 6, units = "in", res = 600)
+plot_heatmap(physeq.lab.simp.sig, sample.label = "Group", taxa.order = c("Otu00144", "Otu00045",
+                                                                         "Otu00009", "Otu00001",
+                                                                         "Otu00016", "Otu00037",
+                                                                         "Otu00032")) +
+  geom_tile(colour = "gray40") +
+  geom_text(size = 5, aes(label=sprintf("%0.2f", round(Abundance, digits=2)))) +
+  scale_fill_gradientn(name=expression("Mean Relative\nAbundance\n(%)"), limits = c(0,17),
+                       breaks = c(0, 4.25, 8.5, 12.75, 17), colours = c("#FBFFFF", "#C2EDFF",
+                                                                        "#93DFFF", "#62D1FF",
+                                                                        "#1EBDFF","#00A4E8")) +
+  scale_y_discrete(labels=c(expression(" "^H~"Lachnospiraceae"),
+                            expression(" "^GH~italic("Lactobacillus")),
+                            expression(" "^F~"Prevotallaceae"),
+                            expression(" "^E~italic("Akkermansia")),
+                            expression(" "^D~italic("Bacteroides")),
+                            expression(" "^ABC~italic("Lactobacillus")),
+                            expression(" "^AB~"Lachnospiraceae"))) +
+  ylab("OTU Classification") +
+  theme(panel.border=element_blank(),
+        axis.text.x = element_text(angle=0, hjust=0.5, vjust=1.18, size=16, 
+                                   margin = margin(t=0, r=0, b=0, l=0)),
         axis.text.y = element_text(size=16),
-        axis.title.x = element_text(size=20),
-        axis.title.y = element_text(size=20),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 18, face="bold"),
-        legend.text = element_text(size=18),
-        panel.grid.major = element_blank())
+        axis.ticks.x=element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.title.x = element_text(size=16, face="bold", margin = margin(t=10, r=0, b=0, l=0)),
+        axis.title.y = element_text(margin = margin(t=0, r=0, b=0, l=0), size=14, face="bold"),
+        axis.line=element_blank(),
+        legend.title = element_text(size=16, face="bold"),
+        legend.text = element_text(size=16),
+        legend.margin = margin(t=0, r=-5, b=0, l=-8),
+        legend.key.height = unit(0.70, "in"),
+        plot.title = element_text(size=16, face="bold")
+  )
 #dev.off()
 
-
-
-
-##### Alpha Div
-physeq.wchow <- subset_samples(physeq, Sample_Type != "Black_Tissue")
-chow.adiv <- data.frame(sample_data(physeq.wchow))
-chow.adiv.sum <- chow.adiv %>%
-  group_by(Group) %>%
-  summarize(Chao_Mean = mean(chao),
-            Chao_Median = median(chao),
-            Chao_SD = sd(chao),
-            Chao_SE = (sd(chao)/sqrt(length(chao))),
-            Chao_iqr = IQR(chao),
-            InvSimp_Mean = mean(invsimpson),
-            InvSimp_Median = median(invsimpson),
-            InvSimp_SD = sd(invsimpson),
-            InvSimp_SE = (sd(invsimpson)/sqrt(length(invsimpson))),
-            InvSimp_iqr = IQR(invsimpson))
-
-#tiff("Chow.chao.tiff", width=7, height=3, units="in", res=600)
-ggplot(chow.adiv, aes(x=Group, y=chao, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen", "gray26")) +
-  #scale_fill_manual(values=c("gray95", "dimgray") )+
-  xlab("Group") +
-  ylab("Chao Richness")
-#dev.off()
-
-#tiff("Chow.InvSimp.tiff", width=7, height=3, units="in", res=600)
-ggplot(chow.adiv, aes(x=Group, y= invsimpson, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen", "gray26")) +
-  xlab("Group") +
-  ylab("Inverse Simpson Weighted Diversity")
-#dev.off()
 ```
 
 
@@ -925,9 +970,217 @@ print(nmds.sum.plot, vp=viewport(layout.pos.row=1, layout.pos.col=1))
 grid.text("stress = 0.057", x=unit(0.865, "npc"), y=unit(0.17, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=9))
 #dev.off()
 
+```
 
+
+### Simper - Wild vs. Lab
+```{r}
+# Change Group names to be compatible (no "_")
+physeq.sum.simp <- physeq.sum
+
+#simper.pretty(data.frame(otu_table(physeq.sum.simp)),
+              data.frame(sample_data(physeq.sum.simp)),
+              c("Diet"),
+              perc_cutoff = 0.5, low_cutoff = 'y', low_val = 0.01,
+              output_name = 'diet')
+sum.simper <- read.csv("diet_clean_simper.csv")
+#kruskal.pretty(data.frame(otu_table(physeq.sum.simp)),
+               data.frame(sample_data(physeq.sum.simp)),
+               csv = sum.simper,
+               c("Diet"),
+               output_name = 'diet',
+               taxonomy = data.frame(tax_table(physeq.sum.simp)))
+sum.simper.kw <- read.csv("diet_krusk_simper.csv")
+for(i in 1:nrow(sum.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(physeq.sum))) == sum.simper.kw$OTU[i])
+  sum.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(physeq.sum))[save,2], "-",
+          data.frame(tax_table(physeq.sum))[save,3], "-",
+          data.frame(tax_table(physeq.sum))[save,4], "-",
+          data.frame(tax_table(physeq.sum))[save,5], "-",
+          data.frame(tax_table(physeq.sum))[save,6])
+}
+#write.table(sum.simper.kw, "diet_krusk_simper.csv", sep=",")
 
 ```
+### Simper Heatmap - Wild vs. Lab
+```{r}
+# Subset sig OTUs
+physeq.sum.simp.ra <- transform_sample_counts(physeq.sum, function(x){(x/sum(x))*100})
+physeq.sum.simp.sig <- subset_taxa(physeq.sum.simp.ra, Species == "Otu00062" |
+                                     Species == "Otu00091" | Species == "Otu00159" |
+                                     Species == "Otu00116" | Species == "Otu00037" |
+                                     Species == "Otu00015" | Species == "Otu00032")
+                                   
+# Create tax table
+sum.simp.sig.tax <- data.frame(tax_table(physeq.sum.simp.sig))
+sum.simp.sig.tax$Name <- c("Coprococcus_2", "Lachnospiraceae", "Lactobacillus", "Lachnospiraceae", "NK4A136", "Lachnospiraceae", "Lachnospiraceae")
+sum.simp.sig.tax <- tax_table(sum.simp.sig.tax)
+taxa_names(sum.simp.sig.tax) <- taxa_names(physeq.sum.simp.sig)
+
+# Create otu table
+sum.simp.sig.df <- psmelt(physeq.sum.simp.sig)
+sum.simp.sig.sum <- sum.simp.sig.df %>%
+  group_by(OTU, Group) %>%
+  summarize(Mean = mean(Abundance),
+            SD = sd(Abundance),
+            SE = se(Abundance))
+sum.simp.heatmap <- data.frame(matrix(NA, nrow = length(unique(sum.simp.sig.sum$OTU)), ncol = 5))
+colnames(sum.simp.heatmap) <- c("OTU", "Summer_Wild", "Summer_Lab", "Taxonomy", "Name")
+rownames(sum.simp.heatmap) <- unique(sum.simp.sig.sum$OTU)
+sum.simp.heatmap$OTU <- unique(sum.simp.sig.sum$OTU)
+for(i in 1:nrow(sum.simp.sig.sum)){
+  otu <- sum.simp.sig.sum$OTU[i]
+  group <- sum.simp.sig.sum$Group[i]
+  ra <- sum.simp.sig.sum$Mean[i]
+  
+  row <- which(sum.simp.heatmap$OTU == otu)
+  col <- which(colnames(sum.simp.heatmap) == group)
+  
+  sum.simp.heatmap[row, col] <- ra
+}
+sum.simp.heatmap$Taxonomy <- c("Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Coprococcus_2", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified", "Firmicutes - Bacilli - Lactobacillales - Lactobacillaceae - Lactobacillus", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_NK4A136_group", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified")
+sum.simp.heatmap$Name <- c("Coprococcus_2", "Lachnospiraceae", "Lactobacillus", "Lachnospiraceae", "NK4A136", "Lachnospiraceae", "Lachnospiraceae")
+sum.simp.heatmap <- sum.simp.heatmap[,-1]
+sum.simp.heatmap <- sum.simp.heatmap[,-3:-4]
+colnames(sum.simp.heatmap) <- c("Wild", "Captive")
+
+# Create sample data
+sum.simp.heatmap.sampdat <- data.frame(c("Wild", "Captive"))
+colnames(sum.simp.heatmap.sampdat) <- "Group"
+rownames(sum.simp.heatmap.sampdat) <- sum.simp.heatmap.sampdat$Group
+
+# Create phyloseq object for simper heatmap
+physeq.sum.simp.sig <- merge_phyloseq(otu_table(sum.simp.heatmap, taxa_are_rows=T), sum.simp.sig.tax, sample_data(sum.simp.heatmap.sampdat))
+#sample_data(physeq.sum.simp.sig)$Group <- ordered(sample_data(physeq.sum.simp.sig)$Group, levels=c("Wild", "Captive"))
+
+
+##### Plot Heatmap #####
+### THIS ONLY WORKS IF YOU HAVE > 2 SAMPLES. Try this again after I get summer 2 results
+#tiff("sum.bact.heatmap.tiff", width = 8, height = 6, units = "in", res = 600)
+plot_heatmap(physeq.sum.simp.sig, sample.label = "Group", taxa.order = c("Otu00032", "Otu00015",
+                                                                         "Otu00037", "Otu00116",
+                                                                         "Otu00159", "Otu00062",
+                                                                         "Otu00091")) +
+  geom_tile(colour = "gray40") +
+  geom_text(size = 5, aes(label=sprintf("%0.2f", round(Abundance, digits=2)))) +
+  scale_fill_gradientn(name=expression("Mean Relative\nAbundance\n(%)"), limits = c(0,5),
+                       breaks = c(0, 1, 2, 3, 4, 5), colours = c("#FBFFFF", "#C2EDFF",
+                                                                        "#93DFFF", "#62D1FF",
+                                                                        "#1EBDFF","#00A4E8")) +
+  scale_y_discrete(labels=c(expression(" "^H~"Lachnospiraceae"),
+                            expression(" "^GH~italic("Lactobacillus")),
+                            expression(" "^F~"Prevotallaceae"),
+                            expression(" "^E~italic("Akkermansia")),
+                            expression(" "^D~italic("Bacteroides")),
+                            expression(" "^ABC~italic("Lactobacillus")),
+                            expression(" "^AB~"Lachnospiraceae"))) +
+  ylab("OTU Classification") +
+  theme(panel.border=element_blank(),
+        axis.text.x = element_text(angle=0, hjust=0.5, vjust=1.18, size=16, 
+                                   margin = margin(t=0, r=0, b=0, l=0)),
+        axis.text.y = element_text(size=16),
+        axis.ticks.x=element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.title.x = element_text(size=16, face="bold", margin = margin(t=10, r=0, b=0, l=0)),
+        axis.title.y = element_text(margin = margin(t=0, r=0, b=0, l=0), size=14, face="bold"),
+        axis.line=element_blank(),
+        legend.title = element_text(size=16, face="bold"),
+        legend.text = element_text(size=16),
+        legend.margin = margin(t=0, r=-5, b=0, l=-8),
+        legend.key.height = unit(0.70, "in"),
+        plot.title = element_text(size=16, face="bold")
+  )
+#dev.off()
+```
+### Chow
+```{r}
+physeq.chow <- subset_samples(physeq, Sample_Type == "Chow")
+chow.phy <- tax_glom(physeq.chow, taxrank="Phylum")
+chow.phy99 <- transform_sample_counts(chow.phy, function(x){(x/sum(x))*100})
+chow.phy99 <- prune_taxa(taxa_sums(chow.phy99) > 1, chow.phy99)
+
+barplot(sort(taxa_sums(chow.phy99),TRUE)[1:20],las=2,cex.axis=.7)
+
+chow.df <- psmelt(chow.phy99)
+chow.df$Phylum <- ordered(chow.df$Phylum, levels=c("Proteobacteria", "Firmicutes", "Bacteroidetes", "Actinobacteria"))
+
+#tiff("Chow.tiff", width=5, height=5, units="in", res=600)
+ggplot(chow.df, aes(x=Phylum, y=Abundance, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  scale_fill_manual(values=c("#984ea3", "#e41a1c", "#377eb8", "#f781bf")) +
+  xlab("Phyla") +
+  ylab("Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,65),expand=c(0,0)) +
+  theme(axis.text.x = element_blank(),
+        axis.title.x = element_text(size=14),
+        axis.title.y = element_text(size=14),
+        strip.text.x = element_text(size=12),
+        strip.text.y = element_text(size=12),
+        panel.spacing=unit(1, "lines"))
+#dev.off()
+
+
+#tiff("Chow.mdtp.tiff", width=8, height=6, units="in", res=300)
+ggplot(chow.df, aes(x=Phylum, y=Abundance, fill=Phylum)) +
+  geom_bar(stat="identity", color="black") +
+  scale_fill_manual(values=c("#984ea3", "#e41a1c", "#377eb8", "#f781bf")) +
+  xlab("Phyla") +
+  ylab("Relative Abundance for Phyla > 1%") +
+  scale_y_continuous(limits=c(0,65),expand=c(0,0)) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_text(size=16),
+        axis.title.x = element_text(size=20),
+        axis.title.y = element_text(size=20),
+        panel.spacing=unit(1, "lines"),
+        legend.title = element_text(size = 18, face="bold"),
+        legend.text = element_text(size=18),
+        panel.grid.major = element_blank())
+#dev.off()
+
+
+
+
+##### Alpha Div
+physeq.wchow <- subset_samples(physeq, Sample_Type != "Black_Tissue")
+chow.adiv <- data.frame(sample_data(physeq.wchow))
+chow.adiv.sum <- chow.adiv %>%
+  group_by(Group) %>%
+  summarize(Chao_Mean = mean(chao),
+            Chao_Median = median(chao),
+            Chao_SD = sd(chao),
+            Chao_SE = (sd(chao)/sqrt(length(chao))),
+            Chao_iqr = IQR(chao),
+            InvSimp_Mean = mean(invsimpson),
+            InvSimp_Median = median(invsimpson),
+            InvSimp_SD = sd(invsimpson),
+            InvSimp_SE = (sd(invsimpson)/sqrt(length(invsimpson))),
+            InvSimp_iqr = IQR(invsimpson))
+
+#tiff("Chow.chao.tiff", width=7, height=3, units="in", res=600)
+ggplot(chow.adiv, aes(x=Group, y=chao, fill = Group)) +
+  geom_boxplot(position=position_dodge(1)) +
+  geom_point() + 
+  #facet_grid(.~Substrate) +
+  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen", "gray26")) +
+  #scale_fill_manual(values=c("gray95", "dimgray") )+
+  xlab("Group") +
+  ylab("Chao Richness")
+#dev.off()
+
+#tiff("Chow.InvSimp.tiff", width=7, height=3, units="in", res=600)
+ggplot(chow.adiv, aes(x=Group, y= invsimpson, fill = Group)) +
+  geom_boxplot(position=position_dodge(1)) +
+  geom_point() + 
+  #facet_grid(.~Substrate) +
+  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen", "gray26")) +
+  xlab("Group") +
+  ylab("Inverse Simpson Weighted Diversity")
+#dev.off()
+```
+
+
+
 ### Examine Phyla
 ```{r}
 # Merge samples with the same taxonomic rank
@@ -1106,137 +1359,6 @@ ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
 
 
 
-
-### Simper - Lab squirrels
-```{r}
-# Change Group names to be compatible (no "_")
-physeq.simp <- physeq.lab
-rename.samp <- data.frame(sample_data(physeq.simp))
-rename.lab <- which(data.frame(sample_data(physeq.simp))$Group == "Summer_Lab")
-levels(rename.samp$Group) <- c("Summer", "Torpor", "IBA", "Spring")
-rename.samp$Sex <- ordered(rename.samp$Sex, levels=c("Female","Male"))
-physeq.simp <- merge_phyloseq(otu_table(physeq.rem), sample_data(rename.samp), tax_table(physeq.rem))
-
-
-# Group
-#simper.pretty(data.frame(otu_table(physeq.simp)),
-              data.frame(sample_data(physeq.simp)),
-              c("Group"),
-              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
-              output_name='lab_group')
-lab.group.simper <- read.csv("lab_group_clean_simper.csv")
-#kruskal.pretty(data.frame(otu_table(physeq.simp)),
-               data.frame(sample_data(physeq.simp)),
-               csv = lab.group.simper,
-               c("Group"),
-               output_name = 'lab_group',
-               taxonomy = data.frame(tax_table(physeq.simp)))
-lab.group.simper.kw <- read.csv("lab_group_krusk_simper.csv")
-for(i in 1:nrow(lab.group.simper.kw)){
-  save <- which(rownames(data.frame(tax_table(physeq.simp))) == lab.group.simper.kw$OTU[i])
-  lab.group.simper.kw$Taxonomy[i] <-
-    paste(data.frame(tax_table(physeq.simp))[save,2], "-",
-          data.frame(tax_table(physeq.simp))[save,3], "-",
-          data.frame(tax_table(physeq.simp))[save,4], "-",
-          data.frame(tax_table(physeq.simp))[save,5], "-",
-          data.frame(tax_table(physeq.simp))[save,6])
-}
-#write.table(lab.group.simper.kw, "lab_group_krusk_simper.csv", sep=",")
-
-
-
-
-```
-### Simper Heatmap - Lab squirrels
-```{r}
-# Subset sig OTUs
-physeq.lab.simp.ra <- transform_sample_counts(physeq.simp, function(x){(x/sum(x))*100})
-physeq.lab.simp.sig <- subset_taxa(physeq.lab.simp.ra, Species == "Otu00037" | 
-                                     Species == "Otu00016" | Species == "Otu00032" | 
-                                     Species == "Otu00001" | Species == "Otu00009" |
-                                     Species == "Otu00045" | Species == "Otu00144")
-
-# Create tax table
-lab.simp.sig.tax <- data.frame(tax_table(physeq.lab.simp.sig))
-lab.simp.sig.tax$Name <- c("Akkermansia", "Prevotellaceae", "Bacteroides", "Lachnospiraceae", "Lactobacillus", "Lactobacillus", "Lachnospiraceae")
-lab.simp.sig.tax <- tax_table(lab.simp.sig.tax)
-taxa_names(lab.simp.sig.tax) <- taxa_names(physeq.lab.simp.sig)
-
-# Create otu table
-lab.simp.sig.df <- psmelt(physeq.lab.simp.sig)
-lab.simp.sig.sum <- lab.simp.sig.df %>%
-  group_by(OTU, Group) %>%
-  summarize(Mean = mean(Abundance),
-            SD = sd(Abundance),
-            SE = se(Abundance))
-lab.simp.heatmap <- data.frame(matrix(NA,nrow = length(unique(lab.simp.sig.sum$OTU)), ncol = 8))
-colnames(lab.simp.heatmap) <- c("OTU", "Summer", "Torpor", "IBA", "Spring", "Taxonomy", "Significance", "Name")
-rownames(lab.simp.heatmap) <- unique(lab.simp.sig.sum$OTU)
-lab.simp.heatmap$OTU <- unique(lab.simp.sig.sum$OTU)
-for(i in 1:nrow(lab.simp.sig.sum)){
-  otu <- lab.simp.sig.sum$OTU[i]
-  group <- lab.simp.sig.sum$Group[i]
-  ra <- lab.simp.sig.sum$Mean[i]
-  
-  row <- which(lab.simp.heatmap$OTU == otu)
-  col <- which(colnames(lab.simp.heatmap) == group)
-  
-  lab.simp.heatmap[row, col] <- ra
-}
-lab.simp.heatmap$Taxonomy <- c("Verrucomicrobia - Verrucomicrobiae - Verrucomicrobiales - Verrucomicrobiaceae - Akkermansia", "Bacteroidetes - Bacteroidia - Bacteroidales - Prevotellaceae - Prevotellaceae_unclassified", "Bacteroidetes - Bacteroidia - Bacteroidales - Bacteroidaceae - Bacteroides", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified", "Firmicutes - Bacilli - Lactobacillales - Lactobacillaceae - Lactobacillus", "Firmicutes - Bacilli - Lactobacillales - Lactobacillaceae - Lactobacillus", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified")
-lab.simp.heatmap$Significance <- c("IS", "PS_PT_PI", "TS", "ST_SI", "ST_SI_SP", "PT_PI", "PI")
-lab.simp.heatmap$Name = c("Akkermansia", "Prevotellaceae", "Bacteroides", "Lachnospiraceae", "Lactobacillus", "Lactobacillus", "Lachnospiraceae")
-lab.simp.heatmap <- lab.simp.heatmap[,-1]
-lab.simp.heatmap <- lab.simp.heatmap[,-5:-7]
-
-# Create sample data
-lab.simp.heatmap.sampdat <- data.frame(c("Summer", "Torpor", "IBA", "Spring"))
-colnames(lab.simp.heatmap.sampdat) <- "Group"
-rownames(lab.simp.heatmap.sampdat) <- lab.simp.heatmap.sampdat$Group
-
-# Create phyloseq object for simper heatmap
-physeq.lab.simp.sig <- merge_phyloseq(otu_table(lab.simp.heatmap, taxa_are_rows=T), lab.simp.sig.tax, sample_data(lab.simp.heatmap.sampdat))
-sample_data(physeq.lab.simp.sig)$Group <- ordered(sample_data(physeq.lab.simp.sig)$Group, levels=c("Summer", "Torpor", "IBA", "Spring"))
-
-
-##### Plot Heatmap #####
-#tiff("lab.bact.heatmap.tiff", width = 8, height = 6, units = "in", res = 600)
-plot_heatmap(physeq.lab.simp.sig, sample.label = "Group", taxa.order = c("Otu00144", "Otu00045",
-                                                                         "Otu00009", "Otu00001",
-                                                                         "Otu00016", "Otu00037",
-                                                                         "Otu00032")) +
-  geom_tile(colour = "gray40") +
-  geom_text(size = 5, aes(label=sprintf("%0.2f", round(Abundance, digits=2)))) +
-  scale_fill_gradientn(name=expression("Mean Relative\nAbundance\n(%)"), limits = c(0,17),
-                       breaks = c(0, 4.25, 8.5, 12.75, 17), colours = c("#FBFFFF", "#C2EDFF",
-                                                                        "#93DFFF", "#62D1FF",
-                                                                        "#1EBDFF","#00A4E8")) +
-  scale_y_discrete(labels=c(expression(" "^H~"Lachnospiraceae"),
-                            expression(" "^GH~italic("Lactobacillus")),
-                            expression(" "^F~"Prevotallaceae"),
-                            expression(" "^E~italic("Akkermansia")),
-                            expression(" "^D~italic("Bacteroides")),
-                            expression(" "^ABC~italic("Lactobacillus")),
-                            expression(" "^AB~"Lachnospiraceae"))) +
-  ylab("OTU Classification") +
-  theme(panel.border=element_blank(),
-        axis.text.x = element_text(angle=0, hjust=0.5, vjust=1.18, size=16, 
-                                   margin = margin(t=0, r=0, b=0, l=0)),
-        axis.text.y = element_text(size=16),
-        axis.ticks.x=element_blank(),
-        axis.ticks.y=element_blank(),
-        axis.title.x = element_text(size=16, face="bold", margin = margin(t=10, r=0, b=0, l=0)),
-        axis.title.y = element_text(margin = margin(t=0, r=0, b=0, l=0), size=14, face="bold"),
-        axis.line=element_blank(),
-        legend.title = element_text(size=16, face="bold"),
-        legend.text = element_text(size=16),
-        legend.margin = margin(t=0, r=-5, b=0, l=-8),
-        legend.key.height = unit(0.70, "in"),
-        plot.title = element_text(size=16, face="bold")
-  )
-#dev.off()
-
-```
 
 
 ### Cyanobacteria???
