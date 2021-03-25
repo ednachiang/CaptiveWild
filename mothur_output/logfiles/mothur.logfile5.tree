@@ -1,0 +1,64 @@
+Linux version
+
+Using ReadLine,Boost,HDF5
+mothur v.1.44.3
+Last updated: 8/27/20
+by
+Patrick D. Schloss
+
+Department of Microbiology & Immunology
+
+University of Michigan
+http://www.mothur.org
+
+When using, please cite:
+Schloss, P.D., et al., Introducing mothur: Open-source, platform-independent, community-supported software for describing and comparing microbial communities. Appl Environ Microbiol, 2009. 75(23):7537-41.
+
+Distributed under the GNU General Public License
+
+Type 'help()' for information on the commands that are available
+
+For questions and analysis support, please visit our forum at https://forum.mothur.org
+
+Type 'quit()' to exit program
+
+[NOTE]: Setting random seed to 19760620.
+
+Interactive Mode
+
+
+
+mothur > set.current(processors = 40)
+
+Using 40 processors.
+
+Current files saved by mothur:
+processors=40
+
+Output File Names: 
+current_files.summary
+
+
+mothur > dist.seqs(fasta=$HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.rep.renamed3.fasta, output=lt, processors=40)
+
+Using 40 processors.
+
+Sequence	Time	Num_Dists_Below_Cutoff
+
+It took 266 secs to find distances for 13570 sequences. 92065665 distances below cutoff 1.
+
+
+Output File Names: 
+/home/glbrc.org/echiang3/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.rep.renamed3.phylip.dist
+
+
+mothur > 
+[ERROR]: You are missing (
+[ERROR]: Invalid.
+
+mothur > clearcut(phylip=current)
+Using /home/glbrc.org/echiang3/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.rep.renamed3.phylip.dist as input file for the phylip parameter.
+
+Output File Names:
+/home/glbrc.org/echiang3/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.rep.renamed3.phylip.tre
+

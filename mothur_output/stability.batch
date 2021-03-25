@@ -1,0 +1,67 @@
+# Mothur SOP accessed 03/19/2021
+# Modifications: screen.seqs maxlength = 300; chimera.uchime; 
+#make.file(inputdir=fastq, type=gz)
+set.dir(input=$HOME/cecum_bact/fastq, output=$HOME/cecum_bact/mothur_outputs)
+make.contigs(file=stability.file, processors=20)
+summary.seqs(fasta=current)
+screen.seqs(fasta=current, group=current, summary=current, maxambig=0, maxlength=300, maxhomop=8)
+summary.seqs(fasta=current)
+unique.seqs(fasta=current)
+summary.seqs(fasta=current)
+count.seqs(name=current, group=current)
+summary.seqs(count=current)
+align.seqs(fasta=current, reference=$HOME/mothur/silva/silva.v4.v132.align, flip=T)
+summary.seqs(fasta=current, count=current)
+screen.seqs(fasta=current, count=current, summary=current, start=8, end=9582)
+summary.seqs(fasta=current, count=current)
+filter.seqs(fasta=current, vertical=T, trump=.)
+summary.seqs(fasta=current)
+unique.seqs(fasta=current, count=current)
+summary.seqs(fasta=current, count=current)
+pre.cluster(fasta=current, count=current, diffs=2)
+summary.seqs(fasta=current, count=current)
+chimera.uchime(fasta=current, count=current, dereplicate=t)
+remove.seqs(fasta=stability.trim.contigs.good.unique.good.filter.unique.precluster.fasta, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.count_table, accnos=current)
+summary.seqs(fasta=current, count=current)
+classify.seqs(fasta=current, count=stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.count_table, reference=$HOME/mothur/silva/silva.v4.v132.align, taxonomy=$HOME/mothur/silva/silva.nr_v132.tax, cutoff=80)
+remove.lineage(fasta=current, count=current, taxonomy=current, taxon=Chloroplast-Mitochondria-unknown-Archaea-Eukaryota)
+summary.seqs(fasta=current, count=current)
+summary.tax(taxonomy=current, count=current)
+dist.seqs(fasta=current)
+cluster.split(column=current, count=current, method=opti, cutoff=0.03)
+make.shared(list=current, count=current, label=0.03)
+classify.seqs(fasta=current, count=current, template=$HOME/mothur/silva/silva.nr_v132.align, taxonomy=$HOME/mothur/silva/silva.nr_v132.tax, cutoff=80)
+classify.otu(list=current, taxonomy=current, count=current, label=0.03, cutoff=80, basis=otu, probs=F)
+summary.seqs(fasta=current, count=current)
+rarefaction.single(shared=current)
+summary.single(shared=$HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.shared, label=0.03, calc=nseqs-sobs-coverage)
+
+# Normalize samples
+normalize.shared(shared=current, method=totalgroup, norm = 11013)
+summary.single(shared=current, label=0.03, calc=coverage-nseqs-bergerparker-chao-shannon-invsimpson)
+
+# Remove samples w/ Good's coverage < 95%
+remove.groups(fasta = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.fasta, shared = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.norm.shared, taxonomy = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.cons.taxonomy, count = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.count_table, groups = CC1_057_W, processors = 20)
+summary.single(shared=current, label=0.03, calc=coverage-nseqs-bergerparker-chao-shannon-invsimpson)
+
+
+
+### Code below is for making an OTU tree ###
+
+# Get representative sequence for each OTU
+# get.oturep(fasta = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.fasta, list = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.list, count = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.count_table, cutoff = 0.03, method = abundance)
+
+########## The code between the long, hashtag headers is run in bash, NOT in mothur
+# Rename the gross MiSeq sequence names to OTU #'s
+# Code to rename fasta file entries is from here: https://github.com/ednachiang/Verruco/blob/master/mothur_output/MakePhylogeny.mothur
+cut -d "|" -f 1 stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.rep.fasta > stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.rep.renamed.fasta
+cut -f 2 *renamed.fasta > stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.rep.renamed2.fasta
+sed 's/O/>O/g' *renamed2.fasta > stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.rep.renamed3.fasta
+##########
+
+# Calculate phylip-formatted distance
+#dist.seqs(fasta=$HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.rep.renamed3.fasta, output=lt, processors=40)
+
+# Make tree
+#clearcut(phylip=current)
+#classify.tree(taxonomy=$HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.cons.pick.taxonomy, tree=$HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.rep.renamed3.phylip.tre, cutoff=80)

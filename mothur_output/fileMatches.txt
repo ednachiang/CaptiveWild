@@ -1,0 +1,5 @@
+final.tre = stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.rep.renamed3.phylip.tre
+final.summary = stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.norm.0.03.pick.groups.summary
+final.shared = stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.norm.0.03.pick.shared
+final.taxonomy = stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.cons.pick.taxonomy
+unnorm.summary = stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.groups.summary

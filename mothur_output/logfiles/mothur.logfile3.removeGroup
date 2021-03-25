@@ -1,0 +1,282 @@
+### Note: Lines that are commented refer to commands that I rerun in a later logfile (usually because the command didn't work or I used the wrong command). These commented lines will always be at the end of a logfile.
+
+
+Linux version
+
+Using ReadLine,Boost,HDF5
+mothur v.1.44.3
+Last updated: 8/27/20
+by
+Patrick D. Schloss
+
+Department of Microbiology & Immunology
+
+University of Michigan
+http://www.mothur.org
+
+When using, please cite:
+Schloss, P.D., et al., Introducing mothur: Open-source, platform-independent, community-supported software for describing and comparing microbial communities. Appl Environ Microbiol, 2009. 75(23):7537-41.
+
+Distributed under the GNU General Public License
+
+Type 'help()' for information on the commands that are available
+
+For questions and analysis support, please visit our forum at https://forum.mothur.org
+
+Type 'quit()' to exit program
+
+[NOTE]: Setting random seed to 19760620.
+
+Interactive Mode
+
+
+
+mothur > remove.groups(fasta = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.fasta, shared = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.norm.shared, taxonomy = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.cons.taxonomy, count = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.count_table, groups = CC1_057_W, processors = 20)
+[WARNING]: processors is not a valid parameter, ignoring.
+The valid parameters are: fasta, shared, name, phylip, column, count, group, design, list, taxonomy, accnos, groups, sets, seed, inputdir, and outputdir.
+Removed 16697 sequences from your count file.
+Removed 970 sequences from your fasta file.
+Removed 0 sequences from your taxonomy file.
+Removed groups: CC1_057_W from your shared file.
+
+Output File names: 
+/home/glbrc.org/echiang3/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.pick.count_table
+/home/glbrc.org/echiang3/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.fasta
+/home/glbrc.org/echiang3/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.cons.pick.taxonomy
+/home/glbrc.org/echiang3/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.norm.0.03.pick.shared
+
+
+
+mothur > summary.single(shared=current, label=0.03, calc=coverage-nseqs-bergerparker-chao-shannon-invsimpson)
+Using /home/glbrc.org/echiang3/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.norm.0.03.pick.shared as input file for the shared parameter.
+
+Processing group CC1_058_W
+
+0.03
+
+Processing group CC1_059_W
+
+0.03
+
+Processing group CC1_060_W
+
+0.03
+
+Processing group CC1_881_S
+
+0.03
+
+Processing group CC1_883_I
+
+0.03
+
+Processing group CC1_884_T
+
+0.03
+
+Processing group CC1_885_T
+
+0.03
+
+Processing group CC1_886_T
+
+0.03
+
+Processing group CC1_890_S
+
+0.03
+
+Processing group CC1_894_P
+
+0.03
+
+Processing group CC1_895_T
+
+0.03
+
+Processing group CC1_899_I
+
+0.03
+
+Processing group CC1_901_T
+
+0.03
+
+Processing group CC1_906_P
+
+0.03
+
+Processing group CC1_907_S
+
+0.03
+
+Processing group CC1_910_I
+
+0.03
+
+Processing group CC1_912_S
+
+0.03
+
+Processing group CC1_916_P
+
+0.03
+
+Processing group CC1_917_I
+
+0.03
+
+Processing group CC1_919_I
+
+0.03
+
+Processing group CC1_920_T
+
+0.03
+
+Processing group CC1_921_P
+
+0.03
+
+Processing group CC1_922_I
+
+0.03
+
+Processing group CC1_923_S
+
+0.03
+
+Processing group CC1_924_I
+
+0.03
+
+Processing group CC1_925_I
+
+0.03
+
+Processing group CC2_882_S
+
+0.03
+
+Processing group CC2_889_S
+
+0.03
+
+Processing group CC2_911_S
+
+0.03
+
+Processing group CM1_057_W
+
+0.03
+
+Processing group CM1_058_W
+
+0.03
+
+Processing group CM1_059_W
+
+0.03
+
+Processing group CM1_060_W
+
+0.03
+
+Processing group CM1_882_S
+
+0.03
+
+Processing group CM1_883_I
+
+0.03
+
+Processing group CM1_884_T
+
+0.03
+
+Processing group CM1_885_T
+
+0.03
+
+Processing group CM1_889_S
+
+0.03
+
+Processing group CM1_894_P
+
+0.03
+
+Processing group CM1_895_T
+
+0.03
+
+Processing group CM1_899_I
+
+0.03
+
+Processing group CM1_901_T
+
+0.03
+
+Processing group CM1_906_P
+
+0.03
+
+Processing group CM1_907_S
+
+0.03
+
+Processing group CM1_910_I
+
+0.03
+
+Processing group CM1_911_S
+
+0.03
+
+Processing group CM1_916_P
+
+0.03
+
+Processing group CM1_917_I
+
+0.03
+
+Processing group CM1_919_I
+
+0.03
+
+Processing group CM1_920_T
+
+0.03
+
+Processing group CM1_921_P
+
+0.03
+
+Processing group CM1_922_I
+
+0.03
+
+Processing group CM1_923_S
+
+0.03
+
+Processing group CM1_924_I
+
+0.03
+
+Processing group CM1_925_I
+
+0.03
+
+Processing group CM2_890_S
+
+0.03
+
+Processing group CM2_912_S
+
+0.03
+
+Output File Names: 
+/home/glbrc.org/echiang3/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.norm.0.03.pick.groups.summary

@@ -1,0 +1,285 @@
+Linux version
+
+Using ReadLine,Boost,HDF5
+mothur v.1.44.3
+Last updated: 8/27/20
+by
+Patrick D. Schloss
+
+Department of Microbiology & Immunology
+
+University of Michigan
+http://www.mothur.org
+
+When using, please cite:
+Schloss, P.D., et al., Introducing mothur: Open-source, platform-independent, community-supported software for describing and comparing microbial communities. Appl Environ Microbiol, 2009. 75(23):7537-41.
+
+Distributed under the GNU General Public License
+
+Type 'help()' for information on the commands that are available
+
+For questions and analysis support, please visit our forum at https://forum.mothur.org
+
+Type 'quit()' to exit program
+
+[NOTE]: Setting random seed to 19760620.
+
+Interactive Mode
+
+
+
+mothur > set.current(processors = 40)
+
+Using 40 processors.
+
+Current files saved by mothur:
+processors=40
+
+Output File Names: 
+current_files.summary
+
+
+mothur > get.oturep(fasta = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.fasta, list = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.list, count = $HOME/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.denovo.uchime.pick.pick.count_table, cutoff = 0.03, method = abundance)
+0.03	13808
+M04026_190_000000000-BCP3L_1_1112_24395_10913 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_28739_13382 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1107_27017_15239 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_24281_16249 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2103_11298_11739 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2113_17843_17519 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2103_17225_8645 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2113_18504_5119 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1106_16213_7603 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2109_11980_15252 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_27690_20546 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_11605_8842 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_24274_7570 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_19932_15982 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_27321_20937 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2104_10163_11012 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1113_12828_15730 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_14809_7645 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2108_19699_13840 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2104_11476_11197 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2109_15026_23330 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_5272_17231 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_8905_13636 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_23496_22671 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_20010_4485 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2107_21273_18586 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1103_28007_17290 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_7512_15759 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_19950_9678 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2104_24884_21776 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_22067_23350 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1107_22994_12528 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_27569_10488 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1112_23563_22245 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_11825_21805 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2107_14853_17896 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2112_24340_13419 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_6432_11852 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_15624_14314 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_21199_26912 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_8608_27088 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_21222_18202 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2114_5482_17426 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_11345_15224 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2104_15782_11753 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_21819_7356 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_11906_16051 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_11793_16917 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_9599_12861 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_7091_18754 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1103_16612_14303 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1112_26239_24060 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2111_5166_12709 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2102_19794_24789 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1113_15326_23370 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2107_12278_17559 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_15047_7233 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2103_18314_4214 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1111_19299_7445 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_9943_15782 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_22320_20035 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_14571_23406 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_13801_13457 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_13006_8924 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_14644_18087 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_23078_13631 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1113_24180_23976 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1113_25707_15131 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_22865_15115 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_28809_17743 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2110_17382_9538 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1106_18932_13931 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1112_15490_24034 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2112_10109_19077 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2104_25856_9610 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_9594_25826 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2104_13879_5218 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1108_21985_24733 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_8544_22421 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_10971_26856 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_13516_7916 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_13106_7171 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_14736_9828 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_13169_9776 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_2962_15801 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2104_18249_27783 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_7520_18047 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2109_15076_6606 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1106_13241_11811 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_6029_10453 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_26007_11510 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2107_25383_17101 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2109_17635_7812 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_21529_9377 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1106_10386_18286 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1107_9212_14417 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_15982_16745 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_7782_7654 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_21405_9276 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1105_21068_4520 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1106_24307_25353 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_17629_18740 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_11177_4539 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2113_11370_16033 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_16686_14922 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_14214_20060 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2111_10950_22039 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1107_3849_19042 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_15155_4500 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1104_5490_13236 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2104_21220_19655 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_21992_10544 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_8187_23004 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2109_22202_22247 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2103_16690_26552 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_13703_25477 is missing from your fasta or name file, ignoring. Please correct.
+M04026_177_000000000-BBCN8_1_2106_21179_19931 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1104_9730_16997 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1106_25781_17199 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1106_5812_15749 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_19581_25148 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2107_13736_16754 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_20151_3904 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_21005_25355 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_23438_3798 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_22788_5784 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_20645_19663 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1103_19127_23121 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_15144_7197 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2109_19669_5486 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_16619_8093 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2104_20297_20892 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_9807_11106 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_12317_22716 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_6411_11773 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_17384_22341 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1106_22228_12891 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2107_22035_8585 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_4108_12880 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1106_7174_25184 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_11098_6715 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2107_23933_17360 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_6659_20789 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_19633_16123 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_10739_16119 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_15280_21934 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2104_21543_7458 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_26621_22948 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_25077_7733 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_8246_10198 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_20093_6896 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2107_7321_13886 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_24462_21203 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2107_13563_25471 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_8153_9903 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1113_13161_11528 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1114_11192_6456 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_14686_21331 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_21492_19276 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_25286_20130 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2102_11648_16125 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2104_12377_10643 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2104_16922_26391 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2104_20925_4996 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_14187_18562 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_17354_12227 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_18855_11552 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2105_12119_26139 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_14547_2134 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_19173_20198 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2109_23856_3938 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2109_4163_22130 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2109_5799_23724 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2110_22684_4982 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2108_25080_23924 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2109_19564_9394 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2109_20334_10861 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2109_20680_21700 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2107_8308_6626 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2113_25261_10235 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2112_10109_19291 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2112_10664_6596 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2112_12093_24344 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2112_7073_11266 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2113_17780_26158 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2113_9469_23084 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_9863_8355 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1104_12191_12732 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_7453_21200 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1105_15363_19007 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1105_17574_16251 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_17541_8214 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_18797_10156 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1106_17702_22989 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_15016_22617 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_21025_3489 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_21388_23813 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_22318_27206 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_28121_11367 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_6685_17609 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_11837_13699 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1108_27110_22302 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_26585_7592 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_11849_6460 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_13625_5832 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_12799_20948 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_18010_14806 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_20349_21768 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_20910_24691 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_7111_7988 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2102_18812_17707 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_18143_10159 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_27789_16290 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_25259_11336 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1108_4137_11820 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_13857_2312 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_9009_11412 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1106_20666_3369 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_19105_20389 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2107_26238_14291 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2111_27882_16644 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1109_20035_9150 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2107_16066_7953 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2113_9241_21354 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2102_25440_6931 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2111_11578_12684 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2111_18706_5204 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1111_18058_23102 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1108_10588_19524 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_19480_16143 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2101_15996_23151 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2109_16408_21853 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_18371_17717 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_2106_27830_15781 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1102_13205_8215 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1110_17959_15363 is missing from your fasta or name file, ignoring. Please correct.
+M04026_190_000000000-BCP3L_1_1101_16378_18292 is missing from your fasta or name file, ignoring. Please correct.
+M04026_177_000000000-BBCN8_1_1104_16608_5704 is missing from your fasta or name file, ignoring. Please correct.
+
+Output File Names: 
+/home/glbrc.org/echiang3/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.rep.count_table
+/home/glbrc.org/echiang3/cecum_bact/mothur_outputs/stability.trim.contigs.good.unique.good.filter.unique.precluster.pick.pick.opti_mcc.0.03.rep.fasta
