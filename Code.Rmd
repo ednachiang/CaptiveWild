@@ -17,6 +17,8 @@ library(vegan)
 library(phyloseq)
 library(grid)
 library(pgirmess)
+library(picante)
+library(phytools)
 theme_set(theme_bw())
 set.seed(1)
 ```
@@ -35,12 +37,13 @@ source('scripts/misc.R')
 # Link files
 shared = "mothur_output/final.shared"
 taxonomy = "mothur_output/final.taxonomy"
-
+tree = "mothur_output/final.tre"
 
 # Import mothur data
 mothurdata = import_mothur(
   mothur_shared_file = shared,
-  mothur_constaxonomy_file = taxonomy)
+  mothur_constaxonomy_file = taxonomy,
+  mothur_tree_file = tree)
 
 # Add OTU column in taxonomy table
 tax_table(mothurdata) <- cbind(tax_table(mothurdata), 
@@ -49,53 +52,14 @@ tax_table(mothurdata) <- cbind(tax_table(mothurdata),
 # Rename taxonomy table columns
 colnames(tax_table(mothurdata)) <- 
   c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
-```
 
-### Explore mothurdata object
-```{r}
-samp.sum <- data.frame(colSums(otu_table(mothurdata)))
-colnames(samp.sum) <- "Sample_TotalSeqs"
-samp.sum$sample <- row.names(samp.sum)
-samp.sum <- arrange(samp.sum, Sample_TotalSeqs)
-
-ggplot(samp.sum, aes(x=reorder(sample, Sample_TotalSeqs), y=Sample_TotalSeqs)) +
-  ylab("Number of Sequences per Sample") +
-  geom_bar(stat="identity", colour="black", fill="cornflowerblue") +
-  xlab("Sample Name") +
-  ggtitle("Total Number of Sequences per Sample") + 
-  theme(axis.text.x = element_text(colour = "black", size=6, angle=45,hjust = 1,
-                                   vjust = 1))
-
-ggplot(data.frame(sum = sample_sums(mothurdata)), aes(sum)) + 
-  geom_histogram(colour = "white", fill = "blue", bins=60) + 
-  ggtitle("Sample read counts") + 
-  xlab("Total sequences")
-
-
-# Min, Mean, Max of sample read counts
-min(sample_sums(mothurdata))
-mean(sample_sums(mothurdata))
-median(sample_sums(mothurdata))
-max(sample_sums(mothurdata))
-```
-
-
-### Phyloseq Object
-```{r}
-meta <- read.csv("metadata2.csv")
-colnames(meta)[1] <- "Sample"
+# Add metadata
+meta <- read.csv("metadata.csv")
 rownames(meta) <- meta$Sample
-divsum <- read.table("mothur_output/8494.summary", header=T)
-remove <- setdiff(meta$Sample, divsum$group)
-for(i in 1:length(remove)){
-  meta <- meta[-which(meta$Sample == remove[i]),]
-}
-#meta <- meta[,-12:-14]
+divsum <- read.table("mothur_output/final.summary", header = T)
+meta[,12:21] <- divsum[,3:12]
 
-# Add in diversity summaries
-meta[,11:20] <- divsum[,3:12]
-
-# Create interim phyloseq object
+# Update phyloseq object
 physeq <- merge_phyloseq(mothurdata, sample_data(meta))
 
 # Order factors
@@ -104,34 +68,353 @@ sample_data(physeq)$Season <- ordered(sample_data(physeq)$Season,
 sample_data(physeq)$Metabolism <- ordered(sample_data(physeq)$Metabolism,
                                      levels=c("Active", "Torpor", "IBA"))
 sample_data(physeq)$Group <- ordered(sample_data(physeq)$Group,
-                                     levels=c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring", "Chow"))
-
-# Remove unwanted samples
-physeq.rem <- subset_samples(physeq, Sample_Type != "Black_Tissue" & Season != "NA")
-physeq.rem <- subset_samples(physeq.rem, ID != "3916" & ID != "3925" )
-rem <- names(which(taxa_sums(physeq.rem) > 10))
-physeq.rem <- prune_taxa(rem, physeq.rem)
-
-
-#save(physeq.rem, file="Physeq.RData")
+                                     levels=c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring"))
 
 # Separate by season
-physeq.wild <- subset_samples(physeq.rem, Group == "Summer_Wild")
-physeq.sum <- subset_samples(physeq.rem, Group == "Summer_Lab")
-physeq.tor <- subset_samples(physeq.rem, Group == "Torpor")
-physeq.iba <- subset_samples(physeq.rem, Group == "IBA")
-physeq.spr <- subset_samples(physeq.rem, Group == "Spring")
+physeq.wild <- subset_samples(physeq, Group == "Summer_Wild")
+physeq.sum <- subset_samples(physeq, Group == "Summer_Lab")
+physeq.tor <- subset_samples(physeq, Group == "Torpor")
+physeq.iba <- subset_samples(physeq, Group == "IBA")
+physeq.spr <- subset_samples(physeq, Group == "Spring")
 
 # Separate by content/mucosa
-physeq.con <- subset_samples(physeq.rem, Sample_Type == "Content")
-physeq.muc <- subset_samples(physeq.rem, Sample_Type == "Mucosa")
+physeq.con <- subset_samples(physeq, Sample_Type == "Content")
+physeq.muc <- subset_samples(physeq, Sample_Type == "Mucosa")
 
 # Pull out only lab squirrels
-physeq.lab <- subset_samples(physeq.rem, Diet != "Wild")
+physeq.lab <- subset_samples(physeq, Diet != "Wild")
+
+# Min, Mean, Max of sample read counts
+min(sample_sums(mothurdata))
+  # 10452
+mean(sample_sums(mothurdata))
+  # 10999.21
+median(sample_sums(mothurdata))
+  # 11028
+max(sample_sums(mothurdata))
+  # 11156
 ```
+
+### Calculate Faith's phylogenetic diversity
+```{r}
+### Unweighted - Calculate phylogenetic diversity and MPD ###
+
+# Calculate Faith's phylogenetic diversity
+pd.res <- pd(t(data.frame(otu_table(physeq))), phy_tree(physeq), include.root = T)
+pd.df <- data.frame(pd.res)
+
+# Calculate MPD (Mean Pairwise Distance)
+pd.dist <- cophenetic(phy_tree(physeq))
+  # Calculate cophenetic distance
+#ses.mpd.res <- ses.mpd(t(data.frame(otu_table(physeq))), pd.dist, null.model = "taxa.labels", abundance.weighted = F, runs = 999)
+  # Calculate MPD
+  # This'll take a while to run-- be patient
+#save(ses.mpd.res, file = "mpd.RData")
+load("mpd.RData")
+mpd <- data.frame(ses.mpd.res)
+  # Pull out MDP results
+
+
+### Prepare data for plotting ###
+mpd$SampleID <- row.names(mpd)
+pd.res$SampleID <- row.names(pd.res)
+  # Make sure all SampleID's match!
+
+# Pull out first Stat of each test
+# PD test = PD
+# MPD test = SES (Standardized Effect Size)
+pd.stats <- data.frame(pd.res$SampleID, pd.res$PD)
+pd.stats$Measure <- rep("PD", nrow(pd.df))
+colnames(pd.stats) <- c("Sample", "Stat", "Measure")
+mpd.stats <- data.frame(mpd$SampleID, mpd$mpd.obs.z)
+mpd.stats$Measure <- rep("MPD SES", nrow(pd.df))
+colnames(mpd.stats) <- c("Sample", "Stat", "Measure")
+
+# Combine PD & MPD into one big dataframe
+comb.stats <- rbind(pd.stats, mpd.stats)
+
+# Make final dataframe to use
+comb.stats <- rbind(comb.stats, mpd.stats)
+
+# Combine sample data w/ stats data
+comb.stats <- merge(comb.stats, meta, by = "Sample")
+
+# Calculate stats summaries
+stats.sum <- comb.stats %>%
+  group_by(Group, Measure) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+
+
+
+### Prepare PD ###
+pd.ready <- merge(pd.stats, meta, by = "Sample")
+pd.ready$Group <- ordered(pd.ready$Group, levels = c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring"))
+pd.sum <- pd.ready %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.sum$YMAX <- pd.sum$Mean + pd.sum$SE
+pd.sum$YMIN <- pd.sum$Mean - pd.sum$SE
+
+
+
+### Prepare MPD ###
+mpd.ready <- merge(mpd.stats, meta, by = "Sample")
+mpd.ready$Group <- ordered(mpd.ready$Group, levels = c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring"))
+mpd.sum <- mpd.ready %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.sum$YMAX <- mpd.sum$Mean + mpd.sum$SE
+mpd.sum$YMIN <- mpd.sum$Mean - mpd.sum$SE
+
+
+
+
+
+########## PLOT PD & MPD ##########
+
+### Plot PD ###
+pd.plot <- ggplot(pd.ready, aes(x = Group, y = Stat, fill = Group)) +
+  geom_violin() +
+  geom_jitter(size=2, width = 0.2) + 
+  geom_segment(aes(x = 1, y = pd.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = pd.sum$YMAX[1]+0.1), color = "black", size = 2, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = pd.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = pd.sum$YMAX[2]+0.1), color = "black", size = 2, 
+               show.legend = F) +
+  geom_segment(aes(x = 3, y = pd.sum$YMIN[3]-0.1, xend = 3, 
+                   yend = pd.sum$YMAX[3]+0.1), color = "black", size = 2, 
+               show.legend = F) +
+  geom_segment(aes(x = 4, y = pd.sum$YMIN[4]-0.1, xend = 4, 
+                   yend = pd.sum$YMAX[4]+0.1), color = "black", size = 2, 
+               show.legend = F) +
+  geom_segment(aes(x = 5, y = pd.sum$YMIN[5]-0.1, xend = 5, 
+                   yend = pd.sum$YMAX[5]+0.1), color = "black", size = 2, 
+               show.legend = F) +
+  geom_segment(aes(x = 1, y = pd.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = pd.sum$YMAX[1]+0.1), color = "yellow", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = pd.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = pd.sum$YMAX[2]+0.1), color = "yellow", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 3, y = pd.sum$YMIN[3]-0.1, xend = 3, 
+                   yend = pd.sum$YMAX[3]+0.1), color = "yellow", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 4, y = pd.sum$YMIN[4]-0.1, xend = 4, 
+                   yend = pd.sum$YMAX[4]+0.1), color = "yellow", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 5, y = pd.sum$YMIN[5]-0.1, xend = 5, 
+                   yend = pd.sum$YMAX[5]+0.1), color = "yellow", size = 1, 
+               show.legend = F) +
+  geom_point(data = pd.sum, aes(y= Mean), colour="black", size = 3, show.legend = F) +
+  geom_point(data = pd.sum, aes(y= Mean), colour="yellow", size = 2, 
+             show.legend = F) +
+  scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  scale_y_continuous(limits = c(0,50)) +
+  scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  ylab("Faith's Phylogenetic Diversity") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=16),
+        strip.text.x = element_text(face ="bold", size=16),
+        legend.title = element_text(face="bold", size=16),
+        panel.spacing = unit(0.5, "lines"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(face="bold", size=16),
+        axis.text.x = element_text(size=13),
+        axis.text.y = element_text(size=13),
+        legend.text = element_text(size=14))
+
+
+
+
+        
+### Plot MPD ###
+mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
+  geom_violin() +
+  geom_jitter(size=2, width = 0.2) + 
+  geom_segment(aes(x = 1, y = mpd.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = mpd.sum$YMAX[1]+0.1), color = "black", size = 2, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = mpd.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = mpd.sum$YMAX[2]+0.1), color = "black", size = 2, 
+               show.legend = F) +
+  geom_segment(aes(x = 3, y = mpd.sum$YMIN[3]-0.1, xend = 3, 
+                   yend = mpd.sum$YMAX[3]+0.1), color = "black", size = 2, 
+               show.legend = F) +
+  geom_segment(aes(x = 4, y = mpd.sum$YMIN[4]-0.1, xend = 4, 
+                   yend = mpd.sum$YMAX[4]+0.1), color = "black", size = 2, 
+               show.legend = F) +
+  geom_segment(aes(x = 5, y = mpd.sum$YMIN[5]-0.1, xend = 5, 
+                   yend = mpd.sum$YMAX[5]+0.1), color = "black", size = 2, 
+               show.legend = F) +
+  geom_segment(aes(x = 1, y = mpd.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = mpd.sum$YMAX[1]+0.1), color = "yellow", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = mpd.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = mpd.sum$YMAX[2]+0.1), color = "yellow", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 3, y = mpd.sum$YMIN[3]-0.1, xend = 3, 
+                   yend = mpd.sum$YMAX[3]+0.1), color = "yellow", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 4, y = mpd.sum$YMIN[4]-0.1, xend = 4, 
+                   yend = mpd.sum$YMAX[4]+0.1), color = "yellow", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 5, y = mpd.sum$YMIN[5]-0.1, xend = 5, 
+                   yend = mpd.sum$YMAX[5]+0.1), color = "yellow", size = 1, 
+               show.legend = F) +
+  geom_point(data = mpd.sum, aes(y= Mean), colour="black", size = 3, show.legend = F) +
+  geom_point(data = mpd.sum, aes(y= Mean), colour="yellow", size = 2, 
+             show.legend = F) +
+  scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  scale_y_continuous(limits = c(-12,6), breaks = c(-12,-6,0,6)) +
+  scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  ylab("SES MPD") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=16),
+        strip.text.x = element_text(face ="bold", size=16),
+        legend.title = element_text(face="bold", size=16),
+        panel.spacing = unit(0.5, "lines"),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(face="bold", size=16),
+        axis.text.x = element_text(size=13),
+        axis.text.y = element_text(size=13),
+        legend.text = element_text(size=14))
+
+        
+
+        
+        
+        
+        
+        
+########## TESTING PD & MPD ##########
+
+### Test PD ###
+hist(pd.ready$Stat, breaks=10)
+qqnorm(pd.ready$Stat)
+qqline(pd.ready$Stat)
+shapiro.test(pd.ready$Stat)
+  # p-value = 0.02173
+  # Not Normal
+
+# Content vs. Mucosa
+kruskal.test(formula = Stat ~ Sample_Type, data = pd.ready)
+  # p-value = 0.2995
+
+# Female vs. Male
+kruskal.test(formula = Stat ~ Sex, data = pd.ready)
+  # p-value = 0.06398
+
+# Subset out groups
+pd.wild <- pd.ready[which(pd.ready$Group == "Summer_Wild"),]
+pd.sum <- pd.ready[which(pd.ready$Group == "Summer_Lab"),]
+pd.tor <- pd.ready[which(pd.ready$Group == "Torpor"),]
+pd.iba <- pd.ready[which(pd.ready$Group == "IBA"),]
+pd.spr <- pd.ready[which(pd.ready$Group == "Spring"),]
+
+# Subset out pairwise comparisons
+pd.ws <- rbind(pd.wild, pd.sum)
+pd.st <- rbind(pd.sum, pd.tor)
+pd.si <- rbind(pd.sum, pd.iba)
+pd.sp <- rbind(pd.sum, pd.spr)
+pd.ti <- rbind(pd.tor, pd.iba)
+pd.tp <- rbind(pd.tor, pd.spr)
+pd.ip <- rbind(pd.iba, pd.spr)
+
+
+# Run Kruskal-Wallis
+kruskal.test(formula = Stat ~ Group, data = pd.ready)
+  # p-value = 5.983e-06
+kruskalmc(resp = Stat ~ Group, data = pd.ready)
+  # p-value = 0.05
+kruskal.test(formula = Stat ~ Group, data = pd.ws)
+  # Summer Wild vs. Summer Lab
+  # p-value = 0.0002831     
+kruskal.test(formula = Stat ~ Group, data = pd.st)
+  # Summer vs. Torpor
+  # p-value = 0.001414
+kruskal.test(formula = Stat ~ Group, data = pd.si)
+  # Summer vs. IBA
+  # p-value = 0.0006752
+kruskal.test(formula = Stat ~ Group, data = pd.sp)
+  # Summer vs. Spring
+  # p-value = 0.06121
+kruskal.test(formula = Stat ~ Group, data = pd.ti)
+  # Torpor vs. IBA
+  # p-value = 0.6217
+kruskal.test(formula = Stat ~ Group, data = pd.tp)
+  # Torpor vs. Spring
+  # p-value = 0.409
+kruskal.test(formula = Stat ~ Group, data = pd.ip)
+  # IBA vs. Spring
+  # p-value = 0.3583
+
+# Adjust p-values
+p.adjust(c(5.983e-06, 0.0002831, 0.001414, 0.0006752, 0.06121, 0.6217, 0.409, 0.3583), method = "fdr")
+  # Group = 0.000047864*
+  # Summer Wild vs. Summer Lab = 0.001132400*
+  # Summer vs. Torpor = 0.002828000*
+  # Summer vs. IBA = 0.001800533*
+  # Summer vs. Spring = 0.097936000
+  # Torpor vs. IBA = 0.621700000
+  # Torpor vs. Spring = 0.467428571
+  # IBA vs. Spring = 0.467428571
+
+
+
+
+
+### Test MPD ###
+hist(mpd.ready$Stat, breaks=10)
+qqnorm(mpd.ready$Stat)
+qqline(mpd.ready$Stat)
+shapiro.test(mpd.ready$Stat)
+  # p-value = 0.3692
+  # Normal
+
+# Content vs. Mucosa
+kruskal.test(formula = Stat ~ Sample_Type, data = mpd.ready)
+  # p-value = 0.7617
+
+# Female vs. Male
+kruskal.test(formula = Stat ~ Sex, data = mpd.ready)
+  # p-value = 0.1156
+
+
+# Run ANOVA
+summary(aov(Stat ~ Group, data = mpd.ready))
+  # p-value = 3.17e-07
+TukeyHSD(aov(Stat ~ Group, data = mpd.ready))
+  # Summer_Lab-Summer_Wild = 0.9578688
+  # Torpor-Summer_Wild = 0.0005115*
+  # IBA-Summer_Wild = 0.0138100*
+  # Spring-Summer_Wild = 0.4788400
+  # Torpor-Summer_Lab = 0.0000011*
+  # IBA-Summer_Lab = 0.0000533*
+  # Spring-Summer_Lab = 0.0740687
+  # IBA-Torpor = 0.5130325
+  # Spring-Torpor = 0.0609899
+  # Spring-IBA = 0.5610479
+
+
+```
+
 ### Test content vs. mucosa - Alpha Diversity
 ```{r}
-adiv <- data.frame(sample_data(physeq.rem))
+adiv <- data.frame(sample_data(physeq))
 
 ########## Compare Con vs. Muc within Group ##########
 
@@ -143,95 +426,152 @@ adiv.iba <- adiv[which(adiv$Group == "IBA"),]
 adiv.spr <- adiv[which(adiv$Group == "Spring"),]
 
 
-##### Chao #####
+########## Chao ##########
 hist(adiv.wild$chao, breaks=10)
 qqnorm(adiv.wild$chao)
 qqline(adiv.wild$chao)
 shapiro.test(adiv.wild$chao)
-  # p-value = 0.3404
+  # p-value = 0.1222
   # Normal
 hist(adiv.sum$chao, breaks=10)
 qqnorm(adiv.sum$chao)
 qqline(adiv.sum$chao)
 shapiro.test(adiv.sum$chao)
-  # p-value = 0.6042
-  # Normal
+  # p-value = 0.04878
+  # Not Normal
 hist(adiv.tor$chao, breaks=10)
 qqnorm(adiv.tor$chao)
 qqline(adiv.tor$chao)
 shapiro.test(adiv.tor$chao)
-  # p-value = 0.1055
-  # Normal
+  # p-value = 0.03098
+  # Not Normal
 hist(adiv.iba$chao, breaks=10)
 qqnorm(adiv.iba$chao)
 qqline(adiv.iba$chao)
 shapiro.test(adiv.iba$chao)
-  # p-value = 0.03129
+  # p-value = 0.003596
   # Not Normal
 hist(adiv.spr$chao, breaks=10)
 qqnorm(adiv.spr$chao)
 qqline(adiv.spr$chao)
 shapiro.test(adiv.spr$chao)
-  # p-value = 0.3883
+  # p-value = 0.7986
   # Normal
+p.adjust(c(0.1222, 0.04878, 0.03098, 0.003596, 0.7986), method = "fdr")
+  # 0.15275 0.08130 0.07745 0.01798 0.79860
+  # All normal except for IBA
 
 ### Wilcoxon & T-Test ###
 t.test(chao ~ Sample_Type, data = adiv.wild)
-  # p-value = 0.3824
+  # p-value = 0.6204
 t.test(chao ~ Sample_Type, data = adiv.sum)
-  # p-value = 0.8265
+  # p-value = 0.1594
 t.test(chao ~ Sample_Type, data = adiv.tor)
-  # p-value = 0.03331*
+  # p-value = 0.06551
 wilcox.test(chao ~ Sample_Type, data = adiv.iba)
-  # p-value = 0.4318
+  # p-value = 0.1304
 t.test(chao ~ Sample_Type, data = adiv.spr)
-  # p-value = 0.9252
+  # p-value = 0.8614
 
 
 
-##### Shannon #####
+
+
+########## Shannon ##########
 hist(adiv.wild$shannon, breaks=10)
 qqnorm(adiv.wild$shannon)
 qqline(adiv.wild$shannon)
 shapiro.test(adiv.wild$shannon)
-  # p-value = 0.03979
+  # p-value = 0.2175
   # Not Normal
 hist(adiv.sum$shannon, breaks=10)
 qqnorm(adiv.sum$shannon)
 qqline(adiv.sum$shannon)
 shapiro.test(adiv.sum$shannon)
-  # p-value = 0.9038
+  # p-value = 0.6834
   # Normal
 hist(adiv.tor$shannon, breaks=10)
 qqnorm(adiv.tor$shannon)
 qqline(adiv.tor$shannon)
 shapiro.test(adiv.tor$shannon)
-  # p-value = 0.876
+  # p-value = 0.3188
   # Normal
 hist(adiv.iba$shannon, breaks=10)
 qqnorm(adiv.iba$shannon)
 qqline(adiv.iba$shannon)
 shapiro.test(adiv.iba$shannon)
-  # p-value = 0.7765
+  # p-value = 0.5667
   # Normal
 hist(adiv.spr$shannon, breaks=10)
 qqnorm(adiv.spr$shannon)
 qqline(adiv.spr$shannon)
 shapiro.test(adiv.spr$shannon)
-  # p-value = 0.3872
+  # p-value = 0.09141
   # Normal
 
-### Wilcoxon & T-Test ###
-wilcox.test(shannon ~ Sample_Type, data = adiv.wild)
-  # p-value = 0.2
+### T-Test ###
+t.test(shannon ~ Sample_Type, data = adiv.wild)
+  # p-value = 0.8645
 t.test(shannon ~ Sample_Type, data = adiv.sum)
-  # p-value = 0.3654
+  # p-value = 0.7171
 t.test(shannon ~ Sample_Type, data = adiv.tor)
-  # p-value = 0.4803
+  # p-value = 0.238
 t.test(shannon ~ Sample_Type, data = adiv.iba)
-  # p-value = 0.4759
+  # p-value = 0.4801
 t.test(shannon ~ Sample_Type, data = adiv.spr)
-  # p-value = 0.1112
+  # p-value = 0.8057
+
+
+
+
+
+########## Inverse Simpson ##########
+hist(adiv.wild$invsimpson, breaks=10)
+qqnorm(adiv.wild$invsimpson)
+qqline(adiv.wild$invsimpson)
+shapiro.test(adiv.wild$invsimpson)
+  # p-value = 0.7197
+  # Normal
+hist(adiv.sum$invsimpson, breaks=10)
+qqnorm(adiv.sum$invsimpson)
+qqline(adiv.sum$invsimpson)
+shapiro.test(adiv.sum$invsimpson)
+  # p-value = 0.2697
+  # Not Normal
+hist(adiv.tor$invsimpson, breaks=10)
+qqnorm(adiv.tor$invsimpson)
+qqline(adiv.tor$invsimpson)
+shapiro.test(adiv.tor$invsimpson)
+  # p-value = 0.02593
+  # Not Normal
+hist(adiv.iba$invsimpson, breaks=10)
+qqnorm(adiv.iba$invsimpson)
+qqline(adiv.iba$invsimpson)
+shapiro.test(adiv.iba$invsimpson)
+  # p-value = 0.01567
+  # Not Normal
+hist(adiv.spr$invsimpson, breaks=10)
+qqnorm(adiv.spr$invsimpson)
+qqline(adiv.spr$invsimpson)
+shapiro.test(adiv.spr$invsimpson)
+  # p-value = 0.582
+  # Normal
+p.adjust(c(0.7197, 0.2697, 0.02593, 0.01567, 0.582), method = "fdr")
+  # 0.719700 0.449500 0.064825 0.064825 0.719700
+  # All Normal
+
+### Wilcoxon & T-Test ###
+t.test(invsimpson ~ Sample_Type, data = adiv.wild)
+  # p-value = 0.5657
+t.test(invsimpson ~ Sample_Type, data = adiv.sum)
+  # p-value = 0.4916
+t.test(invsimpson ~ Sample_Type, data = adiv.tor)
+  # p-value = 0.1772
+wilcox.test(invsimpson ~ Sample_Type, data = adiv.iba)
+  # p-value = 0.5054
+t.test(invsimpson ~ Sample_Type, data = adiv.spr)
+  # p-value = 0.7156
+
 
 ```
 
@@ -240,10 +580,10 @@ t.test(shannon ~ Sample_Type, data = adiv.spr)
 ### Test content vs. mucosa - Beta Diversity
 ```{r}
 ### Bray NMDS - All
-nmds <- ordinate(physeq=physeq.rem, method="NMDS", distance="bray")
-  # Stress = 0.1742581
-plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sample_Type") + facet_grid(.~Group)
-plot_ordination(physeq=physeq.rem, ordination=nmds, color="Group", shape="Sex") + facet_grid(.~Group)
+nmds <- ordinate(physeq=physeq, method="NMDS", distance="bray")
+  # Stress = 0.1420628
+plot_ordination(physeq=physeq, ordination=nmds, color="Group", shape="Sample_Type") + facet_grid(.~Group)
+plot_ordination(physeq=physeq, ordination=nmds, color="Group", shape="Sex") + facet_grid(.~Group)
 
 ### Bray NMDS - By Group
 nmds.wild <- ordinate(physeq=physeq.wild, method="NMDS", distance="bray")
@@ -330,12 +670,12 @@ hist(adiv.lab$chao, breaks=10)
 qqnorm(adiv.lab$chao)
 qqline(adiv.lab$chao)
 shapiro.test(adiv.lab$chao)
-  # p-value = 0.0001635
+  # p-value = 0.0009594
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = chao ~ Group, data = adiv.lab)
-  # p-value = 0.1209
+  # p-value = 0.02469
 
 
 
@@ -344,12 +684,12 @@ hist(adiv.lab$shannon, breaks=10)
 qqnorm(adiv.lab$shannon)
 qqline(adiv.lab$shannon)
 shapiro.test(adiv.lab$shannon)
-  # p-value = 0.7015
+  # p-value = 0.05119
   # Normal
 
 # ANOVA
 summary(aov(shannon ~ Group, data = adiv.lab))
-  # p-value = 0.0932
+  # p-value = 3e-05
 
 
 
@@ -385,7 +725,7 @@ adiv.shannon <- ggplot(adiv.lab, aes(x = Group, y = shannon, fill = Group)) +
   geom_jitter(size=2, width = 0.2) +
   scale_y_continuous(limits = c(1,6), breaks = c(1, 2, 3, 4, 5, 6)) +
   scale_x_discrete(breaks=c("Summer_Lab", "Torpor", "IBA", "Spring"), labels=c("Summer", "Torpor", "IBA", "Spring")) +
-  ylab("Shannon Diversity Index\n") +
+  ylab("Shannon's Diversity Index\n") +
   scale_fill_manual(values = c("lightcoral", "royalblue3", "deepskyblue", "limegreen"),
                     labels = c("Summer", "Torpor", "IBA", "Spring")) +
     theme(panel.grid.major = element_blank(),
@@ -479,7 +819,7 @@ grid.text("stress = 0.141", x=unit(0.85, "npc"), y=unit(0.17, "npc"), vp=viewpor
 
 
   
-###### PERMANOVA - By Season for Sample Type ######
+###### PERMANOVA - Lab squirrels + Group ######
 sampdf.lab <- data.frame(sample_data(physeq.lab))
 bray.lab <- phyloseq::distance(physeq = physeq.lab, method = "bray")
 beta.tax = betadisper(d=bray.lab, group=sampdf.lab$Group)
@@ -514,15 +854,15 @@ physeq.simp <- merge_phyloseq(otu_table(physeq.rem), sample_data(rename.samp), t
               c("Group"),
               perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
               output_name='lab_group')
-lab.group.simper <- read.csv("lab_group_clean_simper.csv")
+lab.group.simper <- read.csv("simper/lab_group_clean_simper.csv")
 #kruskal.pretty(data.frame(otu_table(physeq.simp)),
                data.frame(sample_data(physeq.simp)),
                csv = lab.group.simper,
                c("Group"),
                output_name = 'lab_group',
                taxonomy = data.frame(tax_table(physeq.simp)))
-lab.group.simper.kw <- read.csv("lab_group_krusk_simper.csv")
-for(i in 1:nrow(lab.group.simper.kw)){
+#lab.group.simper.kw <- read.csv("simper/lab_group_krusk_simper.csv")
+#for(i in 1:nrow(lab.group.simper.kw)){
   save <- which(rownames(data.frame(tax_table(physeq.simp))) == lab.group.simper.kw$OTU[i])
   lab.group.simper.kw$Taxonomy[i] <-
     paste(data.frame(tax_table(physeq.simp))[save,2], "-",
@@ -532,7 +872,7 @@ for(i in 1:nrow(lab.group.simper.kw)){
           data.frame(tax_table(physeq.simp))[save,6])
 }
 #write.table(lab.group.simper.kw, "lab_group_krusk_simper.csv", sep=",")
-
+lab.group.simper.kw <- read.csv("simper/lab_group_clean_simper.csv")
 
 
 
@@ -601,13 +941,13 @@ plot_heatmap(physeq.lab.simp.sig, sample.label = "Group", taxa.order = c("Otu001
                        breaks = c(0, 4.25, 8.5, 12.75, 17), colours = c("#FBFFFF", "#C2EDFF",
                                                                         "#93DFFF", "#62D1FF",
                                                                         "#1EBDFF","#00A4E8")) +
-  scale_y_discrete(labels=c(expression(" "^H~"Lachnospiraceae"),
-                            expression(" "^GH~italic("Lactobacillus")),
-                            expression(" "^F~"Prevotallaceae"),
-                            expression(" "^E~italic("Akkermansia")),
-                            expression(" "^D~italic("Bacteroides")),
-                            expression(" "^ABC~italic("Lactobacillus")),
-                            expression(" "^AB~"Lachnospiraceae"))) +
+  scale_y_discrete(labels=c(expression(" "^e~"Lachnospiraceae"),
+                            expression(" "^de~italic("Lactobacillus")),
+                            expression(" "^c~"Prevotallaceae"),
+                            expression(" "^b~italic("Akkermansia")),
+                            expression(" "^a~italic("Bacteroides")),
+                            expression(" "^abc~italic("Lactobacillus")),
+                            expression(" "^ab~"Lachnospiraceae"))) +
   ylab("OTU Classification") +
   theme(panel.border=element_blank(),
         axis.text.x = element_text(angle=0, hjust=0.5, vjust=1.18, size=16, 
@@ -677,15 +1017,29 @@ diet.phy.sum$Group[lab] <- rep("Captive", length(lab))
 
 
 ### Barplot ###
+#tiff("diet.phyla.tiff", width = 10, height = 5, units = "in", res = 600)
 ggplot(diet.phy.sum, aes(x=Phylum, y=Mean, fill=Phylum)) +
   geom_bar(stat="identity", color="black") +
   geom_errorbar(aes(ymax=Mean + SE, ymin=Mean - SE), width=0.25) +
-  facet_grid(Group ~ .) +
+  facet_grid(. ~ Group) +
   scale_fill_brewer(palette="Set1") +
   xlab("Phyla") +
-  ylab("Mean Relative Abundance for Phyla") +
-  theme(axis.text.x = element_blank())
-
+  ylab("Mean Relative Abundance of Phyla (%)\n") +
+  scale_y_continuous(limits = c(0, 70), breaks = c(0, 10, 20, 30, 40, 50, 60, 70), expand = c(0,0)) +
+  theme(panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      panel.spacing=unit(1, "lines"),
+      axis.title = element_text(size=18, face="bold"),
+      strip.text.x = element_text(size=18, face = "bold"),
+      strip.text.y = element_text(size=18),
+      strip.background = element_blank(),
+      axis.text.y = element_text(size=18),
+      legend.title = element_text(size=18, face="bold"),
+      legend.text = element_text(size=18),
+      axis.ticks.x=element_blank(),
+      axis.text.x = element_blank(),
+      title = element_text(size=16, face="bold"))
+#dev.off()
 
 
 
@@ -849,12 +1203,21 @@ wilcox.test(RelAbund ~ Group, data=spi.df, alternative = "greater")
 
 
 
+### P-adjust
+p.adjust(c(0.9019, 0.4279, 0.0004523, 0.7325, 0.2161, 0.266, 0.01258, 0.2561, 0.02978), method = 'fdr')
+  # Firmicutes = 0.9019000
+  # Bacteroidetes = 0.5501571
+  # Cyanobacteria = 0.0040707*
+  # Verrucomicrobia = 0.8240625
+  # Proteobacteria = 0.3990000
+  # Tenericutes = 0.3990000
+  # Elusimicrobia = 0.0566100*
+  # Actinobacteria = 0.3990000
+  # Spirochaetae = 0.0893400
 
 
 
-
-
-
+       
 
 
 
@@ -1032,7 +1395,7 @@ shannon.sum <- ggplot(adiv.sum.diet, aes(x = Habitat, y = shannon, fill = Habita
   geom_boxplot(position = position_dodge(1), outlier.shape = NA) +
   geom_jitter(size=2, width = 0.25) +
   scale_y_continuous(limits = c(2.5, 6), breaks = c(2.5, 3.2, 3.9, 4.6, 5.3, 6.0)) +
-  ylab("Shannon Diversity Index") +
+  ylab("Shannon's Diversity Index") +
   scale_fill_manual(values = c("brown2", "lightcoral")) +
   labs("Group") +
   theme(panel.grid.major = element_blank(),
