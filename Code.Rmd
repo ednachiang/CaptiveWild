@@ -1256,385 +1256,6 @@ sampdf$Relative_Abundance <- otu_table(phy99)
 
 
 
-### Alpha Diversity - Wild vs. Lab
-```{r}
-# Subset summer samples
-physeq.sum.diet <- subset_samples(physeq.rem, Season == "Summer")
-
-# Alpha diversity
-adiv.sum.diet <- data.frame(sample_data(physeq.sum.diet))
-adiv.sum.diet$Habitat <- adiv.sum.diet$Diet
-adiv.sum.diet$Habitat <- ordered(adiv.sum.diet$Habitat, levels=c("Wild", "Captive"))
-adiv.sum.diet$Habitat[(adiv.sum.diet$Diet == "Lab")] <- "Captive"
-
-
-### Chao
-hist(adiv.sum.diet$chao, breaks=10)
-qqnorm(adiv.sum.diet$chao)
-qqline(adiv.sum.diet$chao)
-shapiro.test(adiv.sum.diet$chao)
-  # p-value = 0.01554
-  # Not Normal
-kruskal.test(formula = chao ~ Diet, data = adiv.sum.diet)
-  # p-value = 0.0208
-
-
-### Shannon
-# Test normality
-hist(adiv.sum.diet$shannon, breaks=10)
-qqnorm(adiv.sum.diet$shannon)
-qqline(adiv.sum.diet$shannon)
-shapiro.test(adiv.sum.diet$shannon)
-  # p-value = 0.2649
-summary(aov(shannon ~ Diet, data = adiv.sum.diet))
-  # p-value = 0.0543
-
-
-###### Boxplots ######
-
-### Chao
-chao.sum <- ggplot(adiv.sum.diet, aes(x = Habitat, y = chao, fill = Habitat)) +
-  geom_boxplot(position = position_dodge(1), outlier.shape = NA) +
-  geom_jitter(size=2, width = 0.2) +
-  scale_y_continuous(limits = c(0,2050), breaks = c(0, 500, 1000, 1500, 2000)) +
-  ylab("Chao Richness") +
-  scale_fill_manual(values = c("brown2", "lightcoral")) +
-  labs(fill = "Group") +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_blank(),
-        strip.text = element_text(face="bold", size=16),
-        strip.text.x = element_text(face ="bold", size=16),
-        legend.title = element_text(face="bold", size=16),
-        panel.spacing = unit(0.5, "lines"),
-        axis.title.x = element_blank(),
-        axis.title.y = element_text(face="bold", size=16),
-        axis.text.x = element_text(size=13),
-        axis.text.y = element_text(size=13),
-        legend.text = element_text(size=14))
-
-
-### Shannon
-shannon.sum <- ggplot(adiv.sum.diet, aes(x = Habitat, y = shannon, fill = Habitat)) +
-  geom_boxplot(position = position_dodge(1), outlier.shape = NA) +
-  geom_jitter(size=2, width = 0.25) +
-  scale_y_continuous(limits = c(2.5, 6), breaks = c(2.5, 3.2, 3.9, 4.6, 5.3, 6.0)) +
-  ylab("Shannon's Diversity Index") +
-  scale_fill_manual(values = c("brown2", "lightcoral")) +
-  labs("Group") +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_blank(),
-        strip.text = element_text(face="bold", size=16),
-        strip.text.x = element_text(face ="bold", size=16),
-        legend.title = element_text(face="bold", size=16),
-        panel.spacing = unit(0.5, "lines"),
-        axis.title.x = element_blank(),
-        axis.title.y = element_text(face="bold", size=16),
-        axis.text.x = element_text(size=13),
-        axis.text.y = element_text(size=13),
-        legend.text = element_text(size=14))
-
-
-### Combine plots
-#tiff("adiv.sum.tiff", width = 8.5, height = 3.5, units = "in", res = 600)
-grid.newpage()
-pushViewport(viewport(layout=(grid.layout(1,2))))
-print(chao.sum, vp=viewport(layout.pos.row=1, layout.pos.col=1))
-print(shannon.sum, vp=viewport(layout.pos.row=1, layout.pos.col=2))
-
-grid.text("(A)", x=unit(0.031, "npc"), y=unit(0.974, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=15,fontface="bold"))
-grid.text("(B)", x=unit(0.03, "npc"), y=unit(0.974, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),gp=gpar(fontsize=15,fontface="bold"))
-
-grid.text("a                  b", x=unit(0.435, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=12))
-grid.text("ns", x=unit(0.435, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2), gp=gpar(fontsize=12))
-#dev.off()
-
-
-```
-
-
-
-
-
-### Beta Diversity - Wild vs. Lab
-```{r}
-# Subset summer samples
-physeq.sum.diet <- subset_samples(physeq.rem, Season == "Summer")
-
-### Bray NMDS
-#nmds.sum <- ordinate(physeq=physeq.sum, method="NMDS", distance="bray")
-  # Stress = 0.05705866
-#save(nmds.sum, file = "nmds.sum.RData")
-load("nmds.sum.RData")
-
-
-### PERMANOVA
-sampdf.sum <- data.frame(sample_data(physeq.sum.diet))
-bray.sum <- phyloseq::distance(physeq = physeq.sum.diet, method = "bray")
-beta.tax = betadisper(d=bray.sum, group=sampdf.sum$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.002
-anosim(bray.sum, sampdf.sum$Group, permutations = 1000)
-  # p-value = 0.000999
-  # R2 = 0.6165
-
-
-##### Plot
-
-# Ellipses
-elip.nmds.sum <- data.frame(MDS1 = nmds.sum$points[,1], MDS2 = nmds.sum$points[,2],
-                        Group = sample_data(physeq.sum.diet)$Group)
-plot.new()
-elip.ord.sum <- ordiellipse(nmds.sum, sample_data(physeq.sum.diet)$Group, display="sites", kind="se", conf=0.95, label=T)
-elip.sum.df <- data.frame()
-for(i in levels(elip.nmds.sum$Group)){
-  elip.sum.df <- rbind(elip.sum.df, cbind(as.data.frame(with(elip.nmds.sum[elip.nmds.sum$Group==i,],
-                                                     veganCovEllipse(elip.ord.sum[[i]]$cov,
-                                                                     elip.ord.sum[[i]]$center,
-                                                                     elip.ord.sum[[i]]$scale))),
-                                  group=i))
-}
-
-# Ordination
-nmds.sum.plot <- plot_ordination(physeq=physeq.sum.diet, ordination=nmds.sum, color="Group") +
-  scale_color_manual(values = c("brown2", "lightcoral"),
-                    labels = c("Wild", "Captive")) +
-  labs(color = "Group") +
-  geom_point(size = 2) +
-  geom_path(data=elip.sum.df, aes(x=NMDS1, y=NMDS2, color=group), size=1, linetype=1) +
-   theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.text.x = element_text(size=16),
-        axis.text.y = element_text(size=16),
-        axis.title.x = element_text(size=16, face="bold"),
-        axis.title.y = element_text(size=16, face="bold"),
-        legend.title = element_text(size=16, face="bold"),
-        legend.text = element_text(size=16),
-        plot.title = element_text(size=16, face="bold", hjust=0.5),
-        plot.margin = unit(c(1,1,1,1), "mm"),      # top, right, bottom, left
-        legend.margin=margin(0,0,0,0),
-        legend.box.margin=margin(-10,0,-10,-8)
-        )
-
-
-# Save plot
-#tiff("nmds.sum.tiff", width=5, height=3.5, units="in", res=600)
-grid.newpage()
-pushViewport(viewport(layout=(grid.layout(1,1))))
-print(nmds.sum.plot, vp=viewport(layout.pos.row=1, layout.pos.col=1))
-grid.text("stress = 0.057", x=unit(0.865, "npc"), y=unit(0.17, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=9))
-#dev.off()
-
-```
-
-
-### Simper - Wild vs. Lab
-```{r}
-# Change Group names to be compatible (no "_")
-physeq.sum.simp <- physeq.sum.diet
-
-#simper.pretty(data.frame(otu_table(physeq.sum.simp)),
-              data.frame(sample_data(physeq.sum.simp)),
-              c("Diet"),
-              perc_cutoff = 0.5, low_cutoff = 'y', low_val = 0.01,
-              output_name = 'diet')
-sum.simper <- read.csv("diet_clean_simper.csv")
-#kruskal.pretty(data.frame(otu_table(physeq.sum.simp)),
-               data.frame(sample_data(physeq.sum.simp)),
-               csv = sum.simper,
-               c("Diet"),
-               output_name = 'diet',
-               taxonomy = data.frame(tax_table(physeq.sum.simp)))
-sum.simper.kw <- read.csv("diet_krusk_simper.csv")
-for(i in 1:nrow(sum.simper.kw)){
-  save <- which(rownames(data.frame(tax_table(physeq.sum.diet))) == sum.simper.kw$OTU[i])
-  sum.simper.kw$Taxonomy[i] <-
-    paste(data.frame(tax_table(physeq.sum.diet))[save,2], "-",
-          data.frame(tax_table(physeq.sum.diet))[save,3], "-",
-          data.frame(tax_table(physeq.sum.diet))[save,4], "-",
-          data.frame(tax_table(physeq.sum.diet))[save,5], "-",
-          data.frame(tax_table(physeq.sum.diet))[save,6])
-}
-#write.table(sum.simper.kw, "diet_krusk_simper.csv", sep=",")
-
-```
-### Simper Heatmap - Wild vs. Lab
-```{r}
-# Subset sig OTUs
-physeq.sum.simp.ra <- transform_sample_counts(physeq.sum.diet, function(x){(x/sum(x))*100})
-physeq.sum.simp.sig <- subset_taxa(physeq.sum.simp.ra, Species == "Otu00062" |
-                                     Species == "Otu00091" | Species == "Otu00159" |
-                                     Species == "Otu00116" | Species == "Otu00037" |
-                                     Species == "Otu00015" | Species == "Otu00032")
-                                   
-# Create tax table
-sum.simp.sig.tax <- data.frame(tax_table(physeq.sum.simp.sig))
-sum.simp.sig.tax$Name <- c("Coprococcus_2", "Lachnospiraceae", "Lactobacillus", "Lachnospiraceae", "NK4A136", "Lachnospiraceae", "Lachnospiraceae")
-sum.simp.sig.tax <- tax_table(sum.simp.sig.tax)
-taxa_names(sum.simp.sig.tax) <- taxa_names(physeq.sum.simp.sig)
-
-# Create otu table
-sum.simp.sig.df <- psmelt(physeq.sum.simp.sig)
-sum.simp.sig.sum <- sum.simp.sig.df %>%
-  group_by(OTU, Group) %>%
-  summarize(Mean = mean(Abundance),
-            SD = sd(Abundance),
-            SE = se(Abundance))
-sum.simp.heatmap <- data.frame(matrix(NA, nrow = length(unique(sum.simp.sig.sum$OTU)), ncol = 5))
-colnames(sum.simp.heatmap) <- c("OTU", "Summer_Wild", "Summer_Lab", "Taxonomy", "Name")
-rownames(sum.simp.heatmap) <- unique(sum.simp.sig.sum$OTU)
-sum.simp.heatmap$OTU <- unique(sum.simp.sig.sum$OTU)
-for(i in 1:nrow(sum.simp.sig.sum)){
-  otu <- sum.simp.sig.sum$OTU[i]
-  group <- sum.simp.sig.sum$Group[i]
-  ra <- sum.simp.sig.sum$Mean[i]
-  
-  row <- which(sum.simp.heatmap$OTU == otu)
-  col <- which(colnames(sum.simp.heatmap) == group)
-  
-  sum.simp.heatmap[row, col] <- ra
-}
-sum.simp.heatmap$Taxonomy <- c("Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Coprococcus_2", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified", "Firmicutes - Bacilli - Lactobacillales - Lactobacillaceae - Lactobacillus", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_NK4A136_group", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified", "Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified")
-sum.simp.heatmap$Name <- c("Coprococcus_2", "Lachnospiraceae", "Lactobacillus", "Lachnospiraceae", "NK4A136", "Lachnospiraceae", "Lachnospiraceae")
-sum.simp.heatmap <- sum.simp.heatmap[,-1]
-sum.simp.heatmap <- sum.simp.heatmap[,-3:-4]
-colnames(sum.simp.heatmap) <- c("Wild", "Captive")
-
-# Create sample data
-sum.simp.heatmap.sampdat <- data.frame(c("Wild", "Captive"))
-colnames(sum.simp.heatmap.sampdat) <- "Group"
-rownames(sum.simp.heatmap.sampdat) <- sum.simp.heatmap.sampdat$Group
-
-# Create phyloseq object for simper heatmap
-physeq.sum.simp.sig <- merge_phyloseq(otu_table(sum.simp.heatmap, taxa_are_rows=T), sum.simp.sig.tax, sample_data(sum.simp.heatmap.sampdat))
-#sample_data(physeq.sum.simp.sig)$Group <- ordered(sample_data(physeq.sum.simp.sig)$Group, levels=c("Wild", "Captive"))
-
-
-##### Plot Heatmap #####
-### THIS ONLY WORKS IF YOU HAVE > 2 SAMPLES. Try this again after I get summer 2 results
-#tiff("sum.bact.heatmap.tiff", width = 8, height = 6, units = "in", res = 600)
-plot_heatmap(physeq.sum.simp.sig, sample.label = "Group", taxa.order = c("Otu00032", "Otu00015",
-                                                                         "Otu00037", "Otu00116",
-                                                                         "Otu00159", "Otu00062",
-                                                                         "Otu00091")) +
-  geom_tile(colour = "gray40") +
-  geom_text(size = 5, aes(label=sprintf("%0.2f", round(Abundance, digits=2)))) +
-  scale_fill_gradientn(name=expression("Mean Relative\nAbundance\n(%)"), limits = c(0,5),
-                       breaks = c(0, 1, 2, 3, 4, 5), colours = c("#FBFFFF", "#C2EDFF",
-                                                                        "#93DFFF", "#62D1FF",
-                                                                        "#1EBDFF","#00A4E8")) +
-  scale_y_discrete(labels=c(expression(" "^H~"Lachnospiraceae"),
-                            expression(" "^GH~italic("Lactobacillus")),
-                            expression(" "^F~"Prevotallaceae"),
-                            expression(" "^E~italic("Akkermansia")),
-                            expression(" "^D~italic("Bacteroides")),
-                            expression(" "^ABC~italic("Lactobacillus")),
-                            expression(" "^AB~"Lachnospiraceae"))) +
-  ylab("OTU Classification") +
-  theme(panel.border=element_blank(),
-        axis.text.x = element_text(angle=0, hjust=0.5, vjust=1.18, size=16, 
-                                   margin = margin(t=0, r=0, b=0, l=0)),
-        axis.text.y = element_text(size=16),
-        axis.ticks.x=element_blank(),
-        axis.ticks.y=element_blank(),
-        axis.title.x = element_text(size=16, face="bold", margin = margin(t=10, r=0, b=0, l=0)),
-        axis.title.y = element_text(margin = margin(t=0, r=0, b=0, l=0), size=14, face="bold"),
-        axis.line=element_blank(),
-        legend.title = element_text(size=16, face="bold"),
-        legend.text = element_text(size=16),
-        legend.margin = margin(t=0, r=-5, b=0, l=-8),
-        legend.key.height = unit(0.70, "in"),
-        plot.title = element_text(size=16, face="bold")
-  )
-#dev.off()
-```
-### Chow
-```{r}
-physeq.chow <- subset_samples(physeq, Sample_Type == "Chow")
-chow.phy <- tax_glom(physeq.chow, taxrank="Phylum")
-chow.phy99 <- transform_sample_counts(chow.phy, function(x){(x/sum(x))*100})
-chow.phy99 <- prune_taxa(taxa_sums(chow.phy99) > 1, chow.phy99)
-
-barplot(sort(taxa_sums(chow.phy99),TRUE)[1:20],las=2,cex.axis=.7)
-
-chow.df <- psmelt(chow.phy99)
-chow.df$Phylum <- ordered(chow.df$Phylum, levels=c("Proteobacteria", "Firmicutes", "Bacteroidetes", "Actinobacteria"))
-
-#tiff("Chow.tiff", width=5, height=5, units="in", res=600)
-ggplot(chow.df, aes(x=Phylum, y=Abundance, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  scale_fill_manual(values=c("#984ea3", "#e41a1c", "#377eb8", "#f781bf")) +
-  xlab("Phyla") +
-  ylab("Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,65),expand=c(0,0)) +
-  theme(axis.text.x = element_blank(),
-        axis.title.x = element_text(size=14),
-        axis.title.y = element_text(size=14),
-        strip.text.x = element_text(size=12),
-        strip.text.y = element_text(size=12),
-        panel.spacing=unit(1, "lines"))
-#dev.off()
-
-
-#tiff("Chow.mdtp.tiff", width=8, height=6, units="in", res=300)
-ggplot(chow.df, aes(x=Phylum, y=Abundance, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  scale_fill_manual(values=c("#984ea3", "#e41a1c", "#377eb8", "#f781bf")) +
-  xlab("Phyla") +
-  ylab("Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,65),expand=c(0,0)) +
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_text(size=16),
-        axis.title.x = element_text(size=20),
-        axis.title.y = element_text(size=20),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 18, face="bold"),
-        legend.text = element_text(size=18),
-        panel.grid.major = element_blank())
-#dev.off()
-
-
-
-
-##### Alpha Div
-physeq.wchow <- subset_samples(physeq, Sample_Type != "Black_Tissue")
-chow.adiv <- data.frame(sample_data(physeq.wchow))
-chow.adiv.sum <- chow.adiv %>%
-  group_by(Group) %>%
-  summarize(Chao_Mean = mean(chao),
-            Chao_Median = median(chao),
-            Chao_SD = sd(chao),
-            Chao_SE = (sd(chao)/sqrt(length(chao))),
-            Chao_iqr = IQR(chao),
-            InvSimp_Mean = mean(invsimpson),
-            InvSimp_Median = median(invsimpson),
-            InvSimp_SD = sd(invsimpson),
-            InvSimp_SE = (sd(invsimpson)/sqrt(length(invsimpson))),
-            InvSimp_iqr = IQR(invsimpson))
-
-#tiff("Chow.chao.tiff", width=7, height=3, units="in", res=600)
-ggplot(chow.adiv, aes(x=Group, y=chao, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen", "gray26")) +
-  #scale_fill_manual(values=c("gray95", "dimgray") )+
-  xlab("Group") +
-  ylab("Chao Richness")
-#dev.off()
-
-#tiff("Chow.InvSimp.tiff", width=7, height=3, units="in", res=600)
-ggplot(chow.adiv, aes(x=Group, y= invsimpson, fill = Group)) +
-  geom_boxplot(position=position_dodge(1)) +
-  geom_point() + 
-  #facet_grid(.~Substrate) +
-  scale_fill_manual(values=c("brown2", "lightcoral", "royalblue3", "deepskyblue", "limegreen", "gray26")) +
-  xlab("Group") +
-  ylab("Inverse Simpson Weighted Diversity")
-#dev.off()
-```
 
 
 
@@ -1731,23 +1352,11 @@ kruskal.test(formula = RelAbund ~ Sample_Type, data=cya.df)
   # p-value = 0.733
 ```
 
-### Verruco OTUs???
-```{r}
-ver <- subset_taxa(physeq.rem, Phylum == "Verrucomicrobia")
-ver.tax <- data.frame(tax_table(ver))
-ver.rel <- transform_sample_counts(ver, function(x){(x/sum(x))*100})
-ver.rel <- subset_samples(ver.rel, sample_names(ver.rel)!= "CC1_923_S")
-ver.rel <- subset_samples(ver.rel, sample_names(ver.rel)!= "CC1_925_I")
-ver.rel <- subset_samples(ver.rel, sample_names(ver.rel)!= "CM1_916_P")
-ver.rel <- prune_taxa(taxa_sums(ver.rel)>0, ver.rel)
-
-```
-
 
 ### Test Phyla Rel Abund
 ```{r}
 # Merge samples with the same taxonomic rank
-goodphy <- tax_glom(physeq.rem, taxrank="Phylum")
+goodphy <- tax_glom(physeq, taxrank="Phylum")
 
 # Transform each merged phylum count to rel abund
 phy99 <- transform_sample_counts(goodphy, function(x){(x/sum(x))*100})
@@ -1763,26 +1372,18 @@ cya.df$RelAbund <- t(data.frame(otu_table(cya.phy)))
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=cya.df)
-  # p-value = 8.591e-05
-kruskalmc(resp = RelAbund ~ Group, data=cya.df)
-  # Summer_Wild vs. Summer_Lab
-  # Summer_Wild vs. IBA
-  # Summer_Wild vs. Spring
-  # Torpor vs. Spring
+  # p-value = 1.826e-05
 pairwise.wilcox.test(cya.df$RelAbund, cya.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.00081
-  # Wild-Torpor = 0.00083
-  # Wild-IBA = 0.00074
-  # Wild-Spring = 0.00291
-  # Lab-Torpor = 0.10286
-  # Lab-IBA = 1
-  # Lab-Spring = 0.17796
-  # Torpor-IBA = 0.01648
-  # Torpor-Spring = 0.00391
-  # IBA-Spring = 0.17796
-kruskal.test(formula = RelAbund ~ Sample_Type, data=cya.df)
-  # p-value = 0.733
-
+  # Wild-Lab = 0.00012
+  # Wild-Torpor = 0.00031
+  # Wild-IBA = 0.00069
+  # Wild-Spring = 0.00078
+  # Lab-Torpor = 0.18556
+  # Lab-IBA = 0.31707
+  # Lab-Spring = 0.13316
+  # Torpor-IBA = 0.00879
+  # Torpor-Spring = 0.00238
+  # IBA-Spring = 0.32613
 
 
 
@@ -1793,26 +1394,18 @@ fir.df$RelAbund <- t(data.frame(otu_table(fir.phy)))
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=fir.df)
-  # p-value = 7.758e-07
-kruskalmc(resp = RelAbund ~ Group, data=fir.df)
-  # Summer_Wild vs. Torpor
-  # Summer_Wild vs. IBA
-  # Summer_Lab vs. Torpor
-  # Summer_Lab vs. IBA
+  # p-value = 1.523e-08
 pairwise.wilcox.test(fir.df$RelAbund, fir.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.80753
-  # Wild-Torpor = 0.00062 
-  # Wild-IBA = 0.00014
-  # Wild-Spring = 0.17191
-  # Lab-Torpor = 2.8e-05
-  # Lab-IBA = 8.0e-06
-  # Lab-Spring = 0.09894
-  # Torpor-IBA = 0.72018
-  # Torpor-Spring = 0.00326
-  # IBA-Spring = 0.00062
-kruskal.test(formula = RelAbund ~ Sample_Type, data=fir.df)
-  # p-value = 0.6089
-
+  # Wild-Lab = 0.98066
+  # Wild-Torpor = 0.00013
+  # Wild-IBA = 2.7e-05
+  # Wild-Spring = 0.11733
+  # Lab-Torpor = 1.3e-06
+  # Lab-IBA = 6.7e-08
+  # Lab-Spring = 0.03354
+  # Torpor-IBA = 0.98066
+  # Torpor-Spring = 0.00053
+  # IBA-Spring = 8.2e-05
 
 
 
@@ -1823,21 +1416,19 @@ bac.df$RelAbund <- t(data.frame(otu_table(bac.phy)))
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=bac.df)
-  # p-value = 0.006097
-kruskalmc(resp = RelAbund ~ Group, data=bac.df)
+  # p-value = 0.002398
 pairwise.wilcox.test(bac.df$RelAbund, bac.df$Group, p.adjust.method="fdr")
   # Wild-Lab = 0.578
-  # Wild-Torpor = 0.040
-  # Wild-IBA = 0.040
-  # Wild-Spring = 0.058
-  # Lab-Torpor = 0.040
-  # Lab-IBA = 0.040
-  # Lab-Spring = 0.058
-  # Torpor-IBA = 0.927
-  # Torpor-Spring = 0.722
-  # IBA-Spring = 0.607
-kruskal.test(formula = RelAbund ~ Sample_Type, data=bac.df)
-  # p-value = 0.03301
+  # Wild-Torpor = 0.027
+  # Wild-IBA = 0.032
+  # Wild-Spring = 0.034
+  # Lab-Torpor = 0.027
+  # Lab-IBA = 0.027
+  # Lab-Spring = 0.032
+  # Torpor-IBA = 0.587
+  # Torpor-Spring = 0.968
+  # IBA-Spring = 0.587
+
 
 
 
@@ -1850,27 +1441,19 @@ ver.df$RelAbund <- t(data.frame(otu_table(ver.phy)))
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ver.df)
-  # p-value = 1.621e-06
-kruskalmc(resp = RelAbund ~ Group, data=ver.df)
-  # Wild-Torpor
-  # Wild-IBA
-  # Lab-Torpor
-  # Lab-IBA
-  # Torpor-Spring
-  # IBA-Spring
+  # p-value = 0.0001705
 pairwise.wilcox.test(ver.df$RelAbund, ver.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 1
-  # Wild-Torpor = 0.00042
-  # Wild-IBA = 0.00021
-  # Wild-Spring = 1
-  # Lab-Torpor = 0.00011
-  # Lab-IBA = 0.00011
-  # Lab-Spring = 1
-  # Torpor-IBA = 1
-  # Torpor-Spring = 0.00021
-  # IBA-Spring = 0.00021
-kruskal.test(formula = RelAbund ~ Sample_Type, data=ver.df)
-  # p-value = 0.6544
+  # Wild-Lab = 0.78725
+  # Wild-Torpor = 0.40778
+  # Wild-IBA = 0.00029
+  # Wild-Spring = 0.86541
+  # Lab-Torpor = 0.30073
+  # Lab-IBA = 2.5e-05
+  # Lab-Spring = 0.87464
+  # Torpor-IBA = 0.24716
+  # Torpor-Spring = 0.25768
+  # IBA-Spring = 0.00552
+
 
 
 
@@ -1882,21 +1465,18 @@ pro.df$RelAbund <- t(data.frame(otu_table(pro.phy)))
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=pro.df)
-  # p-value = 0.02498
-kruskalmc(resp = RelAbund ~ Group, data=pro.df)
+  # p-value = 0.01492
 pairwise.wilcox.test(pro.df$RelAbund, pro.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.430
-  # Wild-Torpor = 0.023
-  # Wild-IBA = 0.0144
-  # Wild-Spring = 0.785
-  # Lab-Torpor = 0.144
-  # Lab-IBA = 0.420
-  # Lab-Spring = 805
-  # Torpor-IBA = 0.927
-  # Torpor-Spring = 0.023
-  # IBA-Spring = 0.229
-kruskal.test(formula = RelAbund ~ Sample_Type, data=pro.df)
-  # p-value = 0.2962
+  # Wild-Lab = 0.09057 
+  # Wild-Torpor = 0.00063 
+  # Wild-IBA = 0.11088
+  # Wild-Spring = 0.15644
+  # Lab-Torpor = 0.09057
+  # Lab-IBA = 0.47384
+  # Lab-Spring = 0.97482
+  # Torpor-IBA = 0.71639
+  # Torpor-Spring = 0.09057
+  # IBA-Spring = 0.47384
 
 
 
@@ -1908,21 +1488,19 @@ unc.df$RelAbund <- t(data.frame(otu_table(unc.phy)))
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=unc.df)
-  # p-value = 0.08711
-kruskalmc(resp = RelAbund ~ Group, data=unc.df)
+  # p-value = 0.009454
 pairwise.wilcox.test(unc.df$RelAbund, unc.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.192
-  # Wild-Torpor = 0.192
-  # Wild-IBA = 0.261
-  # Wild-Spring = 0.034
-  # Lab-Torpor = 0.409
-  # Lab-IBA = 0.695
+  # Wild-Lab = 0.1646
+  # Wild-Torpor = 0.0669
+  # Wild-IBA = 0.0669
+  # Wild-Spring = 0.0031
+  # Lab-Torpor = 0.2714
+  # Lab-IBA = 0.0669
   # Lab-Spring = 0.348
-  # Torpor-IBA = 0.840
-  # Torpor-Spring = 0.961
-  # IBA-Spring = 0.791
-kruskal.test(formula = RelAbund ~ Sample_Type, data=unc.df)
-  # p-value = 0.7733
+  # Torpor-IBA = 0.1646
+  # Torpor-Spring = 0.7780
+  # IBA-Spring = 0.4932
+
 
 
 
@@ -1933,23 +1511,19 @@ ten.df$RelAbund <- t(data.frame(otu_table(ten.phy)))
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ten.df)
-  # p-value = 0.02485
-kruskalmc(resp = RelAbund ~ Group, data=ten.df)
-  # Wild-Torpor
-  # Wild-IBA
+  # p-value = 0.003323
 pairwise.wilcox.test(ten.df$RelAbund, ten.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.3235
-  # Wild-Torpor = 0.0025
-  # Wild-IBA = 0.0049
-  # Wild-Spring = 0.5970
-  # Lab-Torpor = 0.5012
-  # Lab-IBA = 0.7848
-  # Lab-Spring = 0.7629
-  # Torpor-IBA = 0.7629
-  # Torpor-Spring = 0.5874
-  # IBA-Spring = 0.00021
-kruskal.test(formula = RelAbund ~ Sample_Type, data=ten.df)
-  # p-value = 0.6538
+  # Wild-Lab = 0.26413
+  # Wild-Torpor = 0.00031
+  # Wild-IBA = 0.00016
+  # Wild-Spring = 0.23577
+  # Lab-Torpor = 0.17312
+  # Lab-IBA = 0.08489
+  # Lab-Spring = 0.74893
+  # Torpor-IBA = 0.78969
+  # Torpor-Spring = 0.66943
+  # IBA-Spring = 0.63371
+
 
 
 
@@ -1960,22 +1534,19 @@ act.df$RelAbund <- t(data.frame(otu_table(act.phy)))
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=act.df)
-  # p-value = 0.03403
-kruskalmc(resp = RelAbund ~ Group, data=act.df)
-  # Wild-Spring
+  # p-value = 0.02879
 pairwise.wilcox.test(act.df$RelAbund, act.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.196
-  # Wild-Torpor = 0.037
-  # Wild-IBA = 0.042
-  # Wild-Spring = 0.037
-  # Lab-Torpor = 0.619
-  # Lab-IBA = 0.618
-  # Lab-Spring = 0.358
-  # Torpor-IBA = 0.693
-  # Torpor-Spring = 0.596
-  # IBA-Spring = 0.458
-kruskal.test(formula = RelAbund ~ Sample_Type, data=act.df)
-  # p-value = 0.7981
+  # Wild-Lab = 0.344
+  # Wild-Torpor = 0.019
+  # Wild-IBA = 0.050
+  # Wild-Spring = 0.019
+  # Lab-Torpor = 0.369
+  # Lab-IBA = 0.501
+  # Lab-Spring = 0.369
+  # Torpor-IBA = 0.544
+  # Torpor-Spring = 0.600
+  # IBA-Spring = 0.344
+
 
 
 
@@ -1988,21 +1559,19 @@ elu.df$RelAbund <- t(data.frame(otu_table(elu.phy)))
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=elu.df)
-  # p-value = 0.03651
-kruskalmc(resp = RelAbund ~ Group, data=elu.df)
-pairwise.wilcox.test(elu.df$RelAbund, elu.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.11
-  # Wild-Torpor = 0.11
-  # Wild-IBA = 0.62
-  # Wild-Spring = 0.10
-  # Lab-Torpor = 0.97
-  # Lab-IBA = 0.29
-  # Lab-Spring = 0.29
-  # Torpor-IBA = 0.29
-  # Torpor-Spring = 0.49
-  # IBA-Spring = 0.15
-kruskal.test(formula = RelAbund ~ Sample_Type, data=elu.df)
-  # p-value = 0.7981
+  # p-value = 0.01106
+pairwise.wilcox.test(elu.df$RelAbund, elu.df$Group, p.adjust.method="fdr")#### ERROR
+  # Wild-Lab = 0.052
+  # Wild-Torpor = 0.065
+  # Wild-IBA = 0.627
+  # Wild-Spring = 0.039
+  # Lab-Torpor = 0.932
+  # Lab-IBA = 0.251
+  # Lab-Spring = 0.096
+  # Torpor-IBA = 0.251
+  # Torpor-Spring = 0.251
+  # IBA-Spring = 0.052
+
 ```
 
 
