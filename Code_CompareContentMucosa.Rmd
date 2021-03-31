@@ -98,7 +98,7 @@ max(sample_sums(mothurdata))
   # 11156
 ```
 
-### Calculate Faith's phylogenetic diversity
+### Phylogenetic Diversity and SES MPD
 ```{r}
 ### Unweighted - Calculate phylogenetic diversity and MPD ###
 
@@ -178,7 +178,7 @@ t.test(Stat ~ Sample_Type, data = mpd.ready, paired = T)
   # p-value = 0.5895
 ```
 
-### Test content vs. mucosa - Alpha Diversity
+### Alpha Diversity
 ```{r}
 adiv <- data.frame(sample_data(physeq.pair))
 
@@ -252,7 +252,7 @@ wilcox.test(invsimpson ~ Sample_Type, data = adiv, paired = T)
 
 
 
-### Test content vs. mucosa - Beta Diversity
+### Beta Diversity
 ```{r}
 ########## Unweighted UniFrac ##########
 UF.u <- phyloseq::distance(physeq = physeq.pair, method = "unifrac")
