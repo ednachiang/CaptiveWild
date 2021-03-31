@@ -103,16 +103,17 @@ max(sample_sums(mothurdata))
 ### Unweighted - Calculate phylogenetic diversity and MPD ###
 
 # Calculate Faith's phylogenetic diversity
-pd.res <- pd(t(data.frame(otu_table(physeq.pair))), phy_tree(physeq.pair), include.root = T)
+pd.res <- pd(t(data.frame(otu_table(physeq.pair))), phy_tree(physeq.pair), 
+             include.root = T)
 pd.df <- data.frame(pd.res)
 
 # Calculate MPD (Mean Pairwise Distance)
 pd.dist <- cophenetic(phy_tree(physeq.pair))
   # Calculate cophenetic distance
-ses.mpd.res <- ses.mpd(t(data.frame(otu_table(physeq.pair))), pd.dist, null.model = "taxa.labels", abundance.weighted = F, runs = 999)
+ses.mpd.res <- ses.mpd(t(data.frame(otu_table(physeq.pair))), pd.dist, 
+                       null.model = "taxa.labels", abundance.weighted = F, runs = 999)
   # Calculate MPD
   # This'll take a while to run-- be patient
-
 mpd <- data.frame(ses.mpd.res)
   # Pull out MDP results
 
@@ -292,59 +293,4 @@ p$tab
 adonis(UF.w ~ Sample_Type, data = pair.sampdf, permutations = 9999)
   # p-value = 0.9947
   # R2 = 0.0067
-
-
-
-
-###### PERMANOVA - By Group for Sample Type ######
-
-sampdf.wild <- data.frame(sample_data(physeq.wild))
-bray.wild <- phyloseq::distance(physeq = physeq.wild, method = "bray")
-beta.tax = betadisper(d=bray.wild, group=sampdf.wild$Sample_Type)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.9013889
-adonis(bray.wild ~ Sample_Type, data = sampdf.wild, permutations = 9999)
-  # p-value = 0.7
-  # R2 = 0.3548
-
-sampdf.sum <- data.frame(sample_data(physeq.sum))
-bray.sum <- phyloseq::distance(physeq = physeq.sum, method = "bray")
-beta.tax = betadisper(d=bray.sum, group=sampdf.sum$Sample_Type)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.628
-adonis(bray.sum ~ Sample_Type, data = sampdf.sum, permutations = 9999)
-  # p-value = 0.9967
-  # R2 = 0.01754
-
-sampdf.tor <- data.frame(sample_data(physeq.tor))
-bray.tor <- phyloseq::distance(physeq = physeq.tor, method = "bray")
-beta.tax = betadisper(d=bray.tor, group=sampdf.tor$Sample_Type)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.755
-adonis(bray.tor ~ Sample_Type, data = sampdf.tor, permutations = 9999)
-  # p-value = 0.9429
-  # R2 = 0.0332
-
-sampdf.iba <- data.frame(sample_data(physeq.iba))
-bray.iba <- phyloseq::distance(physeq = physeq.iba, method = "bray")
-beta.tax = betadisper(d=bray.iba, group=sampdf.iba$Sample_Type)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.79
-adonis(bray.iba ~ Sample_Type, data = sampdf.iba, permutations = 9999)
-  # p-value = 0.9654
-  # R2 = 0.02039
-
-sampdf.spr <- data.frame(sample_data(physeq.spr))
-bray.spr <- phyloseq::distance(physeq = physeq.spr, method = "bray")
-beta.tax = betadisper(d=bray.spr, group=sampdf.spr$Sample_Type)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.008333
-anosim(bray.spr, sampdf.spr$Sample_Type, permutations = 1000)
-  # p-value = 1
-  # R = -0.4167
 ```
