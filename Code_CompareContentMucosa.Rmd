@@ -212,6 +212,31 @@ shapiro.test(adiv.wild$shannon)
 t.test(shannon ~ Sample_Type, data = adiv, paired = T)
   # p-value = 0.8903
 
+
+
+########## Number of Unique OTUs ##########
+otus <- data.frame(otu_table(physeq.pair))
+sampNames <- colnames(otus)
+uniq.otus <- data.frame(matrix(nrow = nsamples(physeq.pair), ncol = 2))
+colnames(uniq.otus) <- c("Sample", "Unique_OTUs")
+for(n in 1:nsamples(physeq.pair)) {
+  COL <- otus[,n]
+  numUniq <- length(which(COL > 0))
+  uniq.otus$Sample[n] <- sampNames[n]
+  uniq.otus$Unique_OTUs[n] <- numUniq
+}
+uniq.otus$Sample_Type <- sample_data(physeq.pair)$Sample_Type
+rownames(uniq.otus) <- uniq.otus$Sample
+
+hist(uniq.otus$Unique_OTUs, breaks=10)
+qqnorm(uniq.otus$Unique_OTUs)
+qqline(uniq.otus$Unique_OTUs)
+shapiro.test(uniq.otus$Unique_OTUs)
+  # p-value = 0.0004062
+  # Not Normal
+wilcox.test(Unique_OTUs ~ Sample_Type, data = uniq.otus)
+  # p-value = 0.05353
+
 ```
 
 
