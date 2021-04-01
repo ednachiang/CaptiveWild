@@ -70,19 +70,27 @@ sample_data(physeq)$Metabolism <- ordered(sample_data(physeq)$Metabolism,
 sample_data(physeq)$Group <- ordered(sample_data(physeq)$Group,
                                      levels=c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring"))
 
-# Separate by season
-physeq.wild <- subset_samples(physeq, Group == "Summer_Wild")
-physeq.sum <- subset_samples(physeq, Group == "Summer_Lab")
-physeq.tor <- subset_samples(physeq, Group == "Torpor")
-physeq.iba <- subset_samples(physeq, Group == "IBA")
-physeq.spr <- subset_samples(physeq, Group == "Spring")
-
-# Separate by content/mucosa
-physeq.con <- subset_samples(physeq, Sample_Type == "Content")
-physeq.muc <- subset_samples(physeq, Sample_Type == "Mucosa")
+# Remove outliers
+physeq <- subset_samples(physeq, ID != 3925)
+physeq <- subset_samples(physeq, ID != 3916)
 
 # Subset out paired samples
-physeq.pair <- subset_samples(physeq, ID != c(3881, 3886, 4057))
+physeq.pair <- subset_samples(physeq, ID != 3881)
+physeq.pair <- subset_samples(physeq.pair, ID != 3886)
+physeq.pair <- subset_samples(physeq.pair, ID != 4057)
+
+# Separate by season
+physeq.wild <- subset_samples(physeq.pair, Group == "Summer_Wild")
+physeq.sum <- subset_samples(physeq.pair, Group == "Summer_Lab")
+physeq.tor <- subset_samples(physeq.pair, Group == "Torpor")
+physeq.iba <- subset_samples(physeq.pair, Group == "IBA")
+physeq.spr <- subset_samples(physeq.pair, Group == "Spring")
+
+# Separate by content/mucosa
+physeq.con <- subset_samples(physeq.pair, Sample_Type == "Content")
+physeq.muc <- subset_samples(physeq.pair, Sample_Type == "Mucosa")
+
+
 
 # Pull out only lab squirrels
 physeq.lab <- subset_samples(physeq, Diet != "Wild")
@@ -158,11 +166,11 @@ hist(pd.ready$Stat, breaks=10)
 qqnorm(pd.ready$Stat)
 qqline(pd.ready$Stat)
 shapiro.test(pd.ready$Stat)
-  # p-value = 0.05333
-  # Normal
+  # p-value = 0.0008458
+  # Not Normal
 
-t.test(Stat ~ Sample_Type, data = pd.ready, paired = T)
-  # p-value = 0.1376
+wilcox.test(Stat ~ Sample_Type, data = pd.ready, paired = T)
+  # p-value = 0.173
 
 
 
@@ -171,11 +179,11 @@ hist(mpd.ready$Stat, breaks=10)
 qqnorm(mpd.ready$Stat)
 qqline(mpd.ready$Stat)
 shapiro.test(mpd.ready$Stat)
-  # p-value = 0.361
+  # p-value = 0.1955
   # Normal
 
 t.test(Stat ~ Sample_Type, data = mpd.ready, paired = T)
-  # p-value = 0.5895
+  # p-value = 0.7921
 ```
 
 ### Alpha Diversity
@@ -192,62 +200,18 @@ adiv.iba <- adiv[which(adiv$Group == "IBA"),]
 adiv.spr <- adiv[which(adiv$Group == "Spring"),]
 
 
-########## Chao ##########
-hist(adiv$chao, breaks=10)
-qqnorm(adiv$chao)
-qqline(adiv$chao)
-shapiro.test(adiv$chao)
-  # p-value = 0.001037
-  # Not Normal
-
-### Wilcoxon & T-Test ###
-wilcox.test(chao ~ Sample_Type, data = adiv, paired = T)
-  # p-value = 0.003878*
-# Separate out by Group
-wilcox.test(chao ~ Sample_Type, data = adiv.wild, paired = T)
-  # p-value = 0.2454
-wilcox.test(chao ~ Sample_Type, data = adiv.sum, paired = T)
-  # p-value = 0.3271
-wilcox.test(chao ~ Sample_Type, data = adiv.tor, paired = T)
-  # p-value = 0.07519
-wilcox.test(chao ~ Sample_Type, data = adiv.iba, paired = T)
-  # p-value = 0.1953
-wilcox.test(chao ~ Sample_Type, data = adiv.spr, paired = T)
-  # p-value = 0.8478
-p.adjust(c(0.003878, 0.2454, 0.3271, 0.07519, 0.1953, 0.8478), method = "fdr")
-  # 0.023268* 0.368100 0.392520 0.225570 0.368100 0.847800
-  # All content vs. all mucosa = sig diff
-  # Not sig within each group
-
-
-
-
 ########## Shannon ##########
 hist(adiv$shannon, breaks=10)
 qqnorm(adiv$shannon)
 qqline(adiv$shannon)
 shapiro.test(adiv.wild$shannon)
-  # p-value = 0.4286
+  # p-value = 0.4148
   # Normal
 
 ### T-Test ###
 t.test(shannon ~ Sample_Type, data = adiv, paired = T)
-  # p-value = 0.3436
+  # p-value = 0.8903
 
-
-
-
-########## Inverse Simpson ##########
-hist(adiv$invsimpson, breaks=10)
-qqnorm(adiv$invsimpson)
-qqline(adiv$invsimpson)
-shapiro.test(adiv$invsimpson)
-  # p-value = 1.215e-05
-  # Not Normal
-
-### Wilcoxon & T-Test ###
-wilcox.test(invsimpson ~ Sample_Type, data = adiv, paired = T)
-  # p-value = 0.2109
 ```
 
 
@@ -257,7 +221,7 @@ wilcox.test(invsimpson ~ Sample_Type, data = adiv, paired = T)
 ########## Unweighted UniFrac ##########
 UF.u <- phyloseq::distance(physeq = physeq.pair, method = "unifrac")
 UF.u.pcoa <- ordinate(physeq = physeq.pair, method = "PCoA", distance = "unifrac")
-  # Variation explained = 22.7%
+  # Variation explained = 22.1%
 plot_ordination(physeq = physeq.pair, ordination = UF.u.pcoa, axes = c(1,2),
                 title = "Unweighted UniFrac") +
   geom_point(size = 2, aes(colour = Sample_Type))
@@ -268,16 +232,15 @@ pair.sampdf <- data.frame(sample_data(physeq.pair))
 beta.tax <- betadisper(d=UF.u, group=pair.sampdf$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.093
-adonis(UF.u ~ Sample_Type, data = pair.sampdf, permutations = 9999)
-  # p-value = 0.9282
-  # R2 = 0.01354
+  # p-value = 0.003
+anosim(UF.u, pair.sampdf$Sample_Type, permutations = 9999)
+  # p-value = 0.4388
 
 
 ########## Weighted UniFrac ##########
 UF.w <- phyloseq::distance(physeq = physeq.pair, method = "wunifrac")
 UF.w.pcoa <- ordinate(physeq = physeq.pair, method = "PCoA", distance = "wunifrac")
-  # Variation explained = 35.8%
+  # Variation explained = 35.5%
 
 plot_ordination(physeq = physeq.pair, ordination = UF.w.pcoa, axes = c(1,2),
                 title = "Weighted UniFrac") +
@@ -289,8 +252,8 @@ pair.sampdf <- data.frame(sample_data(physeq.pair))
 beta.tax <- betadisper(d=UF.w, group=pair.sampdf$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.297
+  # p-value = 0.094
 adonis(UF.w ~ Sample_Type, data = pair.sampdf, permutations = 9999)
-  # p-value = 0.9947
-  # R2 = 0.0067
+  # p-value = 0.9971
+  # R2 = 0.00686
 ```
