@@ -265,7 +265,7 @@ mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
   scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(-12,6), breaks = c(-12,-6,0,6)) +
   scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  ylab("SES MPD") +
+  ylab("Phylogenetic Evenness (SES MPD)") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
@@ -273,7 +273,7 @@ mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
         strip.text.x = element_text(face ="bold", size=6),
         axis.title.x = element_text(face="bold", size=6, vjust = 10,
                                     margin = margin(t = 1, r = 10, b = -15, l = 1)),
-        axis.title.y = element_text(face="bold", size=6, vjust = -4),
+        axis.title.y = element_text(face="bold", size=6, vjust = -2),
         axis.text.x = element_text(size=6, angle = 50, hjust = 1, vjust = 1.05),
         axis.text.y = element_text(size=6),
         legend.position = "none") +
