@@ -106,7 +106,7 @@ pd.df <- data.frame(pd.res)
 # Calculate MPD (Mean Pairwise Distance)
 pd.dist <- cophenetic(phy_tree(physeq))
   # Calculate cophenetic distance
-ses.mpd.res <- ses.mpd(t(data.frame(otu_table(physeq))), pd.dist, null.model = "taxa.labels", abundance.weighted = F, runs = 999)
+#ses.mpd.res <- ses.mpd(t(data.frame(otu_table(physeq))), pd.dist, null.model = "taxa.labels", abundance.weighted = F, runs = 999)
   # Calculate MPD
   # This'll take a while to run-- be patient
 #save(ses.mpd.res, file = "mpd.RData")
@@ -415,7 +415,39 @@ summary(aov(shannon ~ Group, data = adiv))
 
 
 
+########## Number of Unique OTUs ##########
+otus <- data.frame(otu_table(physeq))
+sampNames <- colnames(otus)
+uniq.otus <- data.frame(matrix(nrow = nsamples(physeq), ncol = 2))
+colnames(uniq.otus) <- c("Sample", "Unique_OTUs")
+for(n in 1:nsamples(physeq)) {
+  COL <- otus[,n]
+  numUniq <- length(which(COL > 0))
+  uniq.otus$Sample[n] <- sampNames[n]
+  uniq.otus$Unique_OTUs[n] <- numUniq
+}
+uniq.otus$Group <- sample_data(physeq)$Group
+rownames(uniq.otus) <- uniq.otus$Sample
 
+hist(uniq.otus$Unique_OTUs, breaks=10)
+qqnorm(uniq.otus$Unique_OTUs)
+qqline(uniq.otus$Unique_OTUs)
+shapiro.test(uniq.otus$Unique_OTUs)
+  # p-value = 0.000166
+  # Not Normal
+kruskal.test(formula = Unique_OTUs ~ Group, data = uniq.otus)
+  # p-value = 1.227e-06
+pairwise.wilcox.test(uniq.otus$Unique_OTUs, uniq.otus$Group, p.adjust.method="fdr")
+  # Summer Wild vs. Summer Lab = 0.00027*
+  # Summer Wild vs. Torpor = 0.00027*
+  # Summer Wild vs. IBA = 0.00074*
+  # Summer Wild vs. Spring = 0.00194*
+  # Summer Lab vs. Torpor = 0.00027*
+  # Summer Lab vs. IBA = 0.00088*
+  # Summer Lab vs. Spring = 0.12470
+  # Torpor vs. IBA = 0.76330
+  # Torpor vs. Spring = 0.02078*
+  # IBA vs. Spring = 0.09509
 
 ##### Plot #####
 ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
