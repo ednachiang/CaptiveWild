@@ -401,11 +401,6 @@ TukeyHSD(aov(Stat ~ Group, data = mpd.ready))
 ```{r}
 adiv <- data.frame(sample_data(physeq))
 
-# Separate by groups of interest
-adiv.sum2 <- adiv[which(adiv$Season == "Summer"),]
-adiv.lab <- adiv[which(adiv$Diet == "Lab"),]
-
-
 
 ########## Chao ##########
 hist(adiv$chao, breaks=10)
@@ -414,25 +409,9 @@ qqline(adiv$chao)
 shapiro.test(adiv$chao)
   # p-value = 0.003256
   # Not Normal
-hist(adiv.sum2$chao, breaks=10)
-qqnorm(adiv.sum2$chao)
-qqline(adiv.sum2$chao)
-shapiro.test(adiv.sum2$chao)
-  # p-value = 0.3182
-  # Normal
-hist(adiv.lab$chao, breaks=10)
-qqnorm(adiv.lab$chao)
-qqline(adiv.lab$chao)
-shapiro.test(adiv.lab$chao)
-  # p-value = 0.007034
-  # Not Normal
 
 kruskal.test(formula = chao ~ Group, data = adiv)
   # p-value = 0.6918
-t.test(chao ~ Group, data = adiv.sum2)
-  # p-value = 0.5267
-kruskal.test(formula = chao ~ Group, data = adiv.lab)
-  # p-value = 0.5676
 
 
 
@@ -444,26 +423,9 @@ qqline(adiv$shannon)
 shapiro.test(adiv$shannon)
   # p-value = 0.2932
   # Normal
-hist(adiv.sum2$shannon, breaks=10)
-qqnorm(adiv.sum2$shannon)
-qqline(adiv.sum2$shannon)
-shapiro.test(adiv.sum2$shannon)
-  # p-value = 0.06212
-  # Normal
-hist(adiv.lab$shannon, breaks=10)
-qqnorm(adiv.lab$shannon)
-qqline(adiv.lab$shannon)
-shapiro.test(adiv.lab$shannon)
-  # p-value = 0.4766
-  # Normal
-
 
 summary(aov(shannon ~ Group, data = adiv))
   # p-value = 0.847
-t.test(shannon ~ Group, data = adiv.sum2)
-  # p-value = 0.6984
-summary(aov(shannon ~ Group, data = adiv.lab))
-  # p-value = 0.698
 
 
 
@@ -475,25 +437,9 @@ qqline(adiv$invsimpson)
 shapiro.test(adiv$invsimpson)
   # p-value = 7.106e-05
   # Not Normal
-hist(adiv.sum2$invsimpson, breaks=10)
-qqnorm(adiv.sum2$invsimpson)
-qqline(adiv.sum2$invsimpson)
-shapiro.test(adiv.sum2$invsimpson)
-  # p-value = 0.03823
-  # Not Normal
-hist(adiv.lab$invsimpson, breaks=10)
-qqnorm(adiv.lab$invsimpson)
-qqline(adiv.lab$invsimpson)
-shapiro.test(adiv.lab$invsimpson)
-  # p-value = 6.15e-05
-  # Not Normal
 
 kruskal.test(formula = invsimpson ~ Group, data = adiv)
   # p-value = 0.5912
-wilcox.test(invsimpson ~ Group, data = adiv.sum2)
-  # p-value = 0.6796
-kruskal.test(formula = invsimpson ~ Group, data = adiv.lab)
-  # p-value = 0.4772
 
 
 
