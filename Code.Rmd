@@ -402,20 +402,6 @@ TukeyHSD(aov(Stat ~ Group, data = mpd.ready))
 adiv <- data.frame(sample_data(physeq))
 
 
-########## Chao ##########
-hist(adiv$chao, breaks=10)
-qqnorm(adiv$chao)
-qqline(adiv$chao)
-shapiro.test(adiv$chao)
-  # p-value = 0.003256
-  # Not Normal
-
-kruskal.test(formula = chao ~ Group, data = adiv)
-  # p-value = 0.6918
-
-
-
-
 ########## Shannon ##########
 hist(adiv$shannon, breaks=10)
 qqnorm(adiv$shannon)
@@ -430,29 +416,11 @@ summary(aov(shannon ~ Group, data = adiv))
 
 
 
-########## Inverse Simpson ##########
-hist(adiv$invsimpson, breaks=10)
-qqnorm(adiv$invsimpson)
-qqline(adiv$invsimpson)
-shapiro.test(adiv$invsimpson)
-  # p-value = 7.106e-05
-  # Not Normal
-
-kruskal.test(formula = invsimpson ~ Group, data = adiv)
-  # p-value = 0.5912
-
-
-
-
 
 ##### Plot #####
 ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
   geom_boxplot(position = position_dodge(1), outlier.shape = NA) +
   geom_jitter(size=2, width = 0.2)
-
-
-
-
 
 ```
 
