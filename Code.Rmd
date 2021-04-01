@@ -165,99 +165,102 @@ mpd.sum$YMIN <- mpd.sum$Mean - mpd.sum$SE
 ########## PLOT PD & MPD ##########
 
 ### Plot PD ###
+pd.ann <- data.frame(lab = c("a", "b", "c", "cd", "bd"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
+
 pd.plot <- ggplot(pd.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_violin() +
-  geom_jitter(size=2, width = 0.2) + 
   geom_segment(aes(x = 1, y = pd.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = pd.sum$YMAX[1]+0.1), color = "black", size = 2, 
+                   yend = pd.sum$YMAX[1]+0.1), color = "black", size = 1, 
                show.legend = F) +
   geom_segment(aes(x = 2, y = pd.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = pd.sum$YMAX[2]+0.1), color = "black", size = 2, 
+                   yend = pd.sum$YMAX[2]+0.1), color = "black", size = 1, 
                show.legend = F) +
   geom_segment(aes(x = 3, y = pd.sum$YMIN[3]-0.1, xend = 3, 
-                   yend = pd.sum$YMAX[3]+0.1), color = "black", size = 2, 
+                   yend = pd.sum$YMAX[3]+0.1), color = "black", size = 1, 
                show.legend = F) +
   geom_segment(aes(x = 4, y = pd.sum$YMIN[4]-0.1, xend = 4, 
-                   yend = pd.sum$YMAX[4]+0.1), color = "black", size = 2, 
+                   yend = pd.sum$YMAX[4]+0.1), color = "black", size = 1, 
                show.legend = F) +
   geom_segment(aes(x = 5, y = pd.sum$YMIN[5]-0.1, xend = 5, 
-                   yend = pd.sum$YMAX[5]+0.1), color = "black", size = 2, 
+                   yend = pd.sum$YMAX[5]+0.1), color = "black", size = 1, 
                show.legend = F) +
   geom_segment(aes(x = 1, y = pd.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = pd.sum$YMAX[1]+0.1), color = "yellow", size = 1, 
+                   yend = pd.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
                show.legend = F) +
   geom_segment(aes(x = 2, y = pd.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = pd.sum$YMAX[2]+0.1), color = "yellow", size = 1, 
+                   yend = pd.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
                show.legend = F) +
   geom_segment(aes(x = 3, y = pd.sum$YMIN[3]-0.1, xend = 3, 
-                   yend = pd.sum$YMAX[3]+0.1), color = "yellow", size = 1, 
+                   yend = pd.sum$YMAX[3]+0.1), color = "white", size = 0.5, 
                show.legend = F) +
   geom_segment(aes(x = 4, y = pd.sum$YMIN[4]-0.1, xend = 4, 
-                   yend = pd.sum$YMAX[4]+0.1), color = "yellow", size = 1, 
+                   yend = pd.sum$YMAX[4]+0.1), color = "white", size = 0.5, 
                show.legend = F) +
   geom_segment(aes(x = 5, y = pd.sum$YMIN[5]-0.1, xend = 5, 
-                   yend = pd.sum$YMAX[5]+0.1), color = "yellow", size = 1, 
+                   yend = pd.sum$YMAX[5]+0.1), color = "white", size = 0.5, 
                show.legend = F) +
-  geom_point(data = pd.sum, aes(y= Mean), colour="black", size = 3, show.legend = F) +
-  geom_point(data = pd.sum, aes(y= Mean), colour="yellow", size = 2, 
+  geom_point(data = pd.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
+  geom_point(data = pd.sum, aes(y= Mean), colour="white", size = 0.5, 
              show.legend = F) +
   scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  scale_y_continuous(limits = c(0,50)) +
+  scale_y_continuous(limits = c(14,50), breaks = c(14,20,26,32,38,44,50)) +
   scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   ylab("Faith's Phylogenetic Diversity") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
-        strip.text = element_text(face="bold", size=16),
-        strip.text.x = element_text(face ="bold", size=16),
-        legend.title = element_text(face="bold", size=16),
-        panel.spacing = unit(0.5, "lines"),
-        axis.title.x = element_blank(),
-        axis.title.y = element_text(face="bold", size=16),
-        axis.text.x = element_text(size=13),
-        axis.text.y = element_text(size=13),
-        legend.text = element_text(size=14))
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6, vjust = 10,
+                                    margin = margin(t = 1, r = 10, b = -15, l = 1)),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6, angle = 50, hjust = 1, vjust = 1.05),
+        axis.text.y = element_text(size=6),
+        legend.position = "none") +
+  geom_text(data = pd.ann, aes(label=lab), x=c(1,2,3,4,5),
+            y=c(50,50,50,50,50), size=2, color="black")
 
 
 
 
         
 ### Plot MPD ###
+mpd.ann <- data.frame(lab = c("a", "a", "b", "b", "ab"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
+
 mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_violin() +
-  geom_jitter(size=2, width = 0.2) + 
   geom_segment(aes(x = 1, y = mpd.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = mpd.sum$YMAX[1]+0.1), color = "black", size = 2, 
+                   yend = mpd.sum$YMAX[1]+0.1), color = "black", size = 1, 
                show.legend = F) +
   geom_segment(aes(x = 2, y = mpd.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = mpd.sum$YMAX[2]+0.1), color = "black", size = 2, 
+                   yend = mpd.sum$YMAX[2]+0.1), color = "black", size = 1, 
                show.legend = F) +
   geom_segment(aes(x = 3, y = mpd.sum$YMIN[3]-0.1, xend = 3, 
-                   yend = mpd.sum$YMAX[3]+0.1), color = "black", size = 2, 
+                   yend = mpd.sum$YMAX[3]+0.1), color = "black", size = 1, 
                show.legend = F) +
   geom_segment(aes(x = 4, y = mpd.sum$YMIN[4]-0.1, xend = 4, 
-                   yend = mpd.sum$YMAX[4]+0.1), color = "black", size = 2, 
+                   yend = mpd.sum$YMAX[4]+0.1), color = "black", size = 1, 
                show.legend = F) +
   geom_segment(aes(x = 5, y = mpd.sum$YMIN[5]-0.1, xend = 5, 
-                   yend = mpd.sum$YMAX[5]+0.1), color = "black", size = 2, 
+                   yend = mpd.sum$YMAX[5]+0.1), color = "black", size = 1, 
                show.legend = F) +
   geom_segment(aes(x = 1, y = mpd.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = mpd.sum$YMAX[1]+0.1), color = "yellow", size = 1, 
+                   yend = mpd.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
                show.legend = F) +
   geom_segment(aes(x = 2, y = mpd.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = mpd.sum$YMAX[2]+0.1), color = "yellow", size = 1, 
+                   yend = mpd.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
                show.legend = F) +
   geom_segment(aes(x = 3, y = mpd.sum$YMIN[3]-0.1, xend = 3, 
-                   yend = mpd.sum$YMAX[3]+0.1), color = "yellow", size = 1, 
+                   yend = mpd.sum$YMAX[3]+0.1), color = "white", size = 0.5, 
                show.legend = F) +
   geom_segment(aes(x = 4, y = mpd.sum$YMIN[4]-0.1, xend = 4, 
-                   yend = mpd.sum$YMAX[4]+0.1), color = "yellow", size = 1, 
+                   yend = mpd.sum$YMAX[4]+0.1), color = "white", size = 0.5, 
                show.legend = F) +
   geom_segment(aes(x = 5, y = mpd.sum$YMIN[5]-0.1, xend = 5, 
-                   yend = mpd.sum$YMAX[5]+0.1), color = "yellow", size = 1, 
+                   yend = mpd.sum$YMAX[5]+0.1), color = "white", size = 0.5, 
                show.legend = F) +
-  geom_point(data = mpd.sum, aes(y= Mean), colour="black", size = 3, show.legend = F) +
-  geom_point(data = mpd.sum, aes(y= Mean), colour="yellow", size = 2, 
+  geom_point(data = mpd.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
+  geom_point(data = mpd.sum, aes(y= Mean), colour="white", size = 0.5, 
              show.legend = F) +
   scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(-12,6), breaks = c(-12,-6,0,6)) +
@@ -266,15 +269,16 @@ mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
-        strip.text = element_text(face="bold", size=16),
-        strip.text.x = element_text(face ="bold", size=16),
-        legend.title = element_text(face="bold", size=16),
-        panel.spacing = unit(0.5, "lines"),
-        axis.title.x = element_blank(),
-        axis.title.y = element_text(face="bold", size=16),
-        axis.text.x = element_text(size=13),
-        axis.text.y = element_text(size=13),
-        legend.text = element_text(size=14))
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6, vjust = 10,
+                                    margin = margin(t = 1, r = 10, b = -15, l = 1)),
+        axis.title.y = element_text(face="bold", size=6, vjust = -4),
+        axis.text.x = element_text(size=6, angle = 50, hjust = 1, vjust = 1.05),
+        axis.text.y = element_text(size=6),
+        legend.position = "none") +
+  geom_text(data = mpd.ann, aes(label=lab), x=c(1,2,3,4,5),
+            y=c(6,6,6,6,6), size=2, color="black")
 
         
 
@@ -413,6 +417,74 @@ shapiro.test(adiv$shannon)
 summary(aov(shannon ~ Group, data = adiv))
   # p-value = 0.847
 
+### Prepare data for plot
+shannon.sum <- adiv %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(shannon),
+            SE = se(shannon),
+            SD = sd(shannon),
+            Median = median(shannon))
+shannon.sum$YMAX <- shannon.sum$Mean + shannon.sum$SE
+shannon.sum$YMIN <- shannon.sum$Mean - shannon.sum$SE
+
+### Plot
+shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
+  geom_violin() +
+  geom_segment(aes(x = 1, y = shannon.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = shannon.sum$YMAX[1]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = shannon.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = shannon.sum$YMAX[2]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 3, y = shannon.sum$YMIN[3]-0.1, xend = 3, 
+                   yend = shannon.sum$YMAX[3]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 4, y = shannon.sum$YMIN[4]-0.1, xend = 4, 
+                   yend = shannon.sum$YMAX[4]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 5, y = shannon.sum$YMIN[5]-0.1, xend = 5, 
+                   yend = shannon.sum$YMAX[5]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 1, y = shannon.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = shannon.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = shannon.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = shannon.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_segment(aes(x = 3, y = shannon.sum$YMIN[3]-0.1, xend = 3, 
+                   yend = shannon.sum$YMAX[3]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_segment(aes(x = 4, y = shannon.sum$YMIN[4]-0.1, xend = 4, 
+                   yend = shannon.sum$YMAX[4]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_segment(aes(x = 5, y = shannon.sum$YMIN[5]-0.1, xend = 5, 
+                   yend = shannon.sum$YMAX[5]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_point(data = shannon.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
+  geom_point(data = shannon.sum, aes(y= Mean), colour="white", size = 0.5, 
+             show.legend = F) +
+  scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  scale_y_continuous(limits = c(1,6), breaks = c(1,2,3,4,5,6)) +
+  scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  ylab("Shannon Index") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        legend.title = element_text(face="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6, vjust = 10,
+                                    margin = margin(t = 1, r = 10, b = -15, l = 1)),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6, angle = 50, hjust = 1, vjust = 1.05),
+        axis.text.y = element_text(size=6),
+        legend.text = element_text(size=6),
+        legend.key.height = unit(3, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10)) +
+  annotate("text", x = 3, y = 6, label = "ns", size = 2)
+
+
 
 
 ########## Number of Unique OTUs ##########
@@ -449,14 +521,92 @@ pairwise.wilcox.test(uniq.otus$Unique_OTUs, uniq.otus$Group, p.adjust.method="fd
   # Torpor vs. Spring = 0.02078*
   # IBA vs. Spring = 0.09509
 
-##### Plot #####
-ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
-  geom_boxplot(position = position_dodge(1), outlier.shape = NA) +
-  geom_jitter(size=2, width = 0.2)
+### Prepare data for plot
+uniq.otus.sum <- uniq.otus %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Unique_OTUs),
+            SE = se(Unique_OTUs),
+            SD = sd(Unique_OTUs),
+            Median = median(Unique_OTUs))
+uniq.otus.sum$YMAX <- uniq.otus.sum$Mean + uniq.otus.sum$SE
+uniq.otus.sum$YMIN <- uniq.otus.sum$Mean - uniq.otus.sum$SE
+
+otu.ann <- data.frame(lab = c("a", "bd", "c", "cd", "de"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
+
+otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
+  geom_violin() +
+  geom_segment(aes(x = 1, y = uniq.otus.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = uniq.otus.sum$YMAX[1]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = uniq.otus.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = uniq.otus.sum$YMAX[2]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 3, y = uniq.otus.sum$YMIN[3]-0.1, xend = 3, 
+                   yend = uniq.otus.sum$YMAX[3]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 4, y = uniq.otus.sum$YMIN[4]-0.1, xend = 4, 
+                   yend = uniq.otus.sum$YMAX[4]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 5, y = uniq.otus.sum$YMIN[5]-0.1, xend = 5, 
+                   yend = uniq.otus.sum$YMAX[5]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 1, y = uniq.otus.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = uniq.otus.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = uniq.otus.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = uniq.otus.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_segment(aes(x = 3, y = uniq.otus.sum$YMIN[3]-0.1, xend = 3, 
+                   yend = uniq.otus.sum$YMAX[3]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_segment(aes(x = 4, y = uniq.otus.sum$YMIN[4]-0.1, xend = 4, 
+                   yend = uniq.otus.sum$YMAX[4]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_segment(aes(x = 5, y = uniq.otus.sum$YMIN[5]-0.1, xend = 5, 
+                   yend = uniq.otus.sum$YMAX[5]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_point(data = uniq.otus.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
+  geom_point(data = uniq.otus.sum, aes(y= Mean), colour="white", size = 0.5, 
+             show.legend = F) +
+  scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  scale_y_continuous(limits = c(200,1150), breaks = c(200, 500, 800, 1100)) +
+  scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  ylab("Number of Unique OTUs") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6, vjust = 10, 
+                                    margin = margin(t = 1, r = 10, b = -15, l = 1)),
+        axis.title.y = element_text(face="bold", size=6, vjust = -2),
+        axis.text.x = element_text(size=6, angle = 50, hjust = 1, vjust = 1.05),
+        axis.text.y = element_text(size=6),
+        legend.position = "none") +
+  geom_text(data = otu.ann, aes(label=lab), x=c(1,2,3,4,5),
+            y=c(1150,1150,1150,1150,1150), size=2, color="black")
 
 ```
 
-
+### Plot - PD, SES MPD, Alpha Div
+```{r}
+tiff("adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
+grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(otu.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+grid.text("B", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(pd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=2))
+grid.text("C", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=3),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(mpd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
+grid.text("D", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
+dev.off()
+```
 
 ### Beta Diversity
 ```{r}
