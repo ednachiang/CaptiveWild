@@ -106,7 +106,7 @@ pd.df <- data.frame(pd.res)
 # Calculate MPD (Mean Pairwise Distance)
 pd.dist <- cophenetic(phy_tree(physeq))
   # Calculate cophenetic distance
-#ses.mpd.res <- ses.mpd(t(data.frame(otu_table(physeq))), pd.dist, null.model = "taxa.labels", abundance.weighted = F, runs = 999)
+ses.mpd.res <- ses.mpd(t(data.frame(otu_table(physeq))), pd.dist, null.model = "taxa.labels", abundance.weighted = F, runs = 999)
   # Calculate MPD
   # This'll take a while to run-- be patient
 #save(ses.mpd.res, file = "mpd.RData")
@@ -290,12 +290,12 @@ hist(pd.ready$Stat, breaks=10)
 qqnorm(pd.ready$Stat)
 qqline(pd.ready$Stat)
 shapiro.test(pd.ready$Stat)
-  # p-value = 0.02173
+  # p-value = 0.0003125
   # Not Normal
 
 # Female vs. Male
 kruskal.test(formula = Stat ~ Sex, data = pd.ready)
-  # p-value = 0.06398
+  # p-value = 0.2129
 
 # Subset out groups
 pd.wild <- pd.ready[which(pd.ready$Group == "Summer_Wild"),]
@@ -319,9 +319,7 @@ pd.wp <- rbind(pd.wild, pd.spr)
 
 # Run Kruskal-Wallis
 kruskal.test(formula = Stat ~ Group, data = pd.ready)
-  # p-value = 5.983e-06
-kruskalmc(resp = Stat ~ Group, data = pd.ready)
-  # p-value = 0.05
+  # p-value = 5.833e-06
 kruskal.test(formula = Stat ~ Group, data = pd.ws)
   # Summer Wild vs. Summer Lab
   # p-value = 0.0002831     
@@ -330,41 +328,42 @@ kruskal.test(formula = Stat ~ Group, data = pd.st)
   # p-value = 0.001414
 kruskal.test(formula = Stat ~ Group, data = pd.si)
   # Summer vs. IBA
-  # p-value = 0.0006752
+  # p-value = 0.001944
 kruskal.test(formula = Stat ~ Group, data = pd.sp)
   # Summer vs. Spring
-  # p-value = 0.06121
+  # p-value = 0.2758
 kruskal.test(formula = Stat ~ Group, data = pd.ti)
   # Torpor vs. IBA
-  # p-value = 0.6217
+  # p-value = 0.9563
 kruskal.test(formula = Stat ~ Group, data = pd.tp)
   # Torpor vs. Spring
-  # p-value = 0.409
+  # p-value = 0.03481
 kruskal.test(formula = Stat ~ Group, data = pd.ip)
   # IBA vs. Spring
-  # p-value = 0.3583
+  # p-value = 0.05783
 kruskal.test(formula = Stat ~ Group, data = pd.wt)
   # Summer Wild vs. Torpor
   # p-value = 0.0004888
 kruskal.test(formula = Stat ~ Group, data = pd.wi)
   # Summer Wild vs. IBA
-  # p-value = 0.0001828    
+  # p-value = 0.0002566    
 kruskal.test(formula = Stat ~ Group, data = pd.wp)
   # Summer Wild vs. Spring
-  # p-value = 0.001194   
+  # p-value = 0.0027 
 
 # Adjust p-values
-p.adjust(c(0.0002831, 0.001414, 0.0006752, 0.06121, 0.6217, 0.409, 0.3583, 0.0004888, 0.0001828, 0.001194), method = "fdr")
-  # Summer Wild vs. Summer Lab = 0.001415500*
-  # Summer Lab vs. Torpor = 0.002356667*
-  # Summer Lab vs. IBA = 0.001688000*
-  # Summer Lab vs. Spring = 0.087442857
-  # Torpor vs. IBA = 0.621700000
-  # Torpor vs. Spring = 0.454444444
-  # IBA vs. Spring = 0.447875000
-  # Summer Wild vs. Torpor = 0.001629333*
-  # Summer Wild vs. IBA = 0.001415500*
-  # Summer Wild vs. Spring = 0.002356667*
+p.adjust(c(0.0002831, 0.001414, 0.001944, 0.2758, 0.9563, 0.03481, 0.05783, 0.0004888, 0.0002566, 0.0027), method = "fdr")
+  # Summer Wild vs. Summer Lab = 0.0014155*
+  # Summer Lab vs. Torpor = 0.003535*
+  # Summer Lab vs. IBA = 0.003888*
+  # Summer Lab vs. Spring = 0.30644
+  # Torpor vs. IBA = 0.9563
+  # Torpor vs. Spring = 0.049728571*
+  # IBA vs. Spring = 0.0722875
+  # Summer Wild vs. Torpor = 0.00162933*
+  # Summer Wild vs. IBA = 0.0014155*
+  # Summer Wild vs. Spring = 0.0045*
+
 
  
 
@@ -373,27 +372,27 @@ hist(mpd.ready$Stat, breaks=10)
 qqnorm(mpd.ready$Stat)
 qqline(mpd.ready$Stat)
 shapiro.test(mpd.ready$Stat)
-  # p-value = 0.3692
+  # p-value = 0.1952
   # Normal
 
 # Female vs. Male
 wilcox.test(formula = Stat ~ Sex, data = mpd.ready)
-  # p-value = 0.1181
+  # p-value = 0.1632
 
 # Run ANOVA
 summary(aov(Stat ~ Group, data = mpd.ready))
-  # p-value = 3.17e-07
+  # p-value = 2.78e-07
 TukeyHSD(aov(Stat ~ Group, data = mpd.ready))
-  # Summer_Lab-Summer_Wild = 0.9578688
-  # Torpor-Summer_Wild = 0.0005115*
-  # IBA-Summer_Wild = 0.0138100*
-  # Spring-Summer_Wild = 0.4788400
-  # Torpor-Summer_Lab = 0.0000011*
-  # IBA-Summer_Lab = 0.0000533*
-  # Spring-Summer_Lab = 0.0740687
-  # IBA-Torpor = 0.5130325
-  # Spring-Torpor = 0.0609899
-  # Spring-IBA = 0.5610479
+  # Summer_Lab-Summer_Wild = 0.9488331
+  # Torpor-Summer_Wild = 0.0006378*
+  # IBA-Summer_Wild = 0.0071398*
+  # Spring-Summer_Wild = 0.4584299
+  # Torpor-Summer_Lab = 0.0000015*
+  # IBA-Summer_Lab = 0.0000243*
+  # Spring-Summer_Lab = 0.0825831
+  # IBA-Torpor = 0.7890777
+  # Spring-Torpor = 0.1584833
+  # Spring-IBA = 0.5855451
 
 
 ```
@@ -413,7 +412,7 @@ hist(adiv$chao, breaks=10)
 qqnorm(adiv$chao)
 qqline(adiv$chao)
 shapiro.test(adiv$chao)
-  # p-value = 0.0009435
+  # p-value = 0.003256
   # Not Normal
 hist(adiv.sum2$chao, breaks=10)
 qqnorm(adiv.sum2$chao)
@@ -425,15 +424,15 @@ hist(adiv.lab$chao, breaks=10)
 qqnorm(adiv.lab$chao)
 qqline(adiv.lab$chao)
 shapiro.test(adiv.lab$chao)
-  # p-value = 0.001807
+  # p-value = 0.007034
   # Not Normal
 
 kruskal.test(formula = chao ~ Group, data = adiv)
-  # p-value = 0.5511
+  # p-value = 0.6918
 t.test(chao ~ Group, data = adiv.sum2)
   # p-value = 0.5267
 kruskal.test(formula = chao ~ Group, data = adiv.lab)
-  # p-value = 0.4158
+  # p-value = 0.5676
 
 
 
@@ -443,7 +442,7 @@ hist(adiv$shannon, breaks=10)
 qqnorm(adiv$shannon)
 qqline(adiv$shannon)
 shapiro.test(adiv$shannon)
-  # p-value = 0.3399
+  # p-value = 0.2932
   # Normal
 hist(adiv.sum2$shannon, breaks=10)
 qqnorm(adiv.sum2$shannon)
@@ -455,16 +454,16 @@ hist(adiv.lab$shannon, breaks=10)
 qqnorm(adiv.lab$shannon)
 qqline(adiv.lab$shannon)
 shapiro.test(adiv.lab$shannon)
-  # p-value = 0.4406
+  # p-value = 0.4766
   # Normal
 
 
 summary(aov(shannon ~ Group, data = adiv))
-  # p-value = 0.702
+  # p-value = 0.847
 t.test(shannon ~ Group, data = adiv.sum2)
   # p-value = 0.6984
 summary(aov(shannon ~ Group, data = adiv.lab))
-  # p-value = 0.52
+  # p-value = 0.698
 
 
 
@@ -474,7 +473,7 @@ hist(adiv$invsimpson, breaks=10)
 qqnorm(adiv$invsimpson)
 qqline(adiv$invsimpson)
 shapiro.test(adiv$invsimpson)
-  # p-value = 1.72e-05
+  # p-value = 7.106e-05
   # Not Normal
 hist(adiv.sum2$invsimpson, breaks=10)
 qqnorm(adiv.sum2$invsimpson)
@@ -486,15 +485,15 @@ hist(adiv.lab$invsimpson, breaks=10)
 qqnorm(adiv.lab$invsimpson)
 qqline(adiv.lab$invsimpson)
 shapiro.test(adiv.lab$invsimpson)
-  # p-value = 1.403e-05
+  # p-value = 6.15e-05
   # Not Normal
 
 kruskal.test(formula = invsimpson ~ Group, data = adiv)
-  # p-value = 0.4375
+  # p-value = 0.5912
 wilcox.test(invsimpson ~ Group, data = adiv.sum2)
   # p-value = 0.6796
 kruskal.test(formula = invsimpson ~ Group, data = adiv.lab)
-  # p-value = 0.3069
+  # p-value = 0.4772
 
 
 
@@ -518,7 +517,7 @@ ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
 ########## Unweighted UniFrac ##########
 UF.u <- phyloseq::distance(physeq = physeq, method = "unifrac")
 UF.u.pcoa <- ordinate(physeq = physeq, method = "PCoA", distance = "unifrac")
-  # Variation explained = 22.8%
+  # Variation explained = 22.4%
 
 plot_ordination(physeq = physeq, ordination = UF.u.pcoa, axes = c(1,2),
                 title = "Unweighted UniFrac") +
@@ -530,10 +529,9 @@ sampdf <- data.frame(sample_data(physeq))
 beta.tax <- betadisper(d=UF.u, group=sampdf$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.012
+  # p-value = 0.001
 anosim(UF.u, sampdf$Group, permutations = 9999)
   # p-value = 1e-04 
-  # R = 
 
 
 
@@ -558,7 +556,7 @@ p <- permutest(beta.tax)
 p$tab
   # p-value = 0.001
 anosim(ws.u, sampdf.ws$Group, permutations = 9999)
-  # p-value = 3e-04 
+  # p-value = 2e-04
 
 # Summer Lab vs Torpor
 st.u <- phyloseq::distance(physeq = phy.st, method = "unifrac")
@@ -566,10 +564,8 @@ sampdf.st<- data.frame(sample_data(phy.st))
 beta.tax <- betadisper(d=st.u, group=sampdf.st$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.223
+  # p-value = 0.19
 anosim(st.u, sampdf.st$Group, permutations = 9999)
-  # p-value = 1e-04
-adonis(st.u ~ Group, data = sampdf.st, permutations = 9999)
   # p-value = 1e-04
 
 # Summer Lab vs IBA
@@ -578,10 +574,8 @@ sampdf.si<- data.frame(sample_data(phy.si))
 beta.tax <- betadisper(d=si.u, group=sampdf.si$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.916
+  # p-value = 0.105
 anosim(si.u, sampdf.si$Group, permutations = 9999)
-  # p-value = 1e-04
-adonis(si.u ~ Group, data = sampdf.si, permutations = 9999)
   # p-value = 1e-04
 
 # Summer Lab vs Spring
@@ -590,11 +584,9 @@ sampdf.sp<- data.frame(sample_data(phy.sp))
 beta.tax <- betadisper(d=sp.u, group=sampdf.sp$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.595
+  # p-value = 0.008
 anosim(sp.u, sampdf.sp$Group, permutations = 9999)
-  # p-value = 0.086
-adonis(sp.u ~ Group, data = sampdf.sp, permutations = 9999)
-  # p-value = 0.0033
+  # p-value = 0.5597
 
 # Torpor vs IBA
 ti.u <- phyloseq::distance(physeq = phy.ti, method = "unifrac")
@@ -602,11 +594,9 @@ sampdf.ti<- data.frame(sample_data(phy.ti))
 beta.tax <- betadisper(d=ti.u, group=sampdf.ti$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.426
+  # p-value = 0.6
 anosim(ti.u, sampdf.ti$Group, permutations = 9999)
-  # p-value = 0.287
-adonis(ti.u ~ Group, data = sampdf.ti, permutations = 9999)
-  # p-value = 0.0391
+  # p-value = 0.1113
 
 # Torpor vs Spring
 tp.u <- phyloseq::distance(physeq = phy.tp, method = "unifrac")
@@ -614,11 +604,9 @@ sampdf.tp<- data.frame(sample_data(phy.tp))
 beta.tax <- betadisper(d=tp.u, group=sampdf.tp$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.309
+  # p-value = 0.02
 anosim(tp.u, sampdf.tp$Group, permutations = 9999)
-  # p-value = 6e-04
-adonis(tp.u ~ Group, data = sampdf.tp, permutations = 9999)
-  # p-value = 3e-04
+  # p-value = 0.0027
 
 # IBA vs Spring
 ip.u <- phyloseq::distance(physeq = phy.ip, method = "unifrac")
@@ -626,11 +614,10 @@ sampdf.ip<- data.frame(sample_data(phy.ip))
 beta.tax <- betadisper(d=ip.u, group=sampdf.ip$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.72
+  # p-value = 0.262
 anosim(ip.u, sampdf.ip$Group, permutations = 9999)
-  # p-value = 0.0407
-adonis(ip.u ~ Group, data = sampdf.ip, permutations = 9999)
-  # p-value = 0.0131
+  # p-value = 0.0157
+
 
 # Summer Wild vs. Torpor
 wt.u <- phyloseq::distance(physeq = phy.wt, method = "unifrac")
@@ -640,7 +627,7 @@ p <- permutest(beta.tax)
 p$tab
   # p-value = 0.001
 anosim(wt.u, sampdf.wt$Group, permutations = 9999)
-  # p-value = 1e-04 
+  # p-value = 2e-04 
 
 # Summer Wild vs. IBA
 wi.u <- phyloseq::distance(physeq = phy.wi, method = "unifrac")
@@ -648,9 +635,9 @@ sampdf.wi<- data.frame(sample_data(phy.wi))
 beta.tax <- betadisper(d=wi.u, group=sampdf.wi$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.014
+  # p-value = 0.008
 anosim(wi.u, sampdf.wi$Group, permutations = 9999)
-  # p-value = 2e-04 
+  # p-value = 1e-04 
 
 # Summer Wild vs. Spring
 wp.u <- phyloseq::distance(physeq = phy.wp, method = "unifrac")
@@ -658,25 +645,39 @@ sampdf.wp<- data.frame(sample_data(phy.wp))
 beta.tax <- betadisper(d=wp.u, group=sampdf.wp$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.014
+  # p-value = 0.01
 anosim(wp.u, sampdf.wp$Group, permutations = 9999)
-  # p-value = 3e-04 
-
-# Adjust p-values
-p.adjust(c(3e-04, 1e-04, 1e-04, 0.086, 0.287, 6e-04, 0.0407, 1e-04 , 2e-04, 3e-04), method = "fdr")
-  # Summer Wild vs. Summer Lab = 0.0005000000*
-  # Summer Lab vs. Torpor = 0.0003333333*
-  # Summer Lab vs. IBA = 0.0003333333*
-  # Summer Lab vs. Spring = 0.0955555556
-  # Torpor vs. IBA = 0.2870000000
-  # Torpor vs. Spring = 0.0008571429*
-  # IBA vs. Spring = 0.0508750000 
-  # Summer Wild vs. Torpor = 0.0003333333*
-  # Summer Wild vs. IBA = 0.0005000000*
-  # Summer Wild vs. Spring = 0.0005000000*
+  # p-value = 8e-04 
 
 
+# Adjust betadisper p-values
+p.adjust(c(0.001, 0.19, 0.105, 0.008, 0.6, 0.02, 0.262, 0.001, 0.008, 0.01),
+         method = "fdr")
+  # Summer Wild vs. Summer Lab = 0.005*
+  # Summer Lab vs. Torpor = 0.2375
+  # Summer Lab vs. IBA = 0.15
+  # Summer Lab vs. Spring = 0.02*
+  # Torpor vs. IBA = 0.6
+  # Torpor vs. Spring = 0.033*
+  # IBA vs. Spring = 0.2911
+  # Summer Wild vs. Torpor = 0.005*
+  # Summer Wild vs. IBA = 0.02*
+  # Summer Wild vs. Spring = 0.02*
 
+
+# Adjust ANOSIM p-values
+p.adjust(c(2e-04, 1e-04, 1e-04, 0.5597, 0.1113, 0.0027, 0.0157, 2e-04, 1e-04, 8e-04),
+         method = "fdr")
+  # Summer Wild vs. Summer Lab = 0.0004*
+  # Summer Lab vs. Torpor = 0.00033*
+  # Summer Lab vs. IBA = 0.00033*
+  # Summer Lab vs. Spring = 0.5597
+  # Torpor vs. IBA = 0.123667
+  # Torpor vs. Spring = 0.0038571429*
+  # IBA vs. Spring = 0.019625
+  # Summer Wild vs. Torpor = 0.0004*
+  # Summer Wild vs. IBA = 0.00033*
+  # Summer Wild vs. Spring = 0.0013*
 
 
 
@@ -700,7 +701,7 @@ sampdf <- data.frame(sample_data(physeq))
 beta.tax <- betadisper(d=UF.w, group=sampdf$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.035
+  # p-value = 0.01
 anosim(UF.w, sampdf$Group, permutations = 9999)
   # p-value = 1e-04 
 
@@ -725,9 +726,9 @@ sampdf.ws<- data.frame(sample_data(phy.ws))
 beta.tax <- betadisper(d=ws.w, group=sampdf.ws$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.003
+  # p-value = 0.002
 anosim(ws.w, sampdf.ws$Group, permutations = 9999)
-  # p-value = 0.0022
+  # p-value = 0.0019
 
 # Summer Lab vs Torpor
 st.w <- phyloseq::distance(physeq = phy.st, method = "wunifrac")
@@ -735,11 +736,10 @@ sampdf.st<- data.frame(sample_data(phy.st))
 beta.tax <- betadisper(d=st.w, group=sampdf.st$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.927
+  # p-value = 0.935
 anosim(st.w, sampdf.st$Group, permutations = 9999)
   # p-value = 1e-04
-adonis(st.w ~ Group, data = sampdf.st, permutations = 9999)
-  # p-value = 1e-04
+
 
 # Summer Lab vs IBA
 si.w <- phyloseq::distance(physeq = phy.si, method = "wunifrac")
@@ -747,11 +747,10 @@ sampdf.si<- data.frame(sample_data(phy.si))
 beta.tax <- betadisper(d=si.w, group=sampdf.si$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.765
+  # p-value = 0.511
 anosim(si.w, sampdf.si$Group, permutations = 9999)
   # p-value = 1e-04
-adonis(si.w ~ Group, data = sampdf.si, permutations = 9999)
-  # p-value = 1e-04
+
 
 # Summer Lab vs Spring
 sp.w <- phyloseq::distance(physeq = phy.sp, method = "wunifrac")
@@ -761,9 +760,8 @@ p <- permutest(beta.tax)
 p$tab
   # p-value = 0.272
 anosim(sp.w, sampdf.sp$Group, permutations = 9999)
-  # p-value = 0.0058
-adonis(sp.w ~ Group, data = sampdf.sp, permutations = 9999)
-  # p-value = 0.0038
+  # p-value = 0.0385
+
 
 # Torpor vs IBA
 ti.w <- phyloseq::distance(physeq = phy.ti, method = "wunifrac")
@@ -771,11 +769,9 @@ sampdf.ti<- data.frame(sample_data(phy.ti))
 beta.tax <- betadisper(d=ti.w, group=sampdf.ti$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.851
+  # p-value = 0.483
 anosim(ti.w, sampdf.ti$Group, permutations = 9999)
-  # p-value = 0.3572
-adonis(ti.w ~ Group, data = sampdf.ti, permutations = 9999)
-  # p-value = 0.1585
+  # p-value = 0.7023
 
 # Torpor vs Spring
 tp.w <- phyloseq::distance(physeq = phy.tp, method = "wunifrac")
@@ -783,10 +779,8 @@ sampdf.tp<- data.frame(sample_data(phy.tp))
 beta.tax <- betadisper(d=tp.w, group=sampdf.tp$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.356
+  # p-value = 0.128
 anosim(tp.w, sampdf.tp$Group, permutations = 9999)
-  # p-value = 1e-04
-adonis(tp.w ~ Group, data = sampdf.tp, permutations = 9999)
   # p-value = 1e-04
 
 # IBA vs Spring
@@ -795,11 +789,9 @@ sampdf.ip<- data.frame(sample_data(phy.ip))
 beta.tax <- betadisper(d=ip.w, group=sampdf.ip$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.413
+  # p-value = 0.292
 anosim(ip.w, sampdf.ip$Group, permutations = 9999)
   # p-value = 1e-04
-adonis(ip.w ~ Group, data = sampdf.ip, permutations = 9999)
-  # p-value = 2e-04
 
 # Summer Wild vs. Torpor
 wt.w <- phyloseq::distance(physeq = phy.wt, method = "wunifrac")
@@ -807,7 +799,7 @@ sampdf.wt<- data.frame(sample_data(phy.wt))
 beta.tax <- betadisper(d=wt.w, group=sampdf.wt$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.004
+  # p-value = 0.005
 anosim(wt.w, sampdf.wt$Group, permutations = 9999)
   # p-value = 1e-04 
 
@@ -817,7 +809,7 @@ sampdf.wi<- data.frame(sample_data(phy.wi))
 beta.tax <- betadisper(d=wi.w, group=sampdf.wi$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.005
+  # p-value = 0.007
 anosim(wi.w, sampdf.wi$Group, permutations = 9999)
   # p-value = 1e-04
 
@@ -827,28 +819,45 @@ sampdf.wp<- data.frame(sample_data(phy.wp))
 beta.tax <- betadisper(d=wp.w, group=sampdf.wp$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.03
+  # p-value = 0.151
 anosim(wp.w, sampdf.wp$Group, permutations = 9999)
-  # p-value = 4e-04 
+  # p-value = 8e-04 
 
-# Adjust p-values
-p.adjust(c(0.0022, 1e-04, 1e-04, 0.0058, 0.3572, 1e-04, 1e-04, 1e-04, 1e-04, 4e-04), method = "fdr")
-  # Summer Wild vs. Summer Lab = 0.0027500000*
-  # Summer Lab vs. Torpor = 0.0001666667*
-  # Summer Lab vs. IBA = 0.0001666667*
-  # Summer Lab vs. Spring = 0.0064444444*
-  # Torpor vs. IBA = 0.3572000000
-  # Torpor vs. Spring = 0.0001666667*
-  # IBA vs. Spring = 0.0001666667*
-  # Summer Wild vs. Torpor = 0.0001666667*
-  # Summer Wild vs. IBA = 0.0001666667*
-  # Summer Wild vs. Spring = 0.0005714286*
+
+# Adjust betadisper p-values
+p.adjust(c(0.002, 0.935, 0.511, 0.272, 0.483, 0.128, 0.292, 0.005, 0.007, 0.151),
+         method = "fdr")
+  # Summer Wild vs. Summer Lab = 0.02*
+  # Summer Lab vs. Torpor = 0.935
+  # Summer Lab vs. IBA = 0.56778
+  # Summer Lab vs. Spring = 0.41714286
+  # Torpor vs. IBA = 0.56778
+  # Torpor vs. Spring = 0.302
+  # IBA vs. Spring = 0.41714286
+  # Summer Wild vs. Torpor = 0.0233*
+  # Summer Wild vs. IBA = 0.0233*
+  # Summer Wild vs. Spring = 0.302
+
+# Adjust ANOSIM p-values
+p.adjust(c(0.0019, 1e-04, 1e-04, 0.0385, 0.7023, 1e-04, 1e-04, 1e-04, 1e-04, 8e-04),
+         method = "fdr")
+  # Summer Wild vs. Summer Lab = 0.002375*
+  # Summer Lab vs. Torpor = 0.0001667*
+  # Summer Lab vs. IBA = 0.0001667*
+  # Summer Lab vs. Spring = 0.042778*
+  # Torpor vs. IBA = 0.7023
+  # Torpor vs. Spring = 0.0001667*
+  # IBA vs. Spring = 0.0001667*
+  # Summer Wild vs. Torpor = 0.0001667*
+  # Summer Wild vs. IBA = 0.0001667*
+  # Summer Wild vs. Spring = 0.0011428571*
+
 
 
 ```
 
 
-### Simper - Lab squirrels
+### Simper
 ```{r}
 # Change Group names to be compatible (no "_")
 sum.rename <- data.frame(sample_data(physeq))
@@ -860,11 +869,6 @@ sum.rename$GroupRename[which(sum.rename$Group == "IBA")] <- "IBA"
 sum.rename$GroupRename[which(sum.rename$Group == "Spring")] <- "Spring"
 sum.rename$GroupRename <- ordered(sum.rename$GroupRename, levels = c("SummerWild", "SummerLab", "Torpor", "IBA", "Spring"))
 physeq.simp <- merge_phyloseq(otu_table(physeq), sample_data(sum.rename), tax_table(physeq))
-
-
-
-
-
 
 
 # Group
@@ -904,384 +908,31 @@ wild.otu <- data.frame(otu_table(physeq.wild))
 wild.core <- apply(wild.otu, 1, function(row) all(row != 0))
 wild.core <- wild.otu[wild.core,]
 phy.wild.core <- merge_phyloseq(otu_table(wild.core, taxa_are_rows = T), tax_table(physeq.wild), sample_data(physeq.wild))
+  # 237 OTUs
 
 sum.otu <- data.frame(otu_table(physeq.sum))
 sum.core <- apply(sum.otu, 1, function(row) all(row != 0))
 sum.core <- sum.otu[sum.core,]
 phy.sum.core <- merge_phyloseq(otu_table(sum.core, taxa_are_rows = T), tax_table(physeq.sum), sample_data(physeq.sum))
+  # 28 OTUs
 
 tor.otu <- data.frame(otu_table(physeq.tor))
 tor.core <- apply(tor.otu, 1, function(row) all(row != 0))
 tor.core <- tor.otu[tor.core,]
 phy.tor.core <- merge_phyloseq(otu_table(tor.core, taxa_are_rows = T), tax_table(physeq.tor), sample_data(physeq.tor))
+  # 47 OTUs
 
 iba.otu <- data.frame(otu_table(physeq.iba))
 iba.core <- apply(iba.otu, 1, function(row) all(row != 0))
 iba.core <- iba.otu[iba.core,]
 phy.iba.core <- merge_phyloseq(otu_table(iba.core, taxa_are_rows = T), tax_table(physeq.iba), sample_data(physeq.iba))
+  # 48 OTUs
 
 spr.otu <- data.frame(otu_table(physeq.spr))
 spr.core <- apply(spr.otu, 1, function(row) all(row != 0))
 spr.core <- spr.otu[spr.core,]
 phy.spr.core <- merge_phyloseq(otu_table(spr.core, taxa_are_rows = T), tax_table(physeq.spr), sample_data(physeq.spr))
-```
-### Examine Phyla
-```{r}
-### Phyla in Wild
-#physeq.wild.phy <- tax_glom(physeq.wild, taxrank = "Phylum")
-#physeq.wild.phy.ra <- transform_sample_counts(physeq.wild.phy, function(x){(x/sum(x))*100})
-#rem <- names(which(taxa_sums(physeq.wild) > 10))
-#physeq.wild.trim <- prune_taxa(rem, physeq.wild)
-#physeq.wild.ra <- transform_sample_counts(physeq.wild.trim, function(x){(x/sum(x))*100})
-#wild.taxa.sum <- taxa_sums(physeq.wild.ra)
-#wild.taxa.sum <- sort(wild.taxa.sum, decreasing = T)
-
-### Phyla in Summer Lab
-#physeq.sum.phy <- tax_glom(physeq.sum, taxrank = "Phylum")
-#physeq.sum.phy.ra <- transform_sample_counts(physeq.sum.phy, function(x){(x/sum(x))*100})
-#rem <- names(which(taxa_sums(physeq.sum) > 10))
-#physeq.sum.trim <- prune_taxa(rem, physeq.sum)
-#physeq.sum.ra <- transform_sample_counts(physeq.sum.trim, function(x){(x/sum(x))*100})
-#sum.taxa.sum <- taxa_sums(physeq.sum.ra)
-#sum.taxa.sum <- sort(sum.taxa.sum, decreasing = T)
-
-# Create rank abundance of phyla
-#barplot(sort(taxa_sums(physeq.wild.phy.ra),TRUE)[1:20]/nsamples(physeq.wild.phy.ra),las=2,cex.axis=.7)
-  # Firmicutes, Bacteroidetes, Cyano, Verruco, Unclassified, Proteobacteria, Tenericutes, Elusimicrobia, Actinobacteria Spirochaetae
-#barplot(sort(taxa_sums(physeq.sum.phy.ra),TRUE)[1:20]/nsamples(physeq.sum.phy.ra),las=2,cex.axis=.7)
-  # Firmicutes, Bacteroidetes, Verrucomicrobia, Proteobacteria, Unclassified, Tenericutes, Cyanobacteria, Actinobacteria, Elusimicrobia, Spirochaetae
-
-# Subset summer samples
-physeq.sum.diet <- subset_samples(physeq.rem, Season == "Summer")
-physeq.diet.phy <- tax_glom(physeq.sum.diet, taxrank = "Phylum")
-physeq.diet.phy.ra <- transform_sample_counts(physeq.diet.phy, function(x){(x/sum(x))*100})
-
-# Summarize data
-diet.phy.df <- psmelt(physeq.diet.phy.ra)
-diet.phy.df$Phylum <- ordered(diet.phy.df$Phylum, levels=c("Firmicutes", "Bacteroidetes", "Cyanobacteria", "Verrucomicrobia", "Unclassified", "Proteobacteria", "Tenericutes", "Elusimicrobia", "Actinobacteria", "Spirochaetae"))
-diet.phy.df$Phylum[which(is.na(diet.phy.df$Phylum))] <- rep("Unclassified", length(which(is.na(diet.phy.df$Phylum))))
-diet.phy.sum <- diet.phy.df %>%
-  group_by(Phylum, Group) %>%
-  summarize(Mean = mean(Abundance),
-            SD = sd(Abundance),
-            SE = se(Abundance))
-wild <- which(diet.phy.sum$Group == "Summer_Wild")
-lab <- which(diet.phy.sum$Group == "Summer_Lab")
-diet.phy.sum$Group <- ordered(diet.phy.sum$Group, levels=c("Wild", "Captive"))
-diet.phy.sum$Group[wild] <- rep("Wild", length(wild))
-diet.phy.sum$Group[lab] <- rep("Captive", length(lab))
-
-
-### Barplot ###
-#tiff("diet.phyla.tiff", width = 10, height = 5, units = "in", res = 600)
-ggplot(diet.phy.sum, aes(x=Phylum, y=Mean, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  geom_errorbar(aes(ymax=Mean + SE, ymin=Mean - SE), width=0.25) +
-  facet_grid(. ~ Group) +
-  scale_fill_brewer(palette="Set1") +
-  xlab("Phyla") +
-  ylab("Mean Relative Abundance of Phyla (%)\n") +
-  scale_y_continuous(limits = c(0, 70), breaks = c(0, 10, 20, 30, 40, 50, 60, 70), expand = c(0,0)) +
-  theme(panel.grid.major = element_blank(),
-      panel.grid.minor = element_blank(),
-      panel.spacing=unit(1, "lines"),
-      axis.title = element_text(size=18, face="bold"),
-      strip.text.x = element_text(size=18, face = "bold"),
-      strip.text.y = element_text(size=18),
-      strip.background = element_blank(),
-      axis.text.y = element_text(size=18),
-      legend.title = element_text(size=18, face="bold"),
-      legend.text = element_text(size=18),
-      axis.ticks.x=element_blank(),
-      axis.text.x = element_blank(),
-      title = element_text(size=16, face="bold"))
-#dev.off()
-
-
-
-
-
-
-### Firmicutes
-fir.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Firmicutes")
-fir.df <- data.frame(sample_data(fir.phy))
-fir.df$RelAbund <- t(data.frame(otu_table(fir.phy)))
-
-# Test normality
-hist(fir.df$RelAbund, breaks=10)
-qqnorm(fir.df$RelAbund)
-qqline(fir.df$RelAbund)
-shapiro.test(fir.df$RelAbund)
-  # p-value = 0.2635
-  # Normal
-
-t.test(RelAbund ~ Group, data=fir.df)
-  # p-value = 0.9019
-
-
-### Bacteroidetes
-bac.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Bacteroidetes")
-bac.df <- data.frame(sample_data(bac.phy))
-bac.df$RelAbund <- t(data.frame(otu_table(bac.phy)))
-
-# Test normality
-hist(bac.df$RelAbund, breaks=10)
-qqnorm(bac.df$RelAbund)
-qqline(bac.df$RelAbund)
-shapiro.test(bac.df$RelAbund)
-  # p-value = 0.4768
-  # Normal
-
-t.test(RelAbund ~ Group, data=bac.df)
-  # p-value = 0.4279
-
-
-
-### Cyanobacteria
-cya.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Cyanobacteria")
-cya.df <- data.frame(sample_data(cya.phy))
-cya.df$RelAbund <- t(data.frame(otu_table(cya.phy)))
-
-# Test normality
-hist(cya.df$RelAbund, breaks=10)
-qqnorm(cya.df$RelAbund)
-qqline(cya.df$RelAbund)
-shapiro.test(cya.df$RelAbund)
-  # p-value = 0.01417
-  # Not Normal
-
-# correct = F to address error ("cannot compute exact p-value with ties"
-# http://courses.atlas.illinois.edu/spring2016/STAT/STAT200/RProgramming/NonParametricStats.html
-wilcox.test(RelAbund ~ Group, data=cya.df, correct=F, alternative = "greater")
-  # p-value = 0.0004523
-
-
-### Verrucomicrobia
-ver.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Verrucomicrobia")
-ver.df <- data.frame(sample_data(ver.phy))
-ver.df$RelAbund <- t(data.frame(otu_table(ver.phy)))
-
-# Test normality
-hist(ver.df$RelAbund, breaks=10)
-qqnorm(ver.df$RelAbund)
-qqline(ver.df$RelAbund)
-shapiro.test(ver.df$RelAbund)
-  # p-value = 1.939e-06
-  # Not Normal
-
-wilcox.test(RelAbund ~ Group, data=ver.df)
-  # p-value = 0.7325
-
-
-### Proteobacteria
-pro.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Proteobacteria")
-pro.df <- data.frame(sample_data(pro.phy))
-pro.df$RelAbund <- t(data.frame(otu_table(pro.phy)))
-
-# Test normality
-hist(pro.df$RelAbund, breaks=10)
-qqnorm(pro.df$RelAbund)
-qqline(pro.df$RelAbund)
-shapiro.test(pro.df$RelAbund)
-  # p-value = 0.04623
-  # Not Normal
-
-wilcox.test(RelAbund ~ Group, data=pro.df)
-  # p-value = 0.2161
-
-
-### Tenericutes
-ten.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Tenericutes")
-ten.df <- data.frame(sample_data(ten.phy))
-ten.df$RelAbund <- t(data.frame(otu_table(ten.phy)))
-
-# Test normality
-hist(ten.df$RelAbund, breaks=10)
-qqnorm(ten.df$RelAbund)
-qqline(ten.df$RelAbund)
-shapiro.test(ten.df$RelAbund)
-  # p-value = 0.01142
-  # Not Normal
-
-wilcox.test(RelAbund ~ Group, data=ten.df, correct=F)
-  # p-value = 0.266
-
-
-### Elusimicrobia
-elu.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Elusimicrobia")
-elu.df <- data.frame(sample_data(elu.phy))
-elu.df$RelAbund <- t(data.frame(otu_table(elu.phy)))
-
-# Test normality
-hist(elu.df$RelAbund, breaks=10)
-qqnorm(elu.df$RelAbund)
-qqline(elu.df$RelAbund)
-shapiro.test(elu.df$RelAbund)
-  # p-value = 1.174e-05
-  # Not Normal
-
-wilcox.test(RelAbund ~ Group, data=elu.df, alternative = "greater")
-  # p-value = 0.01258
-
-
-### Actinobacteria
-act.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Actinobacteria")
-act.df <- data.frame(sample_data(act.phy))
-act.df$RelAbund <- t(data.frame(otu_table(act.phy)))
-
-# Test normality
-hist(act.df$RelAbund, breaks=10)
-qqnorm(act.df$RelAbund)
-qqline(act.df$RelAbund)
-shapiro.test(act.df$RelAbund)
-  # p-value = 0.02768
-  # Not Normal
-
-wilcox.test(RelAbund ~ Group, data=act.df)
-  # p-value = 0.2561
-
-
-### Spirochaetae
-spi.phy <- subset_taxa(physeq.diet.phy.ra, Phylum == "Spirochaetae")
-spi.df <- data.frame(sample_data(spi.phy))
-spi.df$RelAbund <- t(data.frame(otu_table(spi.phy)))
-
-# Test normality
-hist(spi.df$RelAbund, breaks=10)
-qqnorm(spi.df$RelAbund)
-qqline(spi.df$RelAbund)
-shapiro.test(spi.df$RelAbund)
-  # p-value = 2.031e-07
-  # Not Normal
-
-wilcox.test(RelAbund ~ Group, data=spi.df, alternative = "greater")
-  # p-value = 0.02978
-
-
-
-### P-adjust
-p.adjust(c(0.9019, 0.4279, 0.0004523, 0.7325, 0.2161, 0.266, 0.01258, 0.2561, 0.02978), method = 'fdr')
-  # Firmicutes = 0.9019000
-  # Bacteroidetes = 0.5501571
-  # Cyanobacteria = 0.0040707*
-  # Verrucomicrobia = 0.8240625
-  # Proteobacteria = 0.3990000
-  # Tenericutes = 0.3990000
-  # Elusimicrobia = 0.0566100*
-  # Actinobacteria = 0.3990000
-  # Spirochaetae = 0.0893400
-
-
-
-       
-
-
-
-
-### Barplot ###
-tiff("Phyla.prelim.tiff", width=12, height=3.5, units="in", res=600)
-ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
-  facet_grid(Sample_Type ~ Group) +
-  scale_fill_brewer(palette="Set1") +
-  xlab("Phyla") +
-  ylab("Median Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
-  theme(axis.text.x = element_blank(),
-        #axis.title.x = element_text(size=10),
-        #axis.title.y = element_text(size=10),
-        #strip.text.x = element_text(size=8),
-        #strip.text.y = element_text(size=8),
-        panel.spacing=unit(1, "lines")#,
-        #legend.title = element_text(size = 8),
-        #legend.text = element_text(size=8)
-        )
-dev.off()
-
-#tiff("Phyla3.tiff", width=13, height=8, units="in", res=600)
-ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
-  facet_grid(Sample_Type ~ Group) +
-  scale_fill_brewer(palette="Set1") +
-  xlab("Phyla") +
-  ylab("Median Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
-  theme(axis.text.x = element_blank(),
-        axis.title.x = element_text(size=20),
-        axis.title.y = element_text(size=20),
-        strip.text.x = element_text(size=14),
-        strip.text.y = element_text(size=14),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 14),
-        legend.text = element_text(size=12),
-        axis.text.y = element_text(size=12))
-#dev.off()
-
-tiff("Phyla.mdtp.tiff", width=9.8, height=5.9, units="in", res=600)
-ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
-  facet_grid(Sample_Type ~ Group) +
-  scale_fill_brewer(palette="Set1") +
-  xlab("Phyla") +
-  ylab("Median Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_text(size=14),
-        axis.title.x = element_text(size=18),
-        axis.title.y = element_text(size=18),
-        strip.text.x = element_text(size=13, face="bold"),
-        strip.text.y = element_text(size=13, face="bold"),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 14, face="bold"),
-        legend.text = element_text(size=13),
-        panel.grid.major = element_blank()
-        #panel.grid.minor = element_blank()
-        )
-dev.off()
-
-tiff("Phyla.mdtp2.tiff", width=9.7, height=5.9, units="in", res=600)
-ggplot(phy.sum, aes(x=Phylum, y=Median, fill=Phylum)) +
-  geom_bar(stat="identity", color="black") +
-  geom_errorbar(aes(ymax=iqr.max, ymin=iqr.min), width=0.25) +
-  facet_grid(Sample_Type ~ Group) +
-  scale_fill_brewer(palette="Set1") +
-  xlab("Phyla") +
-  ylab("Median Relative Abundance for Phyla > 1%") +
-  scale_y_continuous(limits=c(0,80),expand=c(0,0))+
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_text(size=14),
-        axis.title.x = element_text(size=18),
-        axis.title.y = element_text(size=18),
-        strip.text.x = element_text(size=16, face="bold"),
-        strip.text.y = element_text(size=16, face="bold"),
-        panel.spacing=unit(1, "lines"),
-        legend.title = element_text(size = 16),
-        legend.text = element_text(size=14),
-        panel.grid.major = element_blank()
-        #panel.grid.minor = element_blank()
-        )
-dev.off()
-
-# Pull out otu table to test phyla
-phy.num <- as.numeric(otu_table(phy99))
-
-# Test normality
-hist(phy.num, breaks=10)
-qqnorm(phy.num)
-qqline(phy.num)
-shapiro.test(phy.num)
-  # p-value < 2.2e-16
-ks.test(phy.num, "pnorm", mean=mean(phy.num), sd=sd(phy.num))
-  # p-value < 2.2e-16
-
-# Get ready for stats
-sampdf <- data.frame(sample_data(phy99))
-sampdf$Relative_Abundance <- otu_table(phy99)
-
-
+  # 112 OTUs
 ```
 
 
@@ -1292,97 +943,6 @@ sampdf$Relative_Abundance <- otu_table(phy99)
 
 
 
-### Cyanobacteria???
-```{r}
-cya <- subset_taxa(physeq.rem, Phylum == "Cyanobacteria")
-cya.tax <- data.frame(tax_table(cya))
-cya.rel <- transform_sample_counts(cya, function(x){(x/sum(x))*100})
-cya.rel <- subset_samples(cya.rel, sample_names(cya.rel)!= "CC1_923_S")
-cya.rel <- subset_samples(cya.rel, sample_names(cya.rel)!= "CC1_925_I")
-cya.rel <- subset_samples(cya.rel, sample_names(cya.rel)!= "CM1_916_P")
-cya.rel <- prune_taxa(taxa_sums(cya.rel)>0, cya.rel)
-View(data.frame(otu_table(cya.rel)))
-View(data.frame(tax_table(cya.rel)))
-
-
-
-
-### Simper @ Phylum-level
-# Change Group names to be compatible (no "_")
-physeq.simp <- physeq.rem
-rename.samp <- data.frame(sample_data(physeq.simp))
-rename.wild <- which(data.frame(sample_data(physeq.simp))$Group == "Summer_Wild")
-rename.lab <- which(data.frame(sample_data(physeq.simp))$Group == "Summer_Lab")
-levels(rename.samp$Group) <- c("SummerWild", "SummerLab", "Torpor", "IBA", "Spring")
-physeq.simp <- merge_phyloseq(otu_table(physeq.rem), sample_data(rename.samp), tax_table(physeq.rem))
-physeq.phylum <- tax_glom(physeq.simp, taxrank="Phylum")
-
-# All
-
-simper.pretty(data.frame(otu_table(physeq.phylum)),
-              data.frame(sample_data(physeq.phylum)),
-              c("Group", "Sample_Type"),
-              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
-              output_name='all.phylum')
-all.phylum.simper <- read.csv("all.phylum_clean_simper.csv")
-kruskal.pretty(data.frame(otu_table(physeq.phylum)),
-               data.frame(sample_data(physeq.phylum)),
-               csv = all.phylum.simper,
-               c("Group", "Sample_Type"),
-               output_name = 'all.phylum',
-               taxonomy = data.frame(tax_table(physeq.phylum)))
-all.phylum.simper.kw <- read.csv("all.phylum_krusk_simper.csv")
-for(i in 1:nrow(all.phylum.simper.kw)){
-  save <- which(rownames(data.frame(tax_table(physeq.phylum))) == all.phylum.simper.kw$OTU[i])
-  all.phylum.simper.kw$Taxonomy[i] <-
-    paste(data.frame(tax_table(physeq.phylum))[save,2], "-",
-          data.frame(tax_table(physeq.phylum))[save,3], "-",
-          data.frame(tax_table(physeq.phylum))[save,4], "-",
-          data.frame(tax_table(physeq.phylum))[save,5], "-",
-          data.frame(tax_table(physeq.phylum))[save,6])
-}
-write.table(all.phylum.simper.kw, "all.phylum_krusk_simper.csv", sep=",")
-
-
-
-
-### Test Cyano Phy Rel Abund
-# Merge samples with the same taxonomic rank
-goodphy <- tax_glom(physeq.rem, taxrank="Phylum")
-
-# Transform each merged phylum count to rel abund
-phy99 <- transform_sample_counts(goodphy, function(x){(x/sum(x))*100})
-
-# Remove any phyla with <1% rel abund
-phy99 <- prune_taxa(taxa_sums(phy99) > 1, phy99)
-
-# Pull out cyanos
-cya.phy <- subset_taxa(phy99, Phylum == "Cyanobacteria")
-cya.df <- data.frame(sample_data(cya.phy))
-cya.df$RelAbund <- t(data.frame(otu_table(cya.phy)))
-
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=cya.df)
-  # p-value = 8.591e-05
-kruskalmc(resp = RelAbund ~ Group, data=cya.df)
-  # Summer_Wild vs. Summer_Lab
-  # Summer_Wild vs. IBA
-  # Summer_Wild vs. Spring
-  # Torpor vs. Spring
-pairwise.wilcox.test(cya.df$RelAbund, cya.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.00081
-  # Wild-Torpor = 0.00083
-  # Wild-IBA = 0.00074
-  # Wild-Spring = 0.00291
-  # Lab-Torpor = 0.10286
-  # Lab-IBA = 1
-  # Lab-Spring = 0.17796
-  # Torpor-IBA = 0.01648
-  # Torpor-Spring = 0.00391
-  # IBA-Spring = 0.17796
-kruskal.test(formula = RelAbund ~ Sample_Type, data=cya.df)
-  # p-value = 0.733
-```
 
 
 ### Test Phyla Rel Abund
@@ -1396,177 +956,296 @@ phy99 <- transform_sample_counts(goodphy, function(x){(x/sum(x))*100})
 # Remove any phyla with <1% rel abund
 phy99 <- prune_taxa(taxa_sums(phy99) > 1, phy99)
 
-### CYANOBACTERIA ###
+# View ordered phyla - most abundant --> least abundant
+# barplot(sort(taxa_sums(phy99),TRUE)[1:20]/nsamples(phy99),las=2,cex.axis=.7)
+# 11 phyla: "Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Bacteria_unclassified", "Kiritimatiellaeota", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia", "Epsilonbacteraeota"
+
+
+### Adjust P-values
+# The raw p-values are from the Group-level Kruskal-Wallis (not pairwise Wilcoxon)
+# I included this code above the phyla-specific analyses for reference
+p.adjust(c(3.383e-08, 0.0001905, 0.0007905, 0.002968, 0.03355, 0.0298, 7.077e-05, 0.001643, 0.04759, 0.009963, 0.009963), method = "fdr")
+  # Firmicutes = 3.721300e-07
+  # Bacteroidetes = 6.985000e-04
+  # Verrucomicrobia = .002173875
+  # Proteobacteria = .005441333e
+  # Unclassified = .03690500
+  # Kiritimatiellaeota = .03642222
+  # Cyanobacteria = 3.892350e-04
+  # Tenericutes = .003614600
+  # Actinobacteria = .04759000
+  # Elusimicrobia = .01369912
+  # Epsilonbacteraeota = .01369912
+
+
+##### FIRMICUTES #####
+fir.phy <- subset_taxa(phy99, Phylum == "Firmicutes")
+fir.df <- data.frame(sample_data(fir.phy))
+fir.df$RelAbund <- t(data.frame(otu_table(fir.phy)))
+
+# Test normality
+hist(fir.df$RelAbund, breaks=10)
+qqnorm(fir.df$RelAbund)
+qqline(fir.df$RelAbund)
+shapiro.test(fir.df$RelAbund)
+  # p-value = 0.02565
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=fir.df)
+  # p-value = 3.383e-08
+pairwise.wilcox.test(fir.df$RelAbund, fir.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 1.00000
+  # Wild-Torpor = 0.00016*
+  # Wild-IBA = 5.7e-05*
+  # Wild-Spring = 0.04371*
+  # Lab-Torpor = 1.3e-06*
+  # Lab-IBA = 2.6e-07*
+  # Lab-Spring = 0.00658*
+  # Torpor-IBA = 1.00000
+  # Torpor-Spring = 0.00108*
+  # IBA-Spring = 0.00041*
+
+
+
+##### BACTEROIDETES #####
+bac.phy <- subset_taxa(phy99, Phylum == "Bacteroidetes")
+bac.df <- data.frame(sample_data(bac.phy))
+bac.df$RelAbund <- t(data.frame(otu_table(bac.phy)))
+
+# Test normality
+hist(bac.df$RelAbund, breaks=10)
+qqnorm(bac.df$RelAbund)
+qqline(bac.df$RelAbund)
+shapiro.test(bac.df$RelAbund)
+  # p-value = 0.5318
+  # Normal
+  # Sticking with Kruskal-Wallis for consistency among phyla-level comparisons
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=bac.df)
+  # p-value = 0.0001905
+pairwise.wilcox.test(bac.df$RelAbund, bac.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.6392
+  # Wild-Torpor = 0.0098*
+  # Wild-IBA = 0.0057 *
+  # Wild-Spring = 0.0093*
+  # Lab-Torpor = 0.0093*
+  # Lab-IBA = 0.0034*
+  # Lab-Spring = 0.0079*
+  # Torpor-IBA = 0.9612
+  # Torpor-Spring = 0.9612
+  # IBA-Spring = 0.9612
+
+
+##### Verrucomicrobia #####
+ver.phy <- subset_taxa(phy99, Phylum == "Verrucomicrobia")
+ver.df <- data.frame(sample_data(ver.phy))
+ver.df$RelAbund <- t(data.frame(otu_table(ver.phy)))
+
+# Test normality
+hist(ver.df$RelAbund, breaks=10)
+qqnorm(ver.df$RelAbund)
+qqline(ver.df$RelAbund)
+shapiro.test(ver.df$RelAbund)
+  # p-value = 3.532e-08
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=ver.df)
+  # p-value = 0.0007905
+pairwise.wilcox.test(ver.df$RelAbund, ver.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.6298
+  # Wild-Torpor = 0.3345
+  # Wild-IBA = 0.0006*
+  # Wild-Spring = 0.3178
+  # Lab-Torpor = 0.3178 
+  # Lab-IBA =  9.6e-05*
+  # Lab-Spring = 0.3178
+  # Torpor-IBA = 0.3178
+  # Torpor-Spring = 0.3345
+  # IBA-Spring = 0.0855
+
+
+
+
+
+##### PROTEOBACTERIA #####
+pro.phy <- subset_taxa(phy99, Phylum == "Proteobacteria")
+pro.df <- data.frame(sample_data(pro.phy))
+pro.df$RelAbund <- t(data.frame(otu_table(pro.phy)))
+
+# Test normality
+hist(pro.df$RelAbund, breaks=10)
+qqnorm(pro.df$RelAbund)
+qqline(pro.df$RelAbund)
+shapiro.test(pro.df$RelAbund)
+  # p-value = 0.0003034
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=pro.df)
+  # p-value = 0.002968
+pairwise.wilcox.test(pro.df$RelAbund, pro.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.07245 
+  # Wild-Torpor = 0.00063*
+  # Wild-IBA = 0.02821*
+  # Wild-Spring = 0.36859
+  # Lab-Torpor = 0.07245 
+  # Lab-IBA = 0.17503
+  # Lab-Spring = 0.69131
+  # Torpor-IBA = 0.97857
+  # Torpor-Spring = 0.04848*
+  # IBA-Spring = 0.15222
+
+
+
+
+##### UNCLASSIFIED #####
+unc.phy <- subset_taxa(phy99, Phylum == "Bacteria_unclassified")
+unc.df <- data.frame(sample_data(unc.phy))
+unc.df$RelAbund <- t(data.frame(otu_table(unc.phy)))
+
+# Test normality
+hist(unc.df$RelAbund, breaks=10)
+qqnorm(unc.df$RelAbund)
+qqline(unc.df$RelAbund)
+shapiro.test(unc.df$RelAbund)
+  # p-value = 2.589e-11
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=unc.df)
+  # p-value = 0.03355
+pairwise.wilcox.test(unc.df$RelAbund, unc.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.182
+  # Wild-Torpor = 0.134
+  # Wild-IBA = 0.134
+  # Wild-Spring = 0.012*
+  # Lab-Torpor = 0.318
+  # Lab-IBA = 0.142
+  # Lab-Spring = 0.425
+  # Torpor-IBA = 0.318
+  # Torpor-Spring = 0.808
+  # IBA-Spring = 0.441
+
+
+
+
+
+##### KIRITIMATIELLAEOTA #####
+# Ar/ma/ti/mon/a/de/tes
+# ^        ^      ^
+# Ki/ri/ti/ma/ti/e/llae/o/ta
+#                       ^
+# Pull out kiris
+kir.phy <- subset_taxa(phy99, Phylum == "Kiritimatiellaeota")
+kir.df <- data.frame(sample_data(kir.phy))
+kir.df$RelAbund <- t(data.frame(otu_table(kir.phy)))
+
+# Test normality
+hist(kir.df$RelAbund, breaks=10)
+qqnorm(kir.df$RelAbund)
+qqline(kir.df$RelAbund)
+shapiro.test(kir.df$RelAbund)
+  # p-value = 8.273e-13
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=kir.df)
+  # p-value = 0.0298
+pairwise.wilcox.test(kir.df$RelAbund, kir.df$Group, p.adjust.method="fdr")
+  # Wild-Lab = 0.96
+  # Wild-Torpor = 0.1
+  # Wild-IBA = 0.74
+  # Wild-Spring = 0.1
+  # Lab-Torpor = 0.1
+  # Lab-IBA = 0.74
+  # Lab-Spring = 0.1
+  # Torpor-IBA = 0.1
+  # Torpor-Spring = 0.96
+  # IBA-Spring = 0.48
+
+
+
+##### CYANOBACTERIA #####
 # Pull out cyanos
 cya.phy <- subset_taxa(phy99, Phylum == "Cyanobacteria")
 cya.df <- data.frame(sample_data(cya.phy))
 cya.df$RelAbund <- t(data.frame(otu_table(cya.phy)))
 
+# Test normality
+hist(cya.df$RelAbund, breaks=10)
+qqnorm(cya.df$RelAbund)
+qqline(cya.df$RelAbund)
+shapiro.test(cya.df$RelAbund)
+  # p-value = 1.665e-07
+  # Not Normal
+
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=cya.df)
-  # p-value = 1.826e-05
+  # p-value = 7.077e-05
 pairwise.wilcox.test(cya.df$RelAbund, cya.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.00012
-  # Wild-Torpor = 0.00031
-  # Wild-IBA = 0.00069
-  # Wild-Spring = 0.00078
-  # Lab-Torpor = 0.18556
-  # Lab-IBA = 0.31707
-  # Lab-Spring = 0.13316
-  # Torpor-IBA = 0.00879
-  # Torpor-Spring = 0.00238
-  # IBA-Spring = 0.32613
+  # Wild-Lab = 8.6e-05*
+  # Wild-Torpor = 0.00021*
+  # Wild-IBA = 8.6e-05*
+  # Wild-Spring = 0.00291*
+  # Lab-Torpor = 0.21206 
+  # Lab-IBA = 0.57042
+  # Lab-Spring = 0.37787
+  # Torpor-IBA = 0.01798*
+  # Torpor-Spring = 0.01422*
+  # IBA-Spring = 0.44112
 
 
 
-### FIRMICUTES ###
-fir.phy <- subset_taxa(phy99, Phylum == "Firmicutes")
-fir.df <- data.frame(sample_data(fir.phy))
-fir.df$RelAbund <- t(data.frame(otu_table(fir.phy)))
-
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=fir.df)
-  # p-value = 1.523e-08
-pairwise.wilcox.test(fir.df$RelAbund, fir.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.98066
-  # Wild-Torpor = 0.00013
-  # Wild-IBA = 2.7e-05
-  # Wild-Spring = 0.11733
-  # Lab-Torpor = 1.3e-06
-  # Lab-IBA = 6.7e-08
-  # Lab-Spring = 0.03354
-  # Torpor-IBA = 0.98066
-  # Torpor-Spring = 0.00053
-  # IBA-Spring = 8.2e-05
-
-
-
-### BACTEROIDETES ###
-bac.phy <- subset_taxa(phy99, Phylum == "Bacteroidetes")
-bac.df <- data.frame(sample_data(bac.phy))
-bac.df$RelAbund <- t(data.frame(otu_table(bac.phy)))
-
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=bac.df)
-  # p-value = 0.002398
-pairwise.wilcox.test(bac.df$RelAbund, bac.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.578
-  # Wild-Torpor = 0.027
-  # Wild-IBA = 0.032
-  # Wild-Spring = 0.034
-  # Lab-Torpor = 0.027
-  # Lab-IBA = 0.027
-  # Lab-Spring = 0.032
-  # Torpor-IBA = 0.587
-  # Torpor-Spring = 0.968
-  # IBA-Spring = 0.587
-
-
-
-
-
-
-### Verrucomicrobia ###
-ver.phy <- subset_taxa(phy99, Phylum == "Verrucomicrobia")
-ver.df <- data.frame(sample_data(ver.phy))
-ver.df$RelAbund <- t(data.frame(otu_table(ver.phy)))
-
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=ver.df)
-  # p-value = 0.0001705
-pairwise.wilcox.test(ver.df$RelAbund, ver.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.78725
-  # Wild-Torpor = 0.40778
-  # Wild-IBA = 0.00029
-  # Wild-Spring = 0.86541
-  # Lab-Torpor = 0.30073
-  # Lab-IBA = 2.5e-05
-  # Lab-Spring = 0.87464
-  # Torpor-IBA = 0.24716
-  # Torpor-Spring = 0.25768
-  # IBA-Spring = 0.00552
-
-
-
-
-
-### PROTEOBACTERIA ###
-pro.phy <- subset_taxa(phy99, Phylum == "Proteobacteria")
-pro.df <- data.frame(sample_data(pro.phy))
-pro.df$RelAbund <- t(data.frame(otu_table(pro.phy)))
-
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=pro.df)
-  # p-value = 0.01492
-pairwise.wilcox.test(pro.df$RelAbund, pro.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.09057 
-  # Wild-Torpor = 0.00063 
-  # Wild-IBA = 0.11088
-  # Wild-Spring = 0.15644
-  # Lab-Torpor = 0.09057
-  # Lab-IBA = 0.47384
-  # Lab-Spring = 0.97482
-  # Torpor-IBA = 0.71639
-  # Torpor-Spring = 0.09057
-  # IBA-Spring = 0.47384
-
-
-
-
-### UNCLASSIFIED ###
-unc.phy <- subset_taxa(phy99, Phylum == "Bacteria_unclassified")
-unc.df <- data.frame(sample_data(unc.phy))
-unc.df$RelAbund <- t(data.frame(otu_table(unc.phy)))
-
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=unc.df)
-  # p-value = 0.009454
-pairwise.wilcox.test(unc.df$RelAbund, unc.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.1646
-  # Wild-Torpor = 0.0669
-  # Wild-IBA = 0.0669
-  # Wild-Spring = 0.0031
-  # Lab-Torpor = 0.2714
-  # Lab-IBA = 0.0669
-  # Lab-Spring = 0.348
-  # Torpor-IBA = 0.1646
-  # Torpor-Spring = 0.7780
-  # IBA-Spring = 0.4932
-
-
-
-
-### TENERICUTES ###
+##### TENERICUTES #####
 ten.phy <- subset_taxa(phy99, Phylum == "Tenericutes")
 ten.df <- data.frame(sample_data(ten.phy))
 ten.df$RelAbund <- t(data.frame(otu_table(ten.phy)))
 
+# Test normality
+hist(ten.df$RelAbund, breaks=10)
+qqnorm(ten.df$RelAbund)
+qqline(ten.df$RelAbund)
+shapiro.test(ten.df$RelAbund)
+  # p-value = 1.228e-08
+  # Not Normal
+
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ten.df)
-  # p-value = 0.003323
+  # p-value = 0.001643
 pairwise.wilcox.test(ten.df$RelAbund, ten.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.26413
-  # Wild-Torpor = 0.00031
-  # Wild-IBA = 0.00016
-  # Wild-Spring = 0.23577
-  # Lab-Torpor = 0.17312
-  # Lab-IBA = 0.08489
-  # Lab-Spring = 0.74893
-  # Torpor-IBA = 0.78969
-  # Torpor-Spring = 0.66943
-  # IBA-Spring = 0.63371
+  # Wild-Lab = 0.22640
+  # Wild-Torpor = 0.00031*
+  # Wild-IBA = 0.00031*
+  # Wild-Spring = 0.44773
+  # Lab-Torpor = 0.12625
+  # Lab-IBA = 0.12625
+  # Lab-Spring = 0.66842
+  # Torpor-IBA = 0.44773
+  # Torpor-Spring = 0.12625
+  # IBA-Spring = 0.12625
 
 
 
 
-### ACTINOBACTERIA ###
+##### ACTINOBACTERIA #####
 act.phy <- subset_taxa(phy99, Phylum == "Actinobacteria")
 act.df <- data.frame(sample_data(act.phy))
 act.df$RelAbund <- t(data.frame(otu_table(act.phy)))
 
+# Test normality
+hist(act.df$RelAbund, breaks=10)
+qqnorm(act.df$RelAbund)
+qqline(act.df$RelAbund)
+shapiro.test(act.df$RelAbund)
+  # p-value = 0.0003346
+  # Not Normal
+
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=act.df)
-  # p-value = 0.02879
+  # p-value = 0.04759
 pairwise.wilcox.test(act.df$RelAbund, act.df$Group, p.adjust.method="fdr")
   # Wild-Lab = 0.344
   # Wild-Torpor = 0.019
@@ -1584,26 +1263,63 @@ pairwise.wilcox.test(act.df$RelAbund, act.df$Group, p.adjust.method="fdr")
 
 
 
-### ELUSIMICROBIA ###
+##### ELUSIMICROBIA #####
 elu.phy <- subset_taxa(phy99, Phylum == "Elusimicrobia")
 elu.df <- data.frame(sample_data(elu.phy))
 elu.df$RelAbund <- t(data.frame(otu_table(elu.phy)))
 
+# Test normality
+hist(elu.df$RelAbund, breaks=10)
+qqnorm(elu.df$RelAbund)
+qqline(elu.df$RelAbund)
+shapiro.test(elu.df$RelAbund)
+  # p-value = 2.203e-11
+  # Not Normal
+
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=elu.df)
-  # p-value = 0.01106
+  # p-value = 0.009963
 pairwise.wilcox.test(elu.df$RelAbund, elu.df$Group, p.adjust.method="fdr")#### ERROR
-  # Wild-Lab = 0.052
+  # Wild-Lab = 0.058
   # Wild-Torpor = 0.065
-  # Wild-IBA = 0.627
-  # Wild-Spring = 0.039
+  # Wild-IBA = 0.932
+  # Wild-Spring = 0.058
   # Lab-Torpor = 0.932
-  # Lab-IBA = 0.251
-  # Lab-Spring = 0.096
-  # Torpor-IBA = 0.251
-  # Torpor-Spring = 0.251
-  # IBA-Spring = 0.052
+  # Lab-IBA = 0.113
+  # Lab-Spring = 0.145
+  # Torpor-IBA = 0.145
+  # Torpor-Spring = 0.398
+  # IBA-Spring = 0.058
 
+
+
+##### EPSILONBACTERAEOTA #####
+eps.phy <- subset_taxa(phy99, Phylum == "Elusimicrobia")
+eps.df <- data.frame(sample_data(eps.phy))
+eps.df$RelAbund <- t(data.frame(otu_table(eps.phy)))
+
+# Test normality
+hist(eps.df$RelAbund, breaks=10)
+qqnorm(eps.df$RelAbund)
+qqline(eps.df$RelAbund)
+shapiro.test(eps.df$RelAbund)
+  # p-value = 2.203e-11
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=eps.df)
+  # p-value = 0.009963
+pairwise.wilcox.test(eps.df$RelAbund, eps.df$Group, p.adjust.method="fdr")#### ERROR
+  # Wild-Lab = 0.058
+  # Wild-Torpor = 0.065
+  # Wild-IBA = 0.932
+  # Wild-Spring = 0.058
+  # Lab-Torpor = 0.932
+  # Lab-IBA = 0.113
+  # Lab-Spring = 0.145
+  # Torpor-IBA = 0.145
+  # Torpor-Spring = 0.398
+  # IBA-Spring = 0.058
 ```
 
 
