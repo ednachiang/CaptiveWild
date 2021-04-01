@@ -70,6 +70,10 @@ sample_data(physeq)$Metabolism <- ordered(sample_data(physeq)$Metabolism,
 sample_data(physeq)$Group <- ordered(sample_data(physeq)$Group,
                                      levels=c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring"))
 
+# Remove outliers
+physeq <- subset_samples(physeq, ID != 3925)
+physeq <- subset_samples(physeq, ID != 3916)
+
 # Separate by season
 physeq.wild <- subset_samples(physeq, Group == "Summer_Wild")
 physeq.sum <- subset_samples(physeq, Group == "Summer_Lab")
@@ -893,6 +897,34 @@ group.simper.kw <- read.csv("group_clean_simper.csv")
 
 ```
 
+
+### Core OTUs
+```{r}
+wild.otu <- data.frame(otu_table(physeq.wild))
+wild.core <- apply(wild.otu, 1, function(row) all(row != 0))
+wild.core <- wild.otu[wild.core,]
+phy.wild.core <- merge_phyloseq(otu_table(wild.core, taxa_are_rows = T), tax_table(physeq.wild), sample_data(physeq.wild))
+
+sum.otu <- data.frame(otu_table(physeq.sum))
+sum.core <- apply(sum.otu, 1, function(row) all(row != 0))
+sum.core <- sum.otu[sum.core,]
+phy.sum.core <- merge_phyloseq(otu_table(sum.core, taxa_are_rows = T), tax_table(physeq.sum), sample_data(physeq.sum))
+
+tor.otu <- data.frame(otu_table(physeq.tor))
+tor.core <- apply(tor.otu, 1, function(row) all(row != 0))
+tor.core <- tor.otu[tor.core,]
+phy.tor.core <- merge_phyloseq(otu_table(tor.core, taxa_are_rows = T), tax_table(physeq.tor), sample_data(physeq.tor))
+
+iba.otu <- data.frame(otu_table(physeq.iba))
+iba.core <- apply(iba.otu, 1, function(row) all(row != 0))
+iba.core <- iba.otu[iba.core,]
+phy.iba.core <- merge_phyloseq(otu_table(iba.core, taxa_are_rows = T), tax_table(physeq.iba), sample_data(physeq.iba))
+
+spr.otu <- data.frame(otu_table(physeq.spr))
+spr.core <- apply(spr.otu, 1, function(row) all(row != 0))
+spr.core <- spr.otu[spr.core,]
+phy.spr.core <- merge_phyloseq(otu_table(spr.core, taxa_are_rows = T), tax_table(physeq.spr), sample_data(physeq.spr))
+```
 ### Examine Phyla
 ```{r}
 ### Phyla in Wild
