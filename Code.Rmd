@@ -25,7 +25,6 @@ set.seed(1)
 
 ### Load Functions
 ```{r}
-source('scripts/veganCovEllipse.R')
 source('scripts/simper_pretty.R')
 source('scripts/R_krusk.R')
 source('scripts/pairwise.adonis.R')
@@ -615,9 +614,21 @@ UF.u <- phyloseq::distance(physeq = physeq, method = "unifrac")
 UF.u.pcoa <- ordinate(physeq = physeq, method = "PCoA", distance = "unifrac")
   # Variation explained = 22.4%
 
-plot_ordination(physeq = physeq, ordination = UF.u.pcoa, axes = c(1,2),
-                title = "Unweighted UniFrac") +
-  geom_point(size = 2, aes(colour = Group))
+uUF.plot <- plot_ordination(physeq = physeq, ordination = UF.u.pcoa, axes = c(1,2),
+                title = "Unweighted UniFrac", color = "Group") +
+  stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
+  scale_colour_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8, colour = "black"),
+        axis.text.y = element_text(size = 8, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 10),
+        legend.position = "none"
+        )
+
 
 
 ### PERMANOVA ###
@@ -787,9 +798,23 @@ UF.w <- phyloseq::distance(physeq = physeq, method = "wunifrac")
 UF.w.pcoa <- ordinate(physeq = physeq, method = "PCoA", distance = "wunifrac")
   # Variation explained = 35.8%
 
-plot_ordination(physeq = physeq, ordination = UF.w.pcoa, axes = c(1,2),
-                title = "Weighted UniFrac") +
-  geom_point(size = 2, aes(colour = Group))
+wUF.plot <- plot_ordination(physeq = physeq, ordination = UF.w.pcoa, axes = c(1,2),
+                title = "Weighted UniFrac", color = "Group") +
+  stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
+  scale_colour_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8, colour = "black"),
+        axis.text.y = element_text(size = 8, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 10),
+        legend.title = element_text(size = 8, face = "bold"),
+        legend.text = element_text(size = 8),
+        legend.key.height = unit(4, 'mm'),
+        legend.box.margin=margin(-10,-10,-10,-10)
+        )
 
 
 ### PERMANOVA ###
@@ -947,11 +972,22 @@ p.adjust(c(0.0019, 1e-04, 1e-04, 0.0385, 0.7023, 1e-04, 1e-04, 1e-04, 1e-04, 8e-
   # Summer Wild vs. Torpor = 0.0001667*
   # Summer Wild vs. IBA = 0.0001667*
   # Summer Wild vs. Spring = 0.0011428571*
-
-
-
 ```
 
+
+### Plot - UniFrac Ordinations
+```{r}
+tiff("bdiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=grid.layout(2,2, widths = c(0.71, 1), heights = c(0.1, 1.5))))
+grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
+          gp=gpar(fontsize=12,fontface="bold"))
+print(uUF.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+grid.text("B", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),
+          gp=gpar(fontsize=12,fontface="bold"))
+print(wUF.plot, vp=viewport(layout.pos.row=2, layout.pos.col=2))
+dev.off()
+```
 
 ### Simper
 ```{r}
