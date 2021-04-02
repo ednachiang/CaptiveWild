@@ -1517,18 +1517,19 @@ p.sig.sum$Species <- ordered(p.sig.sum$Species, levels = c("Otu00044", "Otu00015
 
 w.simp.plot <- ggplot(w.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") +
+  geom_text(size = 2, aes(label=sprintf("%0.2f", round(Mean, digits=2)))) +
   scale_x_discrete(position = "top", labels = c("Summer Wild", "Summer Lab", "Torpor",
                                                 "IBA", "Spring")) +
   ylab("OTU Taxonomic Classification") + xlab("Group\n") +
   scale_y_discrete(labels = c("   ",
-                              expression(" "^a~"NK4A136"),
+                              expression(" "^a~italic("NK4A136")),
                               expression(" "^a~"Lachnospiraceae"),
                               expression(" "^a~"Lachnospiraceae"),
                               expression(" "^X~"Lachnospiraceae"))) +
   scale_fill_gradientn(name = "Mean\nRelative\nAbundance\n(%)", limits = c(0, 2.4),
                        breaks = c(0, 1.2, 2.4),
                        labels = c("0", "1.2", "2.4"),
-                       colours = c("#ffebe6", "#cc3000")) +
+                       colours = c("#fff5f5", "#ffebe6", "#ffad99", "#ec5746")) +
   theme(axis.text.x = element_text(size = 8, color = "black", angle = 45, hjust = 0),
         axis.text.y = element_text(size=8, color = "black"),
         axis.ticks.x = element_blank(),
@@ -1548,24 +1549,22 @@ w.simp.plot <- ggplot(w.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
 
 
 
-
-
-
 s.simp.plot <- ggplot(s.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") +
+  geom_text(size = 2, aes(label=sprintf("%0.2f", round(Mean, digits=2)))) +
   scale_x_discrete(position = "top", labels = c("Summer Wild", "Summer Lab", "Torpor",
                                                 "IBA", "Spring")) +
   ylab("OTU Taxonomic Classification") + xlab("Group\n") +
   scale_y_discrete(labels = c(expression(" "^abc~"Lachnospiraceae"), 
-                              expression(" "^ab~"NK4A136"), 
+                              expression(" "^ab~italic("NK4A136")), 
                               expression(" "^ab~"Bacteroidales"), 
-                              expression(" "^ab~"Ruminococcus 1"), 
+                              expression(" "^ab~italic("Ruminococcus 1")), 
                               expression(" "^a~"Lachnospiraceae"), 
-                              expression(" "^X~"Lactobacillus"))) +
+                              expression(" "^X~italic("Lactobacillus")))) +
   scale_fill_gradientn(name = "Mean\nRelative\nAbundance\n(%)", limits = c(0, 12),
                        breaks = c(0, 6, 12),
                        labels = c("0", "6", "12"),
-                       colours = c("#f9ebee", "#e4677e")) +
+                       colours = c("#fff0f3", "#e4677e")) +
   theme(axis.text.x = element_text(size = 8, color = "black", angle = 40, hjust = 0),
         axis.text.y = element_text(size=8, color = "black"),
         axis.ticks.x = element_blank(),
@@ -1584,16 +1583,18 @@ s.simp.plot <- ggplot(s.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
 
 t.simp.plot <- ggplot(t.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") +
+  geom_text(size = 2, aes(label=sprintf("%0.2f", round(Mean, digits=2)))) +
   scale_x_discrete(position = "top", labels = c("Summer Wild", "Summer Lab", "Torpor",
                                                 "IBA", "Spring")) +
   ylab("OTU Taxonomic Classification") + xlab("Group\n") +
-  scale_y_discrete(labels = c(expression(" "^abc~"Odoribacter"),
-                              expression(" "^ab~"Bacteroides"),
+  scale_y_discrete(labels = c(expression(" "^abc~italic("Odoribacter")),
+                              expression(" "^ab~italic("Bacteroides")),
                               "Kiritimatiellae\nWCHB1-41")) +
   scale_fill_gradientn(name = "Mean\nRelative\nAbundance\n(%)", limits = c(0, 11.4),
                        breaks = c(0, 5.7, 11.4),
                        labels = c("0", "5.7", "11.4"),
-                       colours = c("#ebecfa","#4b42bf")) +
+                       colours = c("#FFFFFF", "#ebecfa", "#c9c6eb", "#a4a0de",
+                                   "#807ad1")) +
   theme(axis.text.x = element_text(size = 8, color = "black", angle = 50, hjust = 0),
         axis.text.y = element_text(size=8, color = "black"),
         axis.ticks.x = element_blank(),
@@ -1613,15 +1614,16 @@ t.simp.plot <- ggplot(t.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
 
 i.simp.plot <- ggplot(i.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") +
+  geom_text(size = 2, aes(label=sprintf("%0.2f", round(Mean, digits=2)))) +
   scale_x_discrete(position = "top", labels = c("Summer Wild", "Summer Lab", "Torpor",
                                                 "IBA", "Spring")) +
   ylab("OTU Taxonomic Classification") + xlab("Group\n") +
-  scale_y_discrete(labels = c(expression(" "^ab~"Akkermansia"),
-                              expression(" "^a~"Odoribacter"))) +
+  scale_y_discrete(labels = c(expression(" "^ab~italic("Akkermansia")),
+                              expression(" "^a~italic("Odoribacter")))) +
   scale_fill_gradientn(name = "Mean\nRelative\nAbundance\n(%)", limits = c(0, 17.6),
                        breaks = c(0, 8.8, 17.6),
                        labels = c("0", "8.8", "17.6"),
-                       colours = c("#e6f9ff", "#00ace6", "#0099cc")) +
+                       colours = c("#e6f9ff", "#66d9ff", "#00ace6")) +
   theme(axis.text.x = element_text(size = 8, color = "black", angle = 50, hjust = 0),
         axis.text.y = element_text(size=8, color = "black"),
         axis.ticks.x = element_blank(),
@@ -1642,18 +1644,19 @@ i.simp.plot <- ggplot(i.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
 
 p.simp.plot <- ggplot(p.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") +
+  geom_text(size = 2, aes(label=sprintf("%0.2f", round(Mean, digits=2)))) +
   scale_x_discrete(position = "top", labels = c("Summer Wild", "Summer Lab", "Torpor",
                                                 "IBA", "Spring")) +
   ylab("OTU Taxonomic Classification") + xlab("Group\n") +
-  scale_y_discrete(labels = c(expression(" "^ab~"Lactobacillus"),
-                              expression(" "^ab~"Coprococcus 2"),
+  scale_y_discrete(labels = c(expression(" "^ab~italic("Lactobacillus")),
+                              expression(" "^ab~italic("Coprococcus 2")),
                               expression(" "^ab~"Lachnospiraceae"),
-                              expression(" "^a~"Bacteroides"),
-                              "Prevotellaceae\nUCG-001")) +
+                              expression(" "^a~italic("Bacteroides")),
+                              expression(italic("Prevotellaceae\nUCG-001")))) +
   scale_fill_gradientn(name = "Mean\nRelative\nAbundance\n(%)", limits = c(0, 6.8),
                        breaks = c(0, 1.7, 3.4, 5.1, 6.8),
                        labels = c("0", "1.7", "3.4", "5.1", "6.8"),
-                       colours = c("#eafaea", "#6fdc6f", "#46d246", "#28a428")) +
+                       colours = c("#f4fbf4", "#6fdc6f", "#46d246", "#2db92d")) +
   theme(axis.text.x = element_text(size = 8, color = "black", angle = 50, hjust = 0),
         axis.text.y = element_text(size=8, color = "black"),
         axis.ticks.x = element_blank(),
@@ -1673,7 +1676,7 @@ p.simp.plot <- ggplot(p.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
 ```
 ### Plot - SIMPER Heatmap
 ```{r}
-#tiff("heatmap.tiff", width = 170, height = 210, units = "mm", res = 600)
+tiff("heatmap.tiff", width = 170, height = 210, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 1), 
                                          heights = c(1, 1, 1))))
@@ -1689,7 +1692,7 @@ grid.text("A", x=unit(0.03, "npc"), y = unit(0.97, "npc"),
           vp=viewport(layout.pos.row=1, layout.pos.col=1),
           gp=gpar(fontsize=12,fontface="bold"))
 
-grid.text("Prevotellaceae\nUCG-003",
+grid.text(expression(italic("Prevotellaceae\nUCG-003")),
           x=unit(0.115, "npc"), y=unit(0.225, "npc"), just = "left",
           vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=8))
 grid.text(expression(" "^b),
@@ -1741,5 +1744,5 @@ grid.text(expression(" "^X),
           x=unit(0.11, "npc"), y=unit(0.64, "npc"),
           vp=viewport(layout.pos.row=3, layout.pos.col=1), gp=gpar(fontsize=8))
 
-#dev.off()
+dev.off()
 ```
