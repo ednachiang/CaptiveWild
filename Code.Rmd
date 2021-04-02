@@ -27,7 +27,6 @@ set.seed(1)
 ```{r}
 source('scripts/simper_pretty.R')
 source('scripts/R_krusk.R')
-source('scripts/pairwise.adonis.R')
 source('scripts/misc.R')
 ```
 
@@ -589,7 +588,7 @@ otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
 
 ### Plot - PD, SES MPD, Alpha Div
 ```{r}
-tiff("adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+#tiff("adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -604,7 +603,7 @@ print(mpd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
 grid.text("D", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
           gp=gpar(fontsize=8,fontface="bold"))
 print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
-dev.off()
+#dev.off()
 ```
 
 ### Beta Diversity
@@ -977,16 +976,16 @@ p.adjust(c(0.0019, 1e-04, 1e-04, 0.0385, 0.7023, 1e-04, 1e-04, 1e-04, 1e-04, 8e-
 
 ### Plot - UniFrac Ordinations
 ```{r}
-tiff("bdiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+#tiff("bdiv.tiff", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
-pushViewport(viewport(layout=grid.layout(2,2, widths = c(0.71, 1), heights = c(0.1, 1.5))))
+pushViewport(viewport(layout=grid.layout(2,2, widths = c(0.73, 1), heights = c(0.1, 1.5))))
 grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
           gp=gpar(fontsize=12,fontface="bold"))
 print(uUF.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
 grid.text("B", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),
           gp=gpar(fontsize=12,fontface="bold"))
 print(wUF.plot, vp=viewport(layout.pos.row=2, layout.pos.col=2))
-dev.off()
+#dev.off()
 ```
 
 ### Simper
@@ -1004,13 +1003,13 @@ physeq.simp <- merge_phyloseq(otu_table(physeq), sample_data(sum.rename), tax_ta
 
 
 # Group
-simper.pretty(data.frame(otu_table(physeq.simp)),
+#simper.pretty(data.frame(otu_table(physeq.simp)),
               data.frame(sample_data(physeq.simp)),
               c("GroupRename"),
               perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
               output_name='group')
 group.simper <- read.csv("group_clean_simper.csv")
-kruskal.pretty(data.frame(otu_table(physeq.simp)),
+#kruskal.pretty(data.frame(otu_table(physeq.simp)),
                data.frame(sample_data(physeq.simp)),
                csv = group.simper,
                c("GroupRename"),
@@ -1455,3 +1454,45 @@ pairwise.wilcox.test(eps.df$RelAbund, eps.df$Group, p.adjust.method="fdr")#### E
 ```
 
 
+
+### Plot - Phyla Rel Abund Barplots
+```{r}
+### Format data
+phy99.df <- psmelt(phy99)
+phy99.df$Phylum <- ordered(phy99.df$Phylum, levels = c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Kiritimatiellaeota", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia", "Epsilonbacteraeota"))
+phy99.df$Phylum[which(is.na(phy99.df$Phylum))] <- rep("Unclassified",length(which(is.na(phy99.df$Phylum))))
+phy.sum <- phy99.df %>%
+  group_by(Group, Phylum) %>%
+  summarize(Mean = mean(Abundance),
+            Median = median(Abundance),
+            SD = sd(Abundance),
+            SE = se(Abundance),
+            iqr = IQR(Abundance))
+
+
+### Plot
+#tiff("phyla.tiff", width=170, height=200, units="mm", res=600)
+ggplot(phy.sum, aes(x = Phylum, y = Mean, fill = Phylum)) +
+  facet_wrap(Group ~ ., strip.position = "top", nrow = 5, scale = "free_y") +
+  geom_bar(stat = "identity", color = "black") +
+  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), width = 0.2) +
+  xlab("Phyla") + ylab("Relative Abundance (%)") +
+  scale_fill_manual(values=c("#ed5e61", "#629fd0", "#ffff33", "#bd87c5", "gray60", "orange", "lawngreen", "rosybrown1", "#cd6b32", "gold", "lightyellow")) +
+  scale_y_continuous(breaks=equal_breaks(n = 4)) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_text(size = 10),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_text(size = 12),
+        axis.title.y = element_text(size = 12),
+        strip.text = element_text(size = 10, face = "bold"),
+        legend.title = element_text(size = 10, face = "bold"),
+        legend.text = element_text(size = 10),
+        legend.key.height = unit(5, 'mm'),
+        legend.key.width = unit(5, 'mm'),
+        legend.box.margin = margin(-10,-10,-10,-10)
+  )
+#dev.off()
+```
