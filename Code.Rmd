@@ -72,6 +72,10 @@ sample_data(physeq)$Group <- ordered(sample_data(physeq)$Group,
 physeq <- subset_samples(physeq, ID != 3925)
 physeq <- subset_samples(physeq, ID != 3916)
 
+# Calculate relative abundance
+physeq <- transform_sample_counts(physeq, function(x){(x/sum(x))*100})
+
+
 # Separate by season
 physeq.wild <- subset_samples(physeq, Group == "Summer_Wild")
 physeq.sum <- subset_samples(physeq, Group == "Summer_Lab")
@@ -92,6 +96,7 @@ median(sample_sums(mothurdata))
 max(sample_sums(mothurdata))
   # 11156
 ```
+
 
 ### Test Phyla Rel Abund
 ```{r}
@@ -1428,15 +1433,15 @@ physeq.simp <- merge_phyloseq(otu_table(physeq), sample_data(sum.rename), tax_ta
               c("GroupRename"),
               perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
               output_name='group')
-group.simper <- read.csv("group_clean_simper.csv")
+#group.simper <- read.csv("group_clean_simper.csv")
 #kruskal.pretty(data.frame(otu_table(physeq.simp)),
                data.frame(sample_data(physeq.simp)),
                csv = group.simper,
                c("GroupRename"),
                output_name = 'group',
                taxonomy = data.frame(tax_table(physeq.simp)))
-group.simper.kw <- read.csv("group_krusk_simper.csv")
-for(i in 1:nrow(group.simper.kw)){
+#group.simper.kw <- read.csv("group_krusk_simper.csv")
+#for(i in 1:nrow(group.simper.kw)){
   save <- which(rownames(data.frame(tax_table(physeq.simp))) == group.simper.kw$OTU[i])
   group.simper.kw$Taxonomy[i] <-
     paste(data.frame(tax_table(physeq.simp))[save,2], "-",
@@ -1446,12 +1451,298 @@ for(i in 1:nrow(group.simper.kw)){
           data.frame(tax_table(physeq.simp))[save,6])
 }
 #write.table(group.simper.kw, "group_krusk_simper.csv", sep=",")
-group.simper.kw <- read.csv("group_clean_simper.csv")
+#group.simper.kw <- read.csv("group_clean_simper.csv", row.names = 1)
+```
 
+
+### Prepare SIMPER Heatmap
+```{r}
+simp <- read.csv("simper/group_krusk_simper.csv", sep = ",")
+simp.sig <- simp[which(simp$fdr_krusk_p.val < 0.05),]
+uniq.simp <- unique(simp.sig$OTU)
+  # 20 OTUs
+
+w.sig <- c("Otu00119", "Otu00096", "Otu00111", "Otu00163", "Otu00055")
+s.sig <- c("Otu00035", "Otu00003", "Otu00017", "Otu00019", "Otu00027", "Otu00033")
+t.sig <- c("Otu00013", "Otu00016", "Otu00004")
+i.sig <- c("Otu00004", "Otu00001")
+p.sig <- c("Otu00008", "Otu00002", "Otu00005", "Otu00015", "Otu00044")
+
+
+w.sig.phy <- subset_taxa(physeq, Species %in% w.sig) 
+s.sig.phy <- subset_taxa(physeq, Species %in% s.sig)  
+t.sig.phy <- subset_taxa(physeq, Species %in% t.sig)  
+i.sig.phy <- subset_taxa(physeq, Species %in% i.sig)  
+p.sig.phy <- subset_taxa(physeq, Species %in% p.sig)  
+
+
+
+w.sig.df <- psmelt(w.sig.phy)
+w.sig.sum <- w.sig.df %>%
+  group_by(Group, Species) %>%
+  summarize(Mean = mean(Abundance))
+w.sig.sum$Species <- ordered(w.sig.sum$Species, levels = c("Otu00055", "Otu00163", "Otu00111", "Otu00096", "Otu00119"))
+
+s.sig.df <- psmelt(s.sig.phy)
+s.sig.sum <- s.sig.df %>%
+  group_by(Group, Species) %>%
+  summarize(Mean = mean(Abundance))
+s.sig.sum$Species <- ordered(s.sig.sum$Species, levels = c("Otu00033", "Otu00027", "Otu00019", "Otu00017", "Otu00003", "Otu00035"))
+
+t.sig.df <- psmelt(t.sig.phy)
+t.sig.sum <- t.sig.df %>%
+  group_by(Group, Species) %>%
+  summarize(Mean = mean(Abundance))
+t.sig.sum$Species <- ordered(t.sig.sum$Species, levels = c("Otu00004", "Otu00016", "Otu00013"))
+
+i.sig.df <- psmelt(i.sig.phy)
+i.sig.sum <- i.sig.df %>%
+  group_by(Group, Species) %>%
+  summarize(Mean = mean(Abundance))
+i.sig.sum$Species <- ordered(i.sig.sum$Species, levels = c("Otu00001", "Otu00004"))
+
+
+p.sig.df <- psmelt(p.sig.phy)
+p.sig.sum <- p.sig.df %>%
+  group_by(Group, Species) %>%
+  summarize(Mean = mean(Abundance))
+p.sig.sum$Species <- ordered(p.sig.sum$Species, levels = c("Otu00044", "Otu00015", "Otu00005", "Otu00002", "Otu00008"))
+
+
+
+
+########## SIMPER HEATMAP ##########
+
+
+
+w.simp.plot <- ggplot(w.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
+  geom_tile(colour = "gray40") +
+  scale_x_discrete(position = "top", labels = c("Summer Wild", "Summer Lab", "Torpor",
+                                                "IBA", "Spring")) +
+  ylab("OTU Taxonomic Classification") + xlab("Group\n") +
+  scale_y_discrete(labels = c("   ",
+                              expression(" "^a~"NK4A136"),
+                              expression(" "^a~"Lachnospiraceae"),
+                              expression(" "^a~"Lachnospiraceae"),
+                              expression(" "^X~"Lachnospiraceae"))) +
+  scale_fill_gradientn(name = "Mean\nRelative\nAbundance\n(%)", limits = c(0, 2.4),
+                       breaks = c(0, 1.2, 2.4),
+                       labels = c("0", "1.2", "2.4"),
+                       colours = c("#ffebe6", "#cc3000")) +
+  theme(axis.text.x = element_text(size = 8, color = "black", angle = 45, hjust = 0),
+        axis.text.y = element_text(size=8, color = "black"),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.border=element_blank(),
+        axis.title.x = element_text(size=10),
+        axis.title.y = element_text(size=10),
+        legend.title = element_text(size=8),
+        legend.text = element_text(size=8),
+        legend.key.height = unit(3.5, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10),
+        plot.margin = margin(t=0, r=5, b=13, l=0, unit = "mm")
+  )
+
+
+
+
+
+
+
+
+s.simp.plot <- ggplot(s.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
+  geom_tile(colour = "gray40") +
+  scale_x_discrete(position = "top", labels = c("Summer Wild", "Summer Lab", "Torpor",
+                                                "IBA", "Spring")) +
+  ylab("OTU Taxonomic Classification") + xlab("Group\n") +
+  scale_y_discrete(labels = c(expression(" "^abc~"Lachnospiraceae"), 
+                              expression(" "^ab~"NK4A136"), 
+                              expression(" "^ab~"Bacteroidales"), 
+                              expression(" "^ab~"Ruminococcus 1"), 
+                              expression(" "^a~"Lachnospiraceae"), 
+                              expression(" "^X~"Lactobacillus"))) +
+  scale_fill_gradientn(name = "Mean\nRelative\nAbundance\n(%)", limits = c(0, 12),
+                       breaks = c(0, 6, 12),
+                       labels = c("0", "6", "12"),
+                       colours = c("#f9ebee", "#e4677e")) +
+  theme(axis.text.x = element_text(size = 8, color = "black", angle = 40, hjust = 0),
+        axis.text.y = element_text(size=8, color = "black"),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.border=element_blank(),
+        axis.title.x = element_text(size=10),
+        axis.title.y = element_text(size=10),
+        legend.title = element_text(size=8),
+        legend.text = element_text(size=8),
+        legend.key.height = unit(4, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10),
+        plot.margin = margin(t=0, r=2, b=10, l=5, unit = "mm")
+        )
+
+
+t.simp.plot <- ggplot(t.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
+  geom_tile(colour = "gray40") +
+  scale_x_discrete(position = "top", labels = c("Summer Wild", "Summer Lab", "Torpor",
+                                                "IBA", "Spring")) +
+  ylab("OTU Taxonomic Classification") + xlab("Group\n") +
+  scale_y_discrete(labels = c(expression(" "^abc~"Odoribacter"),
+                              expression(" "^ab~"Bacteroides"),
+                              "Kiritimatiellae\nWCHB1-41")) +
+  scale_fill_gradientn(name = "Mean\nRelative\nAbundance\n(%)", limits = c(0, 11.4),
+                       breaks = c(0, 5.7, 11.4),
+                       labels = c("0", "5.7", "11.4"),
+                       colours = c("#ebecfa","#4b42bf")) +
+  theme(axis.text.x = element_text(size = 8, color = "black", angle = 50, hjust = 0),
+        axis.text.y = element_text(size=8, color = "black"),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.border=element_blank(),
+        axis.title.x = element_text(size=10),
+        axis.title.y = element_text(size=10),
+        legend.title = element_text(size=8),
+        legend.text = element_text(size=8),
+        legend.key.height = unit(2, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10),
+        plot.margin = margin(t=5, r=2, b=15, l=, unit = "mm")
+        )
+
+
+
+i.simp.plot <- ggplot(i.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
+  geom_tile(colour = "gray40") +
+  scale_x_discrete(position = "top", labels = c("Summer Wild", "Summer Lab", "Torpor",
+                                                "IBA", "Spring")) +
+  ylab("OTU Taxonomic Classification") + xlab("Group\n") +
+  scale_y_discrete(labels = c(expression(" "^ab~"Akkermansia"),
+                              expression(" "^a~"Odoribacter"))) +
+  scale_fill_gradientn(name = "Mean\nRelative\nAbundance\n(%)", limits = c(0, 17.6),
+                       breaks = c(0, 8.8, 17.6),
+                       labels = c("0", "8.8", "17.6"),
+                       colours = c("#e6f9ff", "#00ace6", "#0099cc")) +
+  theme(axis.text.x = element_text(size = 8, color = "black", angle = 50, hjust = 0),
+        axis.text.y = element_text(size=8, color = "black"),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.border=element_blank(),
+        axis.title.x = element_text(size=10),
+        axis.title.y = element_text(size=10),
+        legend.title = element_text(size=8),
+        legend.text = element_text(size=8),
+        legend.key.height = unit(1.5, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10),
+        plot.margin = margin(t=5, r=2, b=25, l=5, unit = "mm")
+        )
+
+
+
+
+p.simp.plot <- ggplot(p.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
+  geom_tile(colour = "gray40") +
+  scale_x_discrete(position = "top", labels = c("Summer Wild", "Summer Lab", "Torpor",
+                                                "IBA", "Spring")) +
+  ylab("OTU Taxonomic Classification") + xlab("Group\n") +
+  scale_y_discrete(labels = c(expression(" "^ab~"Lactobacillus"),
+                              expression(" "^ab~"Coprococcus 2"),
+                              expression(" "^ab~"Lachnospiraceae"),
+                              expression(" "^a~"Bacteroides"),
+                              "Prevotellaceae\nUCG-001")) +
+  scale_fill_gradientn(name = "Mean\nRelative\nAbundance\n(%)", limits = c(0, 6.8),
+                       breaks = c(0, 1.7, 3.4, 5.1, 6.8),
+                       labels = c("0", "1.7", "3.4", "5.1", "6.8"),
+                       colours = c("#eafaea", "#6fdc6f", "#46d246", "#28a428")) +
+  theme(axis.text.x = element_text(size = 8, color = "black", angle = 50, hjust = 0),
+        axis.text.y = element_text(size=8, color = "black"),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.border=element_blank(),
+        axis.title.x = element_text(size=10),
+        axis.title.y = element_text(size=10),
+        legend.title = element_text(size=8),
+        legend.text = element_text(size=8),
+        legend.key.height = unit(3.3, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10),
+        plot.margin = margin(t=0, r=2, b=10, l=0, unit = "mm")
+        )
 
 
 ```
+### Plot - SIMPER Heatmap
+```{r}
+tiff("heatmap.tiff", width = 170, height = 210, units = "mm", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 1), 
+                                         heights = c(1, 1, 1))))
 
+print(w.simp.plot, vp=viewport(layout.pos.row=1, layout.pos.col=1))
+print(s.simp.plot, vp=viewport(layout.pos.row=1, layout.pos.col=2))
+print(t.simp.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+print(i.simp.plot, vp=viewport(layout.pos.row=2, layout.pos.col=2))
+print(p.simp.plot, vp=viewport(layout.pos.row=3, layout.pos.col=1))
+
+
+grid.text("A", x=unit(0.03, "npc"), y = unit(0.97, "npc"),
+          vp=viewport(layout.pos.row=1, layout.pos.col=1),
+          gp=gpar(fontsize=12,fontface="bold"))
+
+grid.text("Prevotellaceae\nUCG-003",
+          x=unit(0.115, "npc"), y=unit(0.225, "npc"), just = "left",
+          vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=8))
+grid.text(expression(" "^b),
+          x=unit(0.095, "npc"), y=unit(0.26, "npc"),
+          vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=8))
+
+
+grid.text("X = Enriched in Summer Wild compared to all groups\na = Enriched in Summer Wild compared to Summer Lab\nb = Enriched in Summer Wild compared to IBA",
+          x=unit(0.89, "npc"), y=unit(0.114, "npc"), just = "right",
+          vp=viewport(layout.pos.row=1, layout.pos.col=1), gp=gpar(fontsize=6))
+
+grid.text("B", x=unit(0.03, "npc"), y = unit(0.97, "npc"),
+          vp=viewport(layout.pos.row=1, layout.pos.col=2),
+          gp=gpar(fontsize=12,fontface="bold"))
+grid.text("X = Enriched in Summer Lab compared to all groups\na = Enriched in Summer Lab compared to Torpor\nb = Enriched in Summer Lab compared to IBA\nc = Enriched in Summer Lab compared to Summer Wild",
+          x=unit(0.91, "npc"), y=unit(0.055, "npc"), just = "right",
+          vp=viewport(layout.pos.row=1, layout.pos.col=2), gp=gpar(fontsize=6))
+
+
+grid.text("C", x=unit(0.03, "npc"), y = unit(0.9, "npc"), 
+          vp=viewport(layout.pos.row=2, layout.pos.col=1),
+          gp=gpar(fontsize=12, fontface="bold"))
+
+grid.text(expression(" "^a),
+          x=unit(0.0625, "npc"), y=unit(0.555, "npc"),
+          vp=viewport(layout.pos.row=2, layout.pos.col=1), gp=gpar(fontsize=8))
+
+
+grid.text("a = Enriched in Torpor compared to Summer Lab\nb = Enriched in Torpor compared to Summer Wild\nc = Enriched in Torpor compared to Spring",
+          x=unit(0.94, "npc"), y=unit(0.14, "npc"), just = "right",
+          vp=viewport(layout.pos.row=2, layout.pos.col=1), gp=gpar(fontsize=6))
+
+
+grid.text("D", x=unit(0.03, "npc"), y = unit(0.9, "npc"),
+          vp=viewport(layout.pos.row=2, layout.pos.col=2),
+          gp=gpar(fontsize=12,fontface="bold"))
+grid.text("a = Enriched in IBA compared to Summer Lab\nb = Enriched in IBA compared to Summer Wild",
+          x=unit(0.95, "npc"), y=unit(0.25, "npc"), just = "right",
+          vp=viewport(layout.pos.row=2, layout.pos.col=2), gp=gpar(fontsize=6))
+
+grid.text("E", x=unit(0.03, "npc"), y = unit(0.97, "npc"),
+          vp=viewport(layout.pos.row=3, layout.pos.col=1),
+          gp=gpar(fontsize=12, fontface="bold"))
+grid.text("X = Enriched in Spring compared to all groups\na = Enriched in Spring compared to Summer Wild\nb = Enriched in Spring compared to Torpor and IBA",
+          x=unit(0.93, "npc"), y=unit(0.07, "npc"), just = "right",
+          vp=viewport(layout.pos.row=3, layout.pos.col=1), gp=gpar(fontsize=6))
+
+grid.text(expression(" "^X),
+          x=unit(0.11, "npc"), y=unit(0.64, "npc"),
+          vp=viewport(layout.pos.row=3, layout.pos.col=1), gp=gpar(fontsize=8))
+
+dev.off()
+```
 
 ### Core OTUs
 ```{r}
