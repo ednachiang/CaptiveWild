@@ -1035,6 +1035,7 @@ group.simper.kw <- read.csv("group_clean_simper.csv")
 
 ### Core OTUs
 ```{r}
+### Identify Core OTUs
 wild.otu <- data.frame(otu_table(physeq.wild))
 wild.core <- apply(wild.otu, 1, function(row) all(row != 0))
 wild.core <- wild.otu[wild.core,]
@@ -1064,6 +1065,58 @@ spr.core <- apply(spr.otu, 1, function(row) all(row != 0))
 spr.core <- spr.otu[spr.core,]
 phy.spr.core <- merge_phyloseq(otu_table(spr.core, taxa_are_rows = T), tax_table(physeq.spr), sample_data(physeq.spr))
   # 112 OTUs
+
+
+
+### Compare Core OTUs
+intersect(rownames(wild.core), rownames(sum.core))
+  # 15 shared core OTUs
+  # "Otu00159" "Otu00026" "Otu00154" "Otu00175" "Otu00197" "Otu00120" "Otu00156" "Otu00200" "Otu00093" "Otu00133" "Otu00067" "Otu00068" "Otu00084" "Otu00011" "Otu00137"
+
+intersect(rownames(wild.core), rownames(tor.core))
+  # 25 shared core OTUs
+  # "Otu00188" "Otu00051" "Otu00159" "Otu00026" "Otu00018" "Otu00016" "Otu00154" "Otu00197" "Otu00120" "Otu00161" "Otu00200" "Otu00093" "Otu00067" "Otu00074" "Otu00038" "Otu00004" "Otu00108" "Otu00223" "Otu00045" "Otu00075" "Otu00068" "Otu00084" "Otu00011" "Otu00137" "Otu00058"
+
+intersect(rownames(wild.core), rownames(iba.core))
+  # 24 shared core OTUs
+  # "Otu00170" "Otu00097" "Otu00051" "Otu00026" "Otu00175" "Otu00197" "Otu00120" "Otu00267" "Otu00169" "Otu00184" "Otu00150" "Otu00206" "Otu00156" "Otu00200" "Otu00093" "Otu00067" "Otu00004" "Otu00068" "Otu00084" "Otu00011" "Otu00137" "Otu00116" "Otu00219" "Otu00058"
+
+intersect(rownames(wild.core), rownames(spr.core))
+  # 47 shared core OTUs
+  # "Otu00107" "Otu00170" "Otu00167" "Otu00051" "Otu00159" "Otu00026" "Otu00018" "Otu00016" "Otu00034" "Otu00154" "Otu00175" "Otu00098" "Otu00147" "Otu00403" "Otu00073" "Otu00197" "Otu00229" "Otu00267" "Otu00184" "Otu00150" "Otu00161" "Otu00210" "Otu00156" "Otu00273" "Otu00200" "Otu00093" "Otu00133" "Otu00067" "Otu00038" "Otu00105" "Otu00102" "Otu00182" "Otu00045" "Otu00151" "Otu00122" "Otu00075" "Otu00021" "Otu00050" "Otu00068" "Otu00274" "Otu00011" "Otu00052" "Otu00308" "Otu00137" "Otu00162" "Otu00005" "Otu00058"
+
+intersect(rownames(sum.core), rownames(tor.core))
+  # 17 shared core OTUs
+  # "Otu00072" "Otu00159" "Otu00026" "Otu00154" "Otu00197" "Otu00120" "Otu00200" "Otu00093" "Otu00067" "Otu00040" "Otu00068" "Otu00084" "Otu00043" "Otu00011" "Otu00041" "Otu00137" "Otu00065"
+
+intersect(rownames(sum.core), rownames(iba.core))
+  # 19 shared core OTUs
+  # "Otu00072" "Otu00026" "Otu00053" "Otu00175" "Otu00278" "Otu00197" "Otu00120" "Otu00156" "Otu00200" "Otu00093" "Otu00067" "Otu00068" "Otu00084" "Otu00043" "Otu00011" "Otu00041" "Otu00137" "Otu00090" "Otu00065"
+
+intersect(rownames(sum.core), rownames(spr.core))
+  # 20 shared core OTUs
+  # "Otu00159" "Otu00044" "Otu00026" "Otu00053" "Otu00154" "Otu00175" "Otu00197" "Otu00236" "Otu00156" "Otu00200" "Otu00093" "Otu00133" "Otu00067" "Otu00040" "Otu00068" "Otu00043" "Otu00011" "Otu00041" "Otu00137" "Otu00090"
+
+intersect(rownames(tor.core), rownames(iba.core))
+  # 24 shared core OTUs
+  # "Otu00051" "Otu00072" "Otu00241" "Otu00026" "Otu00197" "Otu00120" "Otu00200" "Otu00093" "Otu00067" "Otu00004" "Otu00143" "Otu00068" "Otu00084" "Otu00043" "Otu00011" "Otu00094" "Otu00041" "Otu00138" "Otu00137" "Otu00007" "Otu00086" "Otu00112" "Otu00058" "Otu00065"
+
+intersect(rownames(tor.core), rownames(spr.core))
+  # 31 shared core OTUs
+  # "Otu00051" "Otu00159" "Otu00078" "Otu00026" "Otu00018" "Otu00016" "Otu00177" "Otu00154" "Otu00197" "Otu00161" "Otu00200" "Otu00093" "Otu00067" "Otu00038" "Otu00009" "Otu00265" "Otu00110" "Otu00045" "Otu00040" "Otu00075" "Otu00143" "Otu00068" "Otu00043" "Otu00011" "Otu00205" "Otu00094" "Otu00041" "Otu00138" "Otu00137" "Otu00112" "Otu00058"
+
+intersect(rownames(iba.core), rownames(spr.core))
+  # 27 shared core OTUs
+  # "Otu00170" "Otu00051" "Otu00433" "Otu00026" "Otu00053" "Otu00175" "Otu00197" "Otu00267" "Otu00184" "Otu00150" "Otu00232" "Otu00156" "Otu00200" "Otu00093" "Otu00067" "Otu00143" "Otu00068" "Otu00043" "Otu00011" "Otu00094" "Otu00109" "Otu00041" "Otu00138" "Otu00137" "Otu00090" "Otu00112" "Otu00058"
+
+### Find core of core OTUs (in every single sample)
+core1 <- intersect(rownames(wild.core), rownames(sum.core))
+core2 <- intersect(core1, rownames(tor.core))
+core3 <- intersect(core2, rownames(iba.core))
+core4 <- intersect(core3, rownames(spr.core))
+
+# 8 CORE core OTUs
+# "Otu00026" "Otu00197" "Otu00200" "Otu00093" "Otu00067" "Otu00068" "Otu00011" "Otu00137"
 ```
 
 
