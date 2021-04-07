@@ -10,15 +10,17 @@ output: html_document
 library(ape)
 library(dplyr)
 library(ggplot2)
-library(gplots)
-library(phangorn)
-library(tidyr)
-library(vegan)
-library(phyloseq)
 library(grid)
-library(pgirmess)
+library(phyloseq)
 library(picante)
 library(phytools)
+library(tidyr)
+library(vegan)
+
+#library(gplots)
+#library(phangorn)
+#library(pgirmess)
+
 theme_set(theme_bw())
 set.seed(1)
 ```
@@ -889,7 +891,7 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
   scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(1,6), breaks = c(1,2,3,4,5,6)) +
   scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  ylab("Shannon Index") +
+  ylab("Shannon's Index") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
