@@ -9,26 +9,27 @@ output: html_document
 ```{r}
 library(ape)
 library(dplyr)
+library(dunn.test)
 library(ggplot2)
-library(gplots)
-library(phangorn)
-library(tidyr)
-library(vegan)
-library(phyloseq)
 library(grid)
-library(pgirmess)
+library(phyloseq)
 library(picante)
 library(phytools)
+library(tidyr)
+library(vegan)
+
+#library(gplots)
+#library(phangorn)
+#library(pgirmess)
+
 theme_set(theme_bw())
 set.seed(1)
 ```
 
 ### Load Functions
 ```{r}
-source('scripts/veganCovEllipse.R')
 source('scripts/simper_pretty.R')
 source('scripts/R_krusk.R')
-source('scripts/pairwise.adonis.R')
 source('scripts/misc.R')
 ```
 
@@ -53,6 +54,25 @@ tax_table(mothurdata) <- cbind(tax_table(mothurdata),
 colnames(tax_table(mothurdata)) <- 
   c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 
+# Remove OTUs that appear in < 3 samples
+otu <- data.frame(otu_table(mothurdata))
+otu.rem <- list()
+for(i in 1:nrow(otu)){
+  empty <- length(which(otu[i,] == 0))
+    # Identifies # of samples w/o OTU
+  if(empty > 54){
+    # If OTU appears in < 3 samples
+    otu.rem <- append(otu.rem, i)
+      # Create list of OTUs that appear in only 1 sample
+  }
+}
+otu.rem.row <- as.numeric(otu.rem)
+  # Convert list to numeric
+otu.rem.df <- otu[-otu.rem.row,]
+  # Remove OTUs
+otu.rem.tab <- otu_table(otu.rem.df, taxa_are_rows = T)
+  # Convert trimmed OTU table to otu_table
+
 # Add metadata
 meta <- read.csv("metadata.csv")
 rownames(meta) <- meta$Sample
@@ -60,7 +80,8 @@ divsum <- read.table("mothur_output/final.summary", header = T)
 meta[,12:21] <- divsum[,3:12]
 
 # Update phyloseq object
-physeq <- merge_phyloseq(mothurdata, sample_data(meta))
+physeq <- merge_phyloseq(otu.rem.tab, tax_table(mothurdata), sample_data(meta),
+                         phy_tree(mothurdata))
 
 # Order factors
 sample_data(physeq)$Season <- ordered(sample_data(physeq)$Season,
@@ -74,7 +95,7 @@ sample_data(physeq)$Group <- ordered(sample_data(physeq)$Group,
 physeq <- subset_samples(physeq, ID != 3925)
 physeq <- subset_samples(physeq, ID != 3916)
 
-# Subset out paired samples
+# Subset out unpaired samples
 physeq.pair <- subset_samples(physeq, ID != 3881)
 physeq.pair <- subset_samples(physeq.pair, ID != 3886)
 physeq.pair <- subset_samples(physeq.pair, ID != 4057)
@@ -90,20 +111,6 @@ physeq.spr <- subset_samples(physeq.pair, Group == "Spring")
 physeq.con <- subset_samples(physeq.pair, Sample_Type == "Content")
 physeq.muc <- subset_samples(physeq.pair, Sample_Type == "Mucosa")
 
-
-
-# Pull out only lab squirrels
-physeq.lab <- subset_samples(physeq, Diet != "Wild")
-
-# Min, Mean, Max of sample read counts
-min(sample_sums(mothurdata))
-  # 10452
-mean(sample_sums(mothurdata))
-  # 10999.21
-median(sample_sums(mothurdata))
-  # 11028
-max(sample_sums(mothurdata))
-  # 11156
 ```
 
 ### Phylogenetic Diversity and SES MPD
@@ -166,11 +173,11 @@ hist(pd.ready$Stat, breaks=10)
 qqnorm(pd.ready$Stat)
 qqline(pd.ready$Stat)
 shapiro.test(pd.ready$Stat)
-  # p-value = 0.0008458
+  # p-value = 9.477e-06
   # Not Normal
 
 wilcox.test(Stat ~ Sample_Type, data = pd.ready, paired = T)
-  # p-value = 0.173
+  # p-value = 0.5782
 
 
 
@@ -179,11 +186,11 @@ hist(mpd.ready$Stat, breaks=10)
 qqnorm(mpd.ready$Stat)
 qqline(mpd.ready$Stat)
 shapiro.test(mpd.ready$Stat)
-  # p-value = 0.1955
+  # p-value = 0.08911
   # Normal
 
 t.test(Stat ~ Sample_Type, data = mpd.ready, paired = T)
-  # p-value = 0.7921
+  # p-value = 0.8007
 ```
 
 ### Alpha Diversity
@@ -232,10 +239,10 @@ hist(uniq.otus$Unique_OTUs, breaks=10)
 qqnorm(uniq.otus$Unique_OTUs)
 qqline(uniq.otus$Unique_OTUs)
 shapiro.test(uniq.otus$Unique_OTUs)
-  # p-value = 0.0004062
+  # p-value = 5.043e-06
   # Not Normal
 wilcox.test(Unique_OTUs ~ Sample_Type, data = uniq.otus)
-  # p-value = 0.05353
+  # p-value = 0.6554
 
 ```
 
@@ -246,7 +253,7 @@ wilcox.test(Unique_OTUs ~ Sample_Type, data = uniq.otus)
 ########## Unweighted UniFrac ##########
 UF.u <- phyloseq::distance(physeq = physeq.pair, method = "unifrac")
 UF.u.pcoa <- ordinate(physeq = physeq.pair, method = "PCoA", distance = "unifrac")
-  # Variation explained = 22.1%
+  # Variation explained = 27.7%
 plot_ordination(physeq = physeq.pair, ordination = UF.u.pcoa, axes = c(1,2),
                 title = "Unweighted UniFrac") +
   geom_point(size = 2, aes(colour = Sample_Type))
@@ -257,15 +264,17 @@ pair.sampdf <- data.frame(sample_data(physeq.pair))
 beta.tax <- betadisper(d=UF.u, group=pair.sampdf$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.003
-anosim(UF.u, pair.sampdf$Sample_Type, permutations = 9999)
-  # p-value = 0.4388
+  # p-value = 0.232
+adonis(UF.u ~ Sample_Type, data = pair.sampdf, permutations = 9999)
+  # p-value = 0.9998
+
+
 
 
 ########## Weighted UniFrac ##########
 UF.w <- phyloseq::distance(physeq = physeq.pair, method = "wunifrac")
 UF.w.pcoa <- ordinate(physeq = physeq.pair, method = "PCoA", distance = "wunifrac")
-  # Variation explained = 35.5%
+  # Variation explained = 35.7%
 
 plot_ordination(physeq = physeq.pair, ordination = UF.w.pcoa, axes = c(1,2),
                 title = "Weighted UniFrac") +
@@ -277,8 +286,7 @@ pair.sampdf <- data.frame(sample_data(physeq.pair))
 beta.tax <- betadisper(d=UF.w, group=pair.sampdf$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.094
+  # p-value = 0.113
 adonis(UF.w ~ Sample_Type, data = pair.sampdf, permutations = 9999)
-  # p-value = 0.9971
-  # R2 = 0.00686
+  # p-value = 0.9957
 ```
