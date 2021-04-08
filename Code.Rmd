@@ -9,6 +9,7 @@ output: html_document
 ```{r}
 library(ape)
 library(dplyr)
+library(dunn.test)
 library(ggplot2)
 library(grid)
 library(phyloseq)
@@ -53,6 +54,25 @@ tax_table(mothurdata) <- cbind(tax_table(mothurdata),
 colnames(tax_table(mothurdata)) <- 
   c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 
+# Remove OTUs that appear in < 3 samples
+otu <- data.frame(otu_table(mothurdata))
+otu.rem <- list()
+for(i in 1:nrow(otu)){
+  empty <- length(which(otu[i,] == 0))
+    # Identifies # of samples w/o OTU
+  if(empty > 54){
+    # If OTU appears in < 3 samples
+    otu.rem <- append(otu.rem, i)
+      # Create list of OTUs that appear in only 1 sample
+  }
+}
+otu.rem.row <- as.numeric(otu.rem)
+  # Convert list to numeric
+otu.rem.df <- otu[-otu.rem.row,]
+  # Remove OTUs
+otu.rem.tab <- otu_table(otu.rem.df, taxa_are_rows = T)
+  # Convert trimmed OTU table to otu_table
+
 # Add metadata
 meta <- read.csv("metadata.csv")
 rownames(meta) <- meta$Sample
@@ -60,7 +80,8 @@ divsum <- read.table("mothur_output/final.summary", header = T)
 meta[,12:21] <- divsum[,3:12]
 
 # Update phyloseq object
-physeq <- merge_phyloseq(mothurdata, sample_data(meta))
+physeq <- merge_phyloseq(otu.rem.tab, tax_table(mothurdata), sample_data(meta),
+                         phy_tree(mothurdata))
 
 # Order factors
 sample_data(physeq)$Season <- ordered(sample_data(physeq)$Season,
@@ -86,17 +107,7 @@ physeq.iba <- subset_samples(physeq, Group == "IBA")
 physeq.spr <- subset_samples(physeq, Group == "Spring")
 
 # Pull out only lab squirrels
-physeq.lab <- subset_samples(physeq, Diet != "Wild")
-
-# Min, Mean, Max of sample read counts
-min(sample_sums(mothurdata))
-  # 10452
-mean(sample_sums(mothurdata))
-  # 10999.21
-median(sample_sums(mothurdata))
-  # 11028
-max(sample_sums(mothurdata))
-  # 11156
+#physeq.lab <- subset_samples(physeq, Diet != "Wild")
 ```
 
 
@@ -119,18 +130,20 @@ phy99 <- prune_taxa(taxa_sums(phy99) > 1, phy99)
 ### Adjust P-values
 # The raw p-values are from the Group-level Kruskal-Wallis (not pairwise Wilcoxon)
 # I included this code above the phyla-specific analyses for reference
-p.adjust(c(3.383e-08, 0.0001905, 0.0007905, 0.002968, 0.03355, 0.0298, 7.077e-05, 0.001643, 0.04759, 0.009963, 0.009963), method = "fdr")
-  # Firmicutes = 3.721300e-07
-  # Bacteroidetes = 6.985000e-04
-  # Verrucomicrobia = .002173875
-  # Proteobacteria = .005441333e
-  # Unclassified = .03690500
-  # Kiritimatiellaeota = .03642222
-  # Cyanobacteria = 3.892350e-04
-  # Tenericutes = .003614600
-  # Actinobacteria = .04759000
-  # Elusimicrobia = .01369912
-  # Epsilonbacteraeota = .01369912
+p.adjust(c(3.367e-08, 0.0003114, 0.0008299, 0.003129, 0.02357, 0.01903, 6.982e-05, 0.002416, 0.0614, 0.01184, 0.01184), method = "fdr")
+  # Firmicutes = 3.703700e-07
+  # Bacteroidetes = 0.001141800e
+  # Verrucomicrobia = 0.002282225
+  # Proteobacteria = 0.005736500e
+  # Unclassified = 0.02592700
+  # Kiritimatiellaeota = 0.02325889
+  # Cyanobacteria = 3.840100e-04
+  # Tenericutes = 0.005315200
+  # Actinobacteria = 0.06140000
+  # Elusimicrobia = 0.01628000
+  # Epsilonbacteraeota = 0.01628000
+
+     
 
 
 ##### FIRMICUTES #####
@@ -143,23 +156,26 @@ hist(fir.df$RelAbund, breaks=10)
 qqnorm(fir.df$RelAbund)
 qqline(fir.df$RelAbund)
 shapiro.test(fir.df$RelAbund)
-  # p-value = 0.02565
+  # p-value = 0.02135
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=fir.df)
-  # p-value = 3.383e-08
-pairwise.wilcox.test(fir.df$RelAbund, fir.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 1.00000
-  # Wild-Torpor = 0.00016*
-  # Wild-IBA = 5.7e-05*
-  # Wild-Spring = 0.04371*
-  # Lab-Torpor = 1.3e-06*
-  # Lab-IBA = 2.6e-07*
-  # Lab-Spring = 0.00658*
-  # Torpor-IBA = 1.00000
-  # Torpor-Spring = 0.00108*
-  # IBA-Spring = 0.00041*
+  # p-value = 3.367e-08
+dunn.test(x = as.numeric(fir.df$RelAbund), g = as.factor(fir.df$Group), method = "bh", label = T)
+  # Wild-Lab = 0.5108
+  # Wild-Torpor = 0.0002*
+  # Wild-IBA= 0.0001*
+  # Wild-Spring = 0.1308
+  # Lab-Torpor = 0.000*
+  # Lab-IBA = 0.000*
+  # Lab-Spring = 0.0880
+  # Torpor-IBA = 0.4975
+  # Torpor-Spring = 0.0226*
+  # Spring-IBA = 0.0213*
+
+
+
 
 
 
@@ -173,24 +189,26 @@ hist(bac.df$RelAbund, breaks=10)
 qqnorm(bac.df$RelAbund)
 qqline(bac.df$RelAbund)
 shapiro.test(bac.df$RelAbund)
-  # p-value = 0.5318
+  # p-value = 0.461
   # Normal
   # Sticking with Kruskal-Wallis for consistency among phyla-level comparisons
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=bac.df)
-  # p-value = 0.0001905
-pairwise.wilcox.test(bac.df$RelAbund, bac.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.6392
-  # Wild-Torpor = 0.0098*
-  # Wild-IBA = 0.0057 *
-  # Wild-Spring = 0.0093*
-  # Lab-Torpor = 0.0093*
-  # Lab-IBA = 0.0034*
-  # Lab-Spring = 0.0079*
-  # Torpor-IBA = 0.9612
-  # Torpor-Spring = 0.9612
-  # IBA-Spring = 0.9612
+  # p-value = 0.0003114
+dunn.test(x = as.numeric(bac.df$RelAbund), g = as.factor(bac.df$Group), method = "bh", label = T)
+  # Wild-Lab = 0.4415
+  # Wild-Torpor = 0.0054*
+  # Wild-IBA = 0.0058*
+  # Wild-Spring = 0.0058*
+  # Lab-Torpor = 0.0062*
+  # Lab-IBA = 0.0073*
+  # Lab-Spring = 0.0057*
+  # Torpor-IBA = 0.4696
+  # Torpor-Spring = 0.4759
+  # IBA-Spring = 0.4447
+
+
 
 
 ##### Verrucomicrobia #####
@@ -203,23 +221,23 @@ hist(ver.df$RelAbund, breaks=10)
 qqnorm(ver.df$RelAbund)
 qqline(ver.df$RelAbund)
 shapiro.test(ver.df$RelAbund)
-  # p-value = 3.532e-08
+  # p-value = 3.582e-08
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ver.df)
-  # p-value = 0.0007905
-pairwise.wilcox.test(ver.df$RelAbund, ver.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.6298
-  # Wild-Torpor = 0.3345
-  # Wild-IBA = 0.0006*
-  # Wild-Spring = 0.3178
-  # Lab-Torpor = 0.3178 
-  # Lab-IBA =  9.6e-05*
-  # Lab-Spring = 0.3178
-  # Torpor-IBA = 0.3178
-  # Torpor-Spring = 0.3345
-  # IBA-Spring = 0.0855
+  # p-value = 0.0008299
+dunn.test(x = as.numeric(ver.df$RelAbund), g = as.factor(ver.df$Group), method = "bh", label = T)
+  # Wild-Lab = 0.4016
+  # Wild-Torpor = 0.0704
+  # Wild-IBA = 0.0021*
+  # Wild-Spring = 0.2333
+  # Lab-Torpor = 0.0871
+  # Lab-IBA = 0.0006*
+  # Lab-Spring = 0.2322
+  # Torpor-IBA = 0.0778
+  # Torpor-Spring = 0.3166
+  # IBA-Spring = 0.0677
 
 
 
@@ -235,54 +253,24 @@ hist(pro.df$RelAbund, breaks=10)
 qqnorm(pro.df$RelAbund)
 qqline(pro.df$RelAbund)
 shapiro.test(pro.df$RelAbund)
-  # p-value = 0.0003034
+  # p-value = 0.0003943
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=pro.df)
-  # p-value = 0.002968
-pairwise.wilcox.test(pro.df$RelAbund, pro.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.07245 
-  # Wild-Torpor = 0.00063*
-  # Wild-IBA = 0.02821*
-  # Wild-Spring = 0.36859
-  # Lab-Torpor = 0.07245 
-  # Lab-IBA = 0.17503
-  # Lab-Spring = 0.69131
-  # Torpor-IBA = 0.97857
-  # Torpor-Spring = 0.04848*
-  # IBA-Spring = 0.15222
+  # p-value = 0.003129
+dunn.test(x = as.numeric(pro.df$RelAbund), g = as.factor(pro.df$Group), method = "bh", label = T)
+  # Wild-Lab = 0.0678
+  # Wild-Torpor = 0.0036*
+  # Wild-IBA = 0.003*
+  # Wild-Spring = 0.1908
+  # Lab-Torpor = 0.0579
+  # Lab-IBA = 0.0746
+  # Lab-Spring = 0.2889
+  # Torpor-IBA = 0.3555
+  # Torpor-Spring = 0.0602
+  # IBA-Spring = 0.0508
 
-
-
-
-##### UNCLASSIFIED #####
-unc.phy <- subset_taxa(phy99, Phylum == "Bacteria_unclassified")
-unc.df <- data.frame(sample_data(unc.phy))
-unc.df$RelAbund <- t(data.frame(otu_table(unc.phy)))
-
-# Test normality
-hist(unc.df$RelAbund, breaks=10)
-qqnorm(unc.df$RelAbund)
-qqline(unc.df$RelAbund)
-shapiro.test(unc.df$RelAbund)
-  # p-value = 2.589e-11
-  # Not Normal
-
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=unc.df)
-  # p-value = 0.03355
-pairwise.wilcox.test(unc.df$RelAbund, unc.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.182
-  # Wild-Torpor = 0.134
-  # Wild-IBA = 0.134
-  # Wild-Spring = 0.012*
-  # Lab-Torpor = 0.318
-  # Lab-IBA = 0.142
-  # Lab-Spring = 0.425
-  # Torpor-IBA = 0.318
-  # Torpor-Spring = 0.808
-  # IBA-Spring = 0.441
 
 
 
@@ -303,23 +291,26 @@ hist(kir.df$RelAbund, breaks=10)
 qqnorm(kir.df$RelAbund)
 qqline(kir.df$RelAbund)
 shapiro.test(kir.df$RelAbund)
-  # p-value = 8.273e-13
+  # p-value = 8.398e-13
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=kir.df)
-  # p-value = 0.0298
-pairwise.wilcox.test(kir.df$RelAbund, kir.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.96
-  # Wild-Torpor = 0.1
-  # Wild-IBA = 0.74
-  # Wild-Spring = 0.1
-  # Lab-Torpor = 0.1
-  # Lab-IBA = 0.74
-  # Lab-Spring = 0.1
-  # Torpor-IBA = 0.1
-  # Torpor-Spring = 0.96
-  # IBA-Spring = 0.48
+  # p-value = 0.01903
+dunn.test(x = as.numeric(kir.df$RelAbund), g = as.factor(kir.df$Group), method = "bh", label = T)
+  # Wild-Lab = 0.5439
+  # Wild-Torpor = 0.0414
+  # Wild-IBA = 0.3471
+  # Wild-Spring = 0.0531
+  # Lab-Torpor = 0.0286
+  # Lab-IBA = 0.3165
+  # Lab-Spring = 0.0607
+  # Torpor-IBA = 0.0548
+  # Torpor-Spring = 0.4929
+  # IBA-Spring = 0.0832
+
+
+
 
 
 
@@ -334,23 +325,28 @@ hist(cya.df$RelAbund, breaks=10)
 qqnorm(cya.df$RelAbund)
 qqline(cya.df$RelAbund)
 shapiro.test(cya.df$RelAbund)
-  # p-value = 1.665e-07
+  # p-value = 3.154e-08
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=cya.df)
-  # p-value = 7.077e-05
-pairwise.wilcox.test(cya.df$RelAbund, cya.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 8.6e-05*
-  # Wild-Torpor = 0.00021*
-  # Wild-IBA = 8.6e-05*
-  # Wild-Spring = 0.00291*
-  # Lab-Torpor = 0.21206 
-  # Lab-IBA = 0.57042
-  # Lab-Spring = 0.37787
-  # Torpor-IBA = 0.01798*
-  # Torpor-Spring = 0.01422*
-  # IBA-Spring = 0.44112
+  # p-value = 6.982e-05
+dunn.test(x = as.numeric(cya.df$RelAbund), g = as.factor(cya.df$Group), method = "bh", label = T)
+  # Wild-Lab = 0.0003*
+  # Wild-Torpor = 0.0251*
+  # Wild-IBA = 0.0001*
+  # Wild-Spring = 0.0001*
+  # Lab-Torpor = 0.0972
+  # Lab-IBA = 0.2689
+  # Lab-Spring = 0.1591
+  # Torpor-IBA = 0.0347
+  # Torpor-Spring = 0.0244*
+  # IBA-Spring = 0.2834
+
+
+
+
+
 
 
 
@@ -364,23 +360,25 @@ hist(ten.df$RelAbund, breaks=10)
 qqnorm(ten.df$RelAbund)
 qqline(ten.df$RelAbund)
 shapiro.test(ten.df$RelAbund)
-  # p-value = 1.228e-08
+  # p-value = 3.674e-08
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ten.df)
-  # p-value = 0.001643
-pairwise.wilcox.test(ten.df$RelAbund, ten.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.22640
-  # Wild-Torpor = 0.00031*
-  # Wild-IBA = 0.00031*
-  # Wild-Spring = 0.44773
-  # Lab-Torpor = 0.12625
-  # Lab-IBA = 0.12625
-  # Lab-Spring = 0.66842
-  # Torpor-IBA = 0.44773
-  # Torpor-Spring = 0.12625
-  # IBA-Spring = 0.12625
+  # p-value = 0.002416
+dunn.test(x = as.numeric(ten.df$RelAbund), g = as.factor(ten.df$Group), method = "bh", label = T)
+  # Wild-Lab = 0.0670
+  # Wild-Torpor = 0.0029*
+  # Wild-IBA = 0.0031*
+  # Wild-Spring = 0.1740
+  # Lab-Torpor = 0.0469
+  # Lab-IBA = 0.0553
+  # Lab-Spring = 0.3478
+  # Torpor-IBA = 0.3370
+  # Torpor-Spring = 0.0609
+  # IBA-Spring = 0.0564
+
+
 
 
 
@@ -395,23 +393,13 @@ hist(act.df$RelAbund, breaks=10)
 qqnorm(act.df$RelAbund)
 qqline(act.df$RelAbund)
 shapiro.test(act.df$RelAbund)
-  # p-value = 0.0003346
+  # p-value = 9.667e-05
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=act.df)
-  # p-value = 0.04759
-pairwise.wilcox.test(act.df$RelAbund, act.df$Group, p.adjust.method="fdr")
-  # Wild-Lab = 0.344
-  # Wild-Torpor = 0.019
-  # Wild-IBA = 0.050
-  # Wild-Spring = 0.019
-  # Lab-Torpor = 0.369
-  # Lab-IBA = 0.501
-  # Lab-Spring = 0.369
-  # Torpor-IBA = 0.544
-  # Torpor-Spring = 0.600
-  # IBA-Spring = 0.344
+  # p-value = 0.0614
+
 
 
 
@@ -428,23 +416,27 @@ hist(elu.df$RelAbund, breaks=10)
 qqnorm(elu.df$RelAbund)
 qqline(elu.df$RelAbund)
 shapiro.test(elu.df$RelAbund)
-  # p-value = 2.203e-11
+  # p-value = 3.056e-11
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=elu.df)
-  # p-value = 0.009963
-pairwise.wilcox.test(elu.df$RelAbund, elu.df$Group, p.adjust.method="fdr")#### ERROR
-  # Wild-Lab = 0.058
-  # Wild-Torpor = 0.065
-  # Wild-IBA = 0.932
-  # Wild-Spring = 0.058
-  # Lab-Torpor = 0.932
-  # Lab-IBA = 0.113
-  # Lab-Spring = 0.145
-  # Torpor-IBA = 0.145
-  # Torpor-Spring = 0.398
-  # IBA-Spring = 0.058
+  # p-value = 0.01184
+dunn.test(x = as.numeric(elu.df$RelAbund), g = as.factor(elu.df$Group), method = "bh", label = T)
+  # Wild-Lab = 0.0421
+  # Wild-Torpor = 0.360
+  # Wild-IBA = 0.2571
+  # Wild-Spring = 0.0185*
+  # Lab-Torpor = 0.4673
+  # Lab-IBA = 0.0655
+  # Lab-Spring = 0.1584
+  # Torpor-IBA = 0.0627
+  # Torpor-Spring = 0.1699
+  # IBA-Spring = 0.0225*
+
+
+
+
 
 
 
@@ -458,23 +450,25 @@ hist(eps.df$RelAbund, breaks=10)
 qqnorm(eps.df$RelAbund)
 qqline(eps.df$RelAbund)
 shapiro.test(eps.df$RelAbund)
-  # p-value = 2.203e-11
+  # p-value = 3.056e-11
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=eps.df)
-  # p-value = 0.009963
-pairwise.wilcox.test(eps.df$RelAbund, eps.df$Group, p.adjust.method="fdr")#### ERROR
-  # Wild-Lab = 0.058
-  # Wild-Torpor = 0.065
-  # Wild-IBA = 0.932
-  # Wild-Spring = 0.058
-  # Lab-Torpor = 0.932
-  # Lab-IBA = 0.113
-  # Lab-Spring = 0.145
-  # Torpor-IBA = 0.145
-  # Torpor-Spring = 0.398
-  # IBA-Spring = 0.058
+  # p-value = 0.01184
+dunn.test(x = as.numeric(eps.df$RelAbund), g = as.factor(eps.df$Group), method = "bh", label = T)
+  # Wild-Lab = 0.0421
+  # Wild-Torpor = 0.0360
+  # Wild-IBA = 0.2571
+  # Wild-Spring = 0.0185*
+  # Lab-Torpor = 0.4673
+  # Lab-IBA = 0.0655
+  # Lab-Spring = 0.1584
+  # Torpor-IBA = 0.0627
+  # Torpor-Spring = 0.1699
+  # IBA-Spring = 0.0225*
+
+
 ```
 
 
@@ -690,7 +684,7 @@ mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
   scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(-12,6), breaks = c(-12,-6,0,6)) +
   scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  ylab("Phylogenetic Evenness (SES MPD)") +
+  ylab("Phylogenetic Evenness (MPD)") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
@@ -719,12 +713,12 @@ hist(pd.ready$Stat, breaks=10)
 qqnorm(pd.ready$Stat)
 qqline(pd.ready$Stat)
 shapiro.test(pd.ready$Stat)
-  # p-value = 0.0003125
+  # p-value = 3.843e-06
   # Not Normal
 
 # Female vs. Male
 kruskal.test(formula = Stat ~ Sex, data = pd.ready)
-  # p-value = 0.2129
+  # p-value = 0.4484
 
 # Subset out groups
 pd.wild <- pd.ready[which(pd.ready$Group == "Summer_Wild"),]
@@ -748,28 +742,28 @@ pd.wp <- rbind(pd.wild, pd.spr)
 
 # Run Kruskal-Wallis
 kruskal.test(formula = Stat ~ Group, data = pd.ready)
-  # p-value = 5.833e-06
+  # p-value = 5.022e-06
 kruskal.test(formula = Stat ~ Group, data = pd.ws)
   # Summer Wild vs. Summer Lab
-  # p-value = 0.0002831     
+  # p-value = 0.000215     
 kruskal.test(formula = Stat ~ Group, data = pd.st)
   # Summer vs. Torpor
-  # p-value = 0.001414
+  # p-value = 0.00169
 kruskal.test(formula = Stat ~ Group, data = pd.si)
   # Summer vs. IBA
-  # p-value = 0.001944
+  # p-value = 0.02324
 kruskal.test(formula = Stat ~ Group, data = pd.sp)
   # Summer vs. Spring
-  # p-value = 0.2758
+  # p-value = 0.8153
 kruskal.test(formula = Stat ~ Group, data = pd.ti)
   # Torpor vs. IBA
-  # p-value = 0.9563
+  # p-value = 0.1394
 kruskal.test(formula = Stat ~ Group, data = pd.tp)
   # Torpor vs. Spring
-  # p-value = 0.03481
+  # p-value = 0.002569
 kruskal.test(formula = Stat ~ Group, data = pd.ip)
   # IBA vs. Spring
-  # p-value = 0.05783
+  # p-value = 0.01676
 kruskal.test(formula = Stat ~ Group, data = pd.wt)
   # Summer Wild vs. Torpor
   # p-value = 0.0004888
