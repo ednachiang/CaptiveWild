@@ -565,7 +565,7 @@ mpd.sum$YMIN <- mpd.sum$Mean - mpd.sum$SE
 ########## PLOT PD & MPD ##########
 
 ### Plot PD ###
-pd.ann <- data.frame(lab = c("a", "b", "c", "cd", "bd"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
+pd.ann <- data.frame(lab = c("a", "b", "c", "bcd", "bd"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
 
 pd.plot <- ggplot(pd.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_violin() +
@@ -603,7 +603,7 @@ pd.plot <- ggplot(pd.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_point(data = pd.sum, aes(y= Mean), colour="white", size = 0.5, 
              show.legend = F) +
   scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  scale_y_continuous(limits = c(14,50), breaks = c(14,20,26,32,38,44,50)) +
+  scale_y_continuous(limits = c(18,36.5), breaks = c(18,21.7,25.4,29.1,32.8,36.5)) +
   scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   ylab("Faith's Phylogenetic Diversity") +
     theme(panel.grid.major = element_blank(),
@@ -625,7 +625,7 @@ pd.plot <- ggplot(pd.ready, aes(x = Group, y = Stat, fill = Group)) +
 
         
 ### Plot MPD ###
-mpd.ann <- data.frame(lab = c("a", "a", "b", "b", "ab"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
+mpd.ann <- data.frame(lab = c("ab", "a", "b", "b", "ab"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
 
 mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_violin() +
@@ -663,7 +663,7 @@ mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_point(data = mpd.sum, aes(y= Mean), colour="white", size = 0.5, 
              show.legend = F) +
   scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  scale_y_continuous(limits = c(-12,6), breaks = c(-12,-6,0,6)) +
+  scale_y_continuous(limits = c(-2.35,3.1), breaks = c(-2.2,-1.14,-0.08,0.98,2.04,3.1)) +
   scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   ylab("Phylogenetic Evenness (MPD)") +
     theme(panel.grid.major = element_blank(),
@@ -701,72 +701,22 @@ shapiro.test(pd.ready$Stat)
 kruskal.test(formula = Stat ~ Sex, data = pd.ready)
   # p-value = 0.4484
 
-# Subset out groups
-pd.wild <- pd.ready[which(pd.ready$Group == "Summer_Wild"),]
-pd.sum <- pd.ready[which(pd.ready$Group == "Summer_Lab"),]
-pd.tor <- pd.ready[which(pd.ready$Group == "Torpor"),]
-pd.iba <- pd.ready[which(pd.ready$Group == "IBA"),]
-pd.spr <- pd.ready[which(pd.ready$Group == "Spring"),]
-
-# Subset out pairwise comparisons
-pd.ws <- rbind(pd.wild, pd.sum)
-pd.st <- rbind(pd.sum, pd.tor)
-pd.si <- rbind(pd.sum, pd.iba)
-pd.sp <- rbind(pd.sum, pd.spr)
-pd.ti <- rbind(pd.tor, pd.iba)
-pd.tp <- rbind(pd.tor, pd.spr)
-pd.ip <- rbind(pd.iba, pd.spr)
-pd.wt <- rbind(pd.wild, pd.tor)
-pd.wi <- rbind(pd.wild, pd.iba)
-pd.wp <- rbind(pd.wild, pd.spr)
-
-
 # Run Kruskal-Wallis
 kruskal.test(formula = Stat ~ Group, data = pd.ready)
   # p-value = 5.022e-06
-kruskal.test(formula = Stat ~ Group, data = pd.ws)
-  # Summer Wild vs. Summer Lab
-  # p-value = 0.000215     
-kruskal.test(formula = Stat ~ Group, data = pd.st)
-  # Summer vs. Torpor
-  # p-value = 0.00169
-kruskal.test(formula = Stat ~ Group, data = pd.si)
-  # Summer vs. IBA
-  # p-value = 0.02324
-kruskal.test(formula = Stat ~ Group, data = pd.sp)
-  # Summer vs. Spring
-  # p-value = 0.8153
-kruskal.test(formula = Stat ~ Group, data = pd.ti)
-  # Torpor vs. IBA
-  # p-value = 0.1394
-kruskal.test(formula = Stat ~ Group, data = pd.tp)
-  # Torpor vs. Spring
-  # p-value = 0.002569
-kruskal.test(formula = Stat ~ Group, data = pd.ip)
-  # IBA vs. Spring
-  # p-value = 0.01676
-kruskal.test(formula = Stat ~ Group, data = pd.wt)
-  # Summer Wild vs. Torpor
-  # p-value = 0.0004888
-kruskal.test(formula = Stat ~ Group, data = pd.wi)
-  # Summer Wild vs. IBA
-  # p-value = 0.0002566    
-kruskal.test(formula = Stat ~ Group, data = pd.wp)
-  # Summer Wild vs. Spring
-  # p-value = 0.0027 
+dunn.test(x = as.numeric(pd.ready$Stat), g = as.factor(pd.ready$Group), method = "bh", label = T)
+# Wild-Lab = 0.0098*
+# Wild-Torpor = 0.0000*
+# Wild-IBA = 0.0001*
+# Wild-Spring = 0.0327
+# Lab-Torpor = 0.0045*
+# Lab-IBA = 0.0367
+# Lab-Spring = 0.4133
+# Torpor-IBA = 0.1515
+# Torpor-Spring = 0.0107*
+# IBA-Spring = 0.0500
 
-# Adjust p-values
-p.adjust(c(0.0002831, 0.001414, 0.001944, 0.2758, 0.9563, 0.03481, 0.05783, 0.0004888, 0.0002566, 0.0027), method = "fdr")
-  # Summer Wild vs. Summer Lab = 0.0014155*
-  # Summer Lab vs. Torpor = 0.003535*
-  # Summer Lab vs. IBA = 0.003888*
-  # Summer Lab vs. Spring = 0.30644
-  # Torpor vs. IBA = 0.9563
-  # Torpor vs. Spring = 0.049728571*
-  # IBA vs. Spring = 0.0722875
-  # Summer Wild vs. Torpor = 0.00162933*
-  # Summer Wild vs. IBA = 0.0014155*
-  # Summer Wild vs. Spring = 0.0045*
+
 
 
  
@@ -776,27 +726,27 @@ hist(mpd.ready$Stat, breaks=10)
 qqnorm(mpd.ready$Stat)
 qqline(mpd.ready$Stat)
 shapiro.test(mpd.ready$Stat)
-  # p-value = 0.1952
+  # p-value = 0.1652
   # Normal
 
 # Female vs. Male
 wilcox.test(formula = Stat ~ Sex, data = mpd.ready)
-  # p-value = 0.1632
+  # p-value = 0.02257
 
 # Run ANOVA
 summary(aov(Stat ~ Group, data = mpd.ready))
-  # p-value = 2.78e-07
+  # p-value = 0.000829
 TukeyHSD(aov(Stat ~ Group, data = mpd.ready))
-  # Summer_Lab-Summer_Wild = 0.9488331
-  # Torpor-Summer_Wild = 0.0006378*
-  # IBA-Summer_Wild = 0.0071398*
-  # Spring-Summer_Wild = 0.4584299
-  # Torpor-Summer_Lab = 0.0000015*
-  # IBA-Summer_Lab = 0.0000243*
-  # Spring-Summer_Lab = 0.0825831
-  # IBA-Torpor = 0.7890777
-  # Spring-Torpor = 0.1584833
-  # Spring-IBA = 0.5855451
+  # Summer_Lab-Summer_Wild = 0.1031086
+  # Torpor-Summer_Wild = 0.7170097
+  # IBA-Summer_Wild = 0.9988490
+  # Spring-Summer_Wild = 0.9906331
+  # Torpor-Summer_Lab = 0.0004883*
+  # IBA-Summer_Lab = 0.0103018*
+  # Spring-Summer_Lab = 0.3525159
+  # IBA-Torpor = 0.7487473
+  # Spring-Torpor = 0.4425591
+  # Spring-IBA = 0.9364683
 
 
 ```
@@ -905,21 +855,24 @@ hist(uniq.otus$Unique_OTUs, breaks=10)
 qqnorm(uniq.otus$Unique_OTUs)
 qqline(uniq.otus$Unique_OTUs)
 shapiro.test(uniq.otus$Unique_OTUs)
-  # p-value = 0.000166
+  # p-value =  2.065e-06
   # Not Normal
 kruskal.test(formula = Unique_OTUs ~ Group, data = uniq.otus)
-  # p-value = 1.227e-06
-pairwise.wilcox.test(uniq.otus$Unique_OTUs, uniq.otus$Group, p.adjust.method="fdr")
-  # Summer Wild vs. Summer Lab = 0.00027*
-  # Summer Wild vs. Torpor = 0.00027*
-  # Summer Wild vs. IBA = 0.00074*
-  # Summer Wild vs. Spring = 0.00194*
-  # Summer Lab vs. Torpor = 0.00027*
-  # Summer Lab vs. IBA = 0.00088*
-  # Summer Lab vs. Spring = 0.12470
-  # Torpor vs. IBA = 0.76330
-  # Torpor vs. Spring = 0.02078*
-  # IBA vs. Spring = 0.09509
+  # p-value = 4.092e-07
+dunn.test(x = as.numeric(uniq.otus$Unique_OTUs), g = as.factor(uniq.otus$Group), method = "bh", label = T)
+# Wild-Lab = 0.0228*
+# Wild-Torpor = 0.0000*
+# Wild-IBA = 0.0000*
+# Wild-Spring = 0.0235*
+# Lab-Torpor = 0.0005*
+# Lab-IBA = 0.0034*
+# Lab-Spring = 0.3570
+# Torpor-IBA = 0.2326
+# Torpor-Spring = 0.0129*
+# IBA-Spring = 0.0345
+
+
+
 
 ### Prepare data for plot
 uniq.otus.sum <- uniq.otus %>%
@@ -931,7 +884,7 @@ uniq.otus.sum <- uniq.otus %>%
 uniq.otus.sum$YMAX <- uniq.otus.sum$Mean + uniq.otus.sum$SE
 uniq.otus.sum$YMIN <- uniq.otus.sum$Mean - uniq.otus.sum$SE
 
-otu.ann <- data.frame(lab = c("a", "bd", "c", "cd", "de"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
+otu.ann <- data.frame(lab = c("a", "bd", "c", "cd", "bd"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
 
 otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
   geom_violin() +
@@ -990,7 +943,7 @@ otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
 
 ### Plot - PD, SES MPD, Alpha Div
 ```{r}
-#tiff("adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+tiff("adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -1005,7 +958,7 @@ print(mpd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
 grid.text("D", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
           gp=gpar(fontsize=8,fontface="bold"))
 print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
-#dev.off()
+dev.off()
 ```
 
 ### Beta Diversity
