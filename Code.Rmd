@@ -106,8 +106,6 @@ physeq.tor <- subset_samples(physeq, Group == "Torpor")
 physeq.iba <- subset_samples(physeq, Group == "IBA")
 physeq.spr <- subset_samples(physeq, Group == "Spring")
 
-# Pull out only lab squirrels
-#physeq.lab <- subset_samples(physeq, Diet != "Wild")
 ```
 
 
@@ -125,23 +123,6 @@ phy99 <- prune_taxa(taxa_sums(phy99) > 1, phy99)
 # View ordered phyla - most abundant --> least abundant
 # barplot(sort(taxa_sums(phy99),TRUE)[1:20]/nsamples(phy99),las=2,cex.axis=.7)
 # 11 phyla: "Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Bacteria_unclassified", "Kiritimatiellaeota", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia", "Epsilonbacteraeota"
-
-
-### Adjust P-values
-# The raw p-values are from the Group-level Kruskal-Wallis (not pairwise Wilcoxon)
-# I included this code above the phyla-specific analyses for reference
-p.adjust(c(3.367e-08, 0.0003114, 0.0008299, 0.003129, 0.02357, 0.01903, 6.982e-05, 0.002416, 0.0614, 0.01184, 0.01184), method = "fdr")
-  # Firmicutes = 3.703700e-07
-  # Bacteroidetes = 0.001141800e
-  # Verrucomicrobia = 0.002282225
-  # Proteobacteria = 0.005736500e
-  # Unclassified = 0.02592700
-  # Kiritimatiellaeota = 0.02325889
-  # Cyanobacteria = 3.840100e-04
-  # Tenericutes = 0.005315200
-  # Actinobacteria = 0.06140000
-  # Elusimicrobia = 0.01628000
-  # Epsilonbacteraeota = 0.01628000
 
      
 
@@ -165,14 +146,14 @@ kruskal.test(formula = RelAbund ~ Group, data=fir.df)
 dunn.test(x = as.numeric(fir.df$RelAbund), g = as.factor(fir.df$Group), method = "bh", label = T)
   # Wild-Lab = 0.5108
   # Wild-Torpor = 0.0002*
-  # Wild-IBA= 0.0001*
+  # Wild-IBA = 0.0001*
   # Wild-Spring = 0.1308
   # Lab-Torpor = 0.000*
   # Lab-IBA = 0.000*
   # Lab-Spring = 0.0880
   # Torpor-IBA = 0.4975
   # Torpor-Spring = 0.0226*
-  # Spring-IBA = 0.0213*
+  # IBA-Spring = 0.0213*
 
 
 
@@ -441,7 +422,7 @@ dunn.test(x = as.numeric(elu.df$RelAbund), g = as.factor(elu.df$Group), method =
 
 
 ##### EPSILONBACTERAEOTA #####
-eps.phy <- subset_taxa(phy99, Phylum == "Elusimicrobia")
+eps.phy <- subset_taxa(phy99, Phylum == "Epsilonbacteraeota")
 eps.df <- data.frame(sample_data(eps.phy))
 eps.df$RelAbund <- t(data.frame(otu_table(eps.phy)))
 
@@ -450,23 +431,23 @@ hist(eps.df$RelAbund, breaks=10)
 qqnorm(eps.df$RelAbund)
 qqline(eps.df$RelAbund)
 shapiro.test(eps.df$RelAbund)
-  # p-value = 3.056e-11
+  # p-value = 3.941e-14
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=eps.df)
-  # p-value = 0.01184
+  # p-value = 0.002286
 dunn.test(x = as.numeric(eps.df$RelAbund), g = as.factor(eps.df$Group), method = "bh", label = T)
-  # Wild-Lab = 0.0421
-  # Wild-Torpor = 0.0360
-  # Wild-IBA = 0.2571
-  # Wild-Spring = 0.0185*
-  # Lab-Torpor = 0.4673
-  # Lab-IBA = 0.0655
-  # Lab-Spring = 0.1584
-  # Torpor-IBA = 0.0627
-  # Torpor-Spring = 0.1699
-  # IBA-Spring = 0.0225*
+  # Wild-Lab = 0.0100*
+  # Wild-Torpor = 0.0107*
+  # Wild-IBA = 0.0012*
+  # Wild-Spring = 0.0011*
+  # Lab-Torpor = 0.4864
+  # Lab-IBA = 0.1699
+  # Lab-Spring = 0.1500
+  # Torpor-IBA = 0.1821
+  # Torpor-Spring = 0.1492
+  # IBA-Spring = 0.3327
 
 
 ```
