@@ -1017,7 +1017,7 @@ p <- permutest(beta.tax)
 p$tab
   # p-value = 0.001
 anosim(ws.u, sampdf.ws$Group, permutations = 9999)
-  # p-value = 2e-04
+  # p-value = 1e-04
 
 # Summer Lab vs Torpor
 st.u <- phyloseq::distance(physeq = phy.st, method = "unifrac")
@@ -1025,7 +1025,7 @@ sampdf.st<- data.frame(sample_data(phy.st))
 beta.tax <- betadisper(d=st.u, group=sampdf.st$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.19
+  # p-value = 0.181
 anosim(st.u, sampdf.st$Group, permutations = 9999)
   # p-value = 1e-04
 
@@ -1035,7 +1035,7 @@ sampdf.si<- data.frame(sample_data(phy.si))
 beta.tax <- betadisper(d=si.u, group=sampdf.si$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.105
+  # p-value = 0.244
 anosim(si.u, sampdf.si$Group, permutations = 9999)
   # p-value = 1e-04
 
@@ -1045,9 +1045,9 @@ sampdf.sp<- data.frame(sample_data(phy.sp))
 beta.tax <- betadisper(d=sp.u, group=sampdf.sp$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.008
+  # p-value = 0.02
 anosim(sp.u, sampdf.sp$Group, permutations = 9999)
-  # p-value = 0.5597
+  # p-value = 0.4146
 
 # Torpor vs IBA
 ti.u <- phyloseq::distance(physeq = phy.ti, method = "unifrac")
@@ -1055,9 +1055,9 @@ sampdf.ti<- data.frame(sample_data(phy.ti))
 beta.tax <- betadisper(d=ti.u, group=sampdf.ti$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.6
+  # p-value = 0.922
 anosim(ti.u, sampdf.ti$Group, permutations = 9999)
-  # p-value = 0.1113
+  # p-value = 0.1647
 
 # Torpor vs Spring
 tp.u <- phyloseq::distance(physeq = phy.tp, method = "unifrac")
@@ -1065,9 +1065,9 @@ sampdf.tp<- data.frame(sample_data(phy.tp))
 beta.tax <- betadisper(d=tp.u, group=sampdf.tp$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.02
+  # p-value = 0.004
 anosim(tp.u, sampdf.tp$Group, permutations = 9999)
-  # p-value = 0.0027
+  # p-value = 0.0012
 
 # IBA vs Spring
 ip.u <- phyloseq::distance(physeq = phy.ip, method = "unifrac")
@@ -1075,9 +1075,9 @@ sampdf.ip<- data.frame(sample_data(phy.ip))
 beta.tax <- betadisper(d=ip.u, group=sampdf.ip$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.262
+  # p-value = 0.144
 anosim(ip.u, sampdf.ip$Group, permutations = 9999)
-  # p-value = 0.0157
+  # p-value = 0.0122
 
 
 # Summer Wild vs. Torpor
@@ -1088,7 +1088,7 @@ p <- permutest(beta.tax)
 p$tab
   # p-value = 0.001
 anosim(wt.u, sampdf.wt$Group, permutations = 9999)
-  # p-value = 2e-04 
+  # p-value = 1e-04 
 
 # Summer Wild vs. IBA
 wi.u <- phyloseq::distance(physeq = phy.wi, method = "unifrac")
@@ -1096,7 +1096,7 @@ sampdf.wi<- data.frame(sample_data(phy.wi))
 beta.tax <- betadisper(d=wi.u, group=sampdf.wi$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.008
+  # p-value = 0.002
 anosim(wi.u, sampdf.wi$Group, permutations = 9999)
   # p-value = 1e-04 
 
@@ -1106,39 +1106,39 @@ sampdf.wp<- data.frame(sample_data(phy.wp))
 beta.tax <- betadisper(d=wp.u, group=sampdf.wp$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.01
+  # p-value = 0.003
 anosim(wp.u, sampdf.wp$Group, permutations = 9999)
-  # p-value = 8e-04 
+  # p-value = 5e-04
 
 
 # Adjust betadisper p-values
-p.adjust(c(0.001, 0.19, 0.105, 0.008, 0.6, 0.02, 0.262, 0.001, 0.008, 0.01),
+p.adjust(c(0.001,0.181,0.244,0.02,0.922,0.004,0.144,0.001,0.002,0.003),
          method = "fdr")
   # Summer Wild vs. Summer Lab = 0.005*
-  # Summer Lab vs. Torpor = 0.2375
-  # Summer Lab vs. IBA = 0.15
-  # Summer Lab vs. Spring = 0.02*
-  # Torpor vs. IBA = 0.6
-  # Torpor vs. Spring = 0.033*
-  # IBA vs. Spring = 0.2911
+  # Summer Lab vs. Torpor = 0.22625
+  # Summer Lab vs. IBA = 0.2711
+  # Summer Lab vs. Spring = 0.0333*
+  # Torpor vs. IBA = 0.9220
+  # Torpor vs. Spring = 0.008*
+  # IBA vs. Spring = 0.205714286
   # Summer Wild vs. Torpor = 0.005*
-  # Summer Wild vs. IBA = 0.02*
-  # Summer Wild vs. Spring = 0.02*
+  # Summer Wild vs. IBA = 0.00667*
+  # Summer Wild vs. Spring = 0.0075*
 
 
 # Adjust ANOSIM p-values
-p.adjust(c(2e-04, 1e-04, 1e-04, 0.5597, 0.1113, 0.0027, 0.0157, 2e-04, 1e-04, 8e-04),
+p.adjust(c(1e-04,1e-04,1e-04,0.4146,0.1647,0.0012,0.0122,1e-04,1e-04,5e-04),
          method = "fdr")
-  # Summer Wild vs. Summer Lab = 0.0004*
-  # Summer Lab vs. Torpor = 0.00033*
-  # Summer Lab vs. IBA = 0.00033*
-  # Summer Lab vs. Spring = 0.5597
-  # Torpor vs. IBA = 0.123667
-  # Torpor vs. Spring = 0.0038571429*
-  # IBA vs. Spring = 0.019625
-  # Summer Wild vs. Torpor = 0.0004*
-  # Summer Wild vs. IBA = 0.00033*
-  # Summer Wild vs. Spring = 0.0013*
+  # Summer Wild vs. Summer Lab = 0.0002*
+  # Summer Lab vs. Torpor = 0.0002*
+  # Summer Lab vs. IBA = 0.0002*
+  # Summer Lab vs. Spring = 0.4146
+  # Torpor vs. IBA = 0.183
+  # Torpor vs. Spring = 0.0017142857*
+  # IBA vs. Spring = 0.01525*
+  # Summer Wild vs. Torpor = 0.0002*
+  # Summer Wild vs. IBA = 0.0002*
+  # Summer Wild vs. Spring = 0.000833*
 
 
 
@@ -1150,7 +1150,7 @@ p.adjust(c(2e-04, 1e-04, 1e-04, 0.5597, 0.1113, 0.0027, 0.0157, 2e-04, 1e-04, 8e
 ########## Weighted UniFrac ##########
 UF.w <- phyloseq::distance(physeq = physeq, method = "wunifrac")
 UF.w.pcoa <- ordinate(physeq = physeq, method = "PCoA", distance = "wunifrac")
-  # Variation explained = 35.8%
+  # Variation explained = 34.9%
 
 wUF.plot <- plot_ordination(physeq = physeq, ordination = UF.w.pcoa, axes = c(1,2),
                 title = "Weighted UniFrac", color = "Group") +
@@ -1176,9 +1176,9 @@ sampdf <- data.frame(sample_data(physeq))
 beta.tax <- betadisper(d=UF.w, group=sampdf$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.01
+  # p-value = 0.009
 anosim(UF.w, sampdf$Group, permutations = 9999)
-  # p-value = 1e-04 
+  # p-value = 1e-04
 
 
 
@@ -1201,9 +1201,9 @@ sampdf.ws<- data.frame(sample_data(phy.ws))
 beta.tax <- betadisper(d=ws.w, group=sampdf.ws$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.002
+  # p-value = 0.001
 anosim(ws.w, sampdf.ws$Group, permutations = 9999)
-  # p-value = 0.0019
+  # p-value = 0.0039
 
 # Summer Lab vs Torpor
 st.w <- phyloseq::distance(physeq = phy.st, method = "wunifrac")
@@ -1211,7 +1211,7 @@ sampdf.st<- data.frame(sample_data(phy.st))
 beta.tax <- betadisper(d=st.w, group=sampdf.st$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.935
+  # p-value = 0.906
 anosim(st.w, sampdf.st$Group, permutations = 9999)
   # p-value = 1e-04
 
@@ -1222,7 +1222,7 @@ sampdf.si<- data.frame(sample_data(phy.si))
 beta.tax <- betadisper(d=si.w, group=sampdf.si$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.511
+  # p-value = 0.502
 anosim(si.w, sampdf.si$Group, permutations = 9999)
   # p-value = 1e-04
 
@@ -1233,9 +1233,9 @@ sampdf.sp<- data.frame(sample_data(phy.sp))
 beta.tax <- betadisper(d=sp.w, group=sampdf.sp$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.272
+  # p-value = 0.188
 anosim(sp.w, sampdf.sp$Group, permutations = 9999)
-  # p-value = 0.0385
+  # p-value = 0.0374
 
 
 # Torpor vs IBA
@@ -1244,9 +1244,9 @@ sampdf.ti<- data.frame(sample_data(phy.ti))
 beta.tax <- betadisper(d=ti.w, group=sampdf.ti$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.483
+  # p-value = 0.48
 anosim(ti.w, sampdf.ti$Group, permutations = 9999)
-  # p-value = 0.7023
+  # p-value = 0.7029
 
 # Torpor vs Spring
 tp.w <- phyloseq::distance(physeq = phy.tp, method = "wunifrac")
@@ -1254,9 +1254,9 @@ sampdf.tp<- data.frame(sample_data(phy.tp))
 beta.tax <- betadisper(d=tp.w, group=sampdf.tp$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.128
+  # p-value = 0.159
 anosim(tp.w, sampdf.tp$Group, permutations = 9999)
-  # p-value = 1e-04
+  # p-value = 2e-04
 
 # IBA vs Spring
 ip.w <- phyloseq::distance(physeq = phy.ip, method = "wunifrac")
@@ -1264,7 +1264,7 @@ sampdf.ip<- data.frame(sample_data(phy.ip))
 beta.tax <- betadisper(d=ip.w, group=sampdf.ip$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.292
+  # p-value = 0.362
 anosim(ip.w, sampdf.ip$Group, permutations = 9999)
   # p-value = 1e-04
 
@@ -1274,7 +1274,7 @@ sampdf.wt<- data.frame(sample_data(phy.wt))
 beta.tax <- betadisper(d=wt.w, group=sampdf.wt$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.005
+  # p-value = 0.004
 anosim(wt.w, sampdf.wt$Group, permutations = 9999)
   # p-value = 1e-04 
 
@@ -1284,7 +1284,7 @@ sampdf.wi<- data.frame(sample_data(phy.wi))
 beta.tax <- betadisper(d=wi.w, group=sampdf.wi$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.007
+  # p-value = 0.004
 anosim(wi.w, sampdf.wi$Group, permutations = 9999)
   # p-value = 1e-04
 
@@ -1294,38 +1294,38 @@ sampdf.wp<- data.frame(sample_data(phy.wp))
 beta.tax <- betadisper(d=wp.w, group=sampdf.wp$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.151
+  # p-value = 0.078
 anosim(wp.w, sampdf.wp$Group, permutations = 9999)
-  # p-value = 8e-04 
+  # p-value = 5e-04
 
 
 # Adjust betadisper p-values
-p.adjust(c(0.002, 0.935, 0.511, 0.272, 0.483, 0.128, 0.292, 0.005, 0.007, 0.151),
+p.adjust(c(0.001,0.906,0.502,0.188,0.48,0.159,0.362,0.004,0.004,0.078),
          method = "fdr")
-  # Summer Wild vs. Summer Lab = 0.02*
-  # Summer Lab vs. Torpor = 0.935
-  # Summer Lab vs. IBA = 0.56778
-  # Summer Lab vs. Spring = 0.41714286
-  # Torpor vs. IBA = 0.56778
-  # Torpor vs. Spring = 0.302
-  # IBA vs. Spring = 0.41714286
-  # Summer Wild vs. Torpor = 0.0233*
-  # Summer Wild vs. IBA = 0.0233*
-  # Summer Wild vs. Spring = 0.302
+  # Summer Wild vs. Summer Lab = 0.01*
+  # Summer Lab vs. Torpor = 0.906
+  # Summer Lab vs. IBA = 0.55778
+  # Summer Lab vs. Spring = 0.3133
+  # Torpor vs. IBA = 0.55778
+  # Torpor vs. Spring = 0.3133
+  # IBA vs. Spring = 0.51714286
+  # Summer Wild vs. Torpor = 0.0133*
+  # Summer Wild vs. IBA = 0.0133*
+  # Summer Wild vs. Spring = 0.195
 
 # Adjust ANOSIM p-values
-p.adjust(c(0.0019, 1e-04, 1e-04, 0.0385, 0.7023, 1e-04, 1e-04, 1e-04, 1e-04, 8e-04),
+p.adjust(c(0.0039,1e-04,1e-04,0.0374,0.7029,2e-04,1e-04,1e-04,1e-04,5e-04),
          method = "fdr")
-  # Summer Wild vs. Summer Lab = 0.002375*
-  # Summer Lab vs. Torpor = 0.0001667*
-  # Summer Lab vs. IBA = 0.0001667*
-  # Summer Lab vs. Spring = 0.042778*
-  # Torpor vs. IBA = 0.7023
-  # Torpor vs. Spring = 0.0001667*
-  # IBA vs. Spring = 0.0001667*
-  # Summer Wild vs. Torpor = 0.0001667*
-  # Summer Wild vs. IBA = 0.0001667*
-  # Summer Wild vs. Spring = 0.0011428571*
+  # Summer Wild vs. Summer Lab = 0.004875*
+  # Summer Lab vs. Torpor = 0.0002*
+  # Summer Lab vs. IBA = 0.0002*
+  # Summer Lab vs. Spring = 0.041556*
+  # Torpor vs. IBA = 0.7029
+  # Torpor vs. Spring = 0.00033*
+  # IBA vs. Spring = 0.0002*
+  # Summer Wild vs. Torpor = 0.0002*
+  # Summer Wild vs. IBA = 0.0002*
+  # Summer Wild vs. Spring = 0.0007142857*
 ```
 
 
