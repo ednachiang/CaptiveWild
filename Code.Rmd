@@ -603,7 +603,7 @@ pd.plot <- ggplot(pd.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_point(data = pd.sum, aes(y= Mean), colour="white", size = 0.5, 
              show.legend = F) +
   scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  scale_y_continuous(limits = c(18,36.5), breaks = c(18,21.7,25.4,29.1,32.8,36.5)) +
+  scale_y_continuous(limits = c(13,40), breaks = c(13,19.5,26,32.5,39)) +
   scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   ylab("Faith's Phylogenetic Diversity") +
     theme(panel.grid.major = element_blank(),
@@ -618,7 +618,7 @@ pd.plot <- ggplot(pd.ready, aes(x = Group, y = Stat, fill = Group)) +
         axis.text.y = element_text(size=6),
         legend.position = "none") +
   geom_text(data = pd.ann, aes(label=lab), x=c(1,2,3,4,5),
-            y=c(50,50,50,50,50), size=2, color="black")
+            y=c(40,40,40,40,40), size=2, color="black")
 
 
 
@@ -663,7 +663,7 @@ mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_point(data = mpd.sum, aes(y= Mean), colour="white", size = 0.5, 
              show.legend = F) +
   scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  scale_y_continuous(limits = c(-2.35,3.1), breaks = c(-2.2,-1.14,-0.08,0.98,2.04,3.1)) +
+  scale_y_continuous(limits = c(-7,5.7), breaks = c(-7,-4.5,-2,0.5,3.0,5.5)) +
   scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   ylab("Phylogenetic Evenness (MPD)") +
     theme(panel.grid.major = element_blank(),
@@ -673,12 +673,12 @@ mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
         strip.text.x = element_text(face ="bold", size=6),
         axis.title.x = element_text(face="bold", size=6, vjust = 10,
                                     margin = margin(t = 1, r = 10, b = -15, l = 1)),
-        axis.title.y = element_text(face="bold", size=6, vjust = -2),
+        axis.title.y = element_text(face="bold", size=6),
         axis.text.x = element_text(size=6, angle = 50, hjust = 1, vjust = 1.05),
         axis.text.y = element_text(size=6),
         legend.position = "none") +
   geom_text(data = mpd.ann, aes(label=lab), x=c(1,2,3,4,5),
-            y=c(6,6,6,6,6), size=2, color="black")
+            y=c(5.7,5.7,5.7,5.7,5.7), size=2, color="black")
 
         
 
@@ -768,15 +768,7 @@ summary(aov(shannon ~ Group, data = adiv))
   # p-value = 0.847
 
 ### Prepare data for plot
-shannon.sum <- adiv %>%
-  group_by(Group) %>%
-  summarize(Mean = mean(shannon),
-            SE = se(shannon),
-            SD = sd(shannon),
-            Median = median(shannon))
-shannon.sum$YMAX <- shannon.sum$Mean + shannon.sum$SE
-shannon.sum$YMIN <- shannon.sum$Mean - shannon.sum$SE
-
+c
 ### Plot
 shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
   geom_violin() +
@@ -814,7 +806,7 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
   geom_point(data = shannon.sum, aes(y= Mean), colour="white", size = 0.5, 
              show.legend = F) +
   scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  scale_y_continuous(limits = c(1,6), breaks = c(1,2,3,4,5,6)) +
+  scale_y_continuous(limits = c(1.4, 5.75), breaks = c(1.4,2.26,3.12,3.98,4.84,5.7)) +
   scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   ylab("Shannon's Index") +
     theme(panel.grid.major = element_blank(),
@@ -832,7 +824,7 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
         legend.key.height = unit(3, 'mm'),
         legend.key.width = unit(3, "mm"),
         legend.box.margin=margin(-10,-10,-10,-10)) +
-  annotate("text", x = 3, y = 6, label = "ns", size = 2)
+  annotate("text", x = 3, y = 5.75, label = "ns", size = 2)
 
 
 
@@ -922,7 +914,7 @@ otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
   geom_point(data = uniq.otus.sum, aes(y= Mean), colour="white", size = 0.5, 
              show.legend = F) +
   scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  scale_y_continuous(limits = c(200,1150), breaks = c(200, 500, 800, 1100)) +
+  scale_y_continuous(limits = c(200,800), breaks = c(200, 400, 600, 800)) +
   scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   ylab("Number of Unique OTUs") +
     theme(panel.grid.major = element_blank(),
@@ -932,12 +924,12 @@ otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
         strip.text.x = element_text(face ="bold", size=6),
         axis.title.x = element_text(face="bold", size=6, vjust = 10, 
                                     margin = margin(t = 1, r = 10, b = -15, l = 1)),
-        axis.title.y = element_text(face="bold", size=6, vjust = -2),
+        axis.title.y = element_text(face="bold", size=6),
         axis.text.x = element_text(size=6, angle = 50, hjust = 1, vjust = 1.05),
         axis.text.y = element_text(size=6),
         legend.position = "none") +
   geom_text(data = otu.ann, aes(label=lab), x=c(1,2,3,4,5),
-            y=c(1150,1150,1150,1150,1150), size=2, color="black")
+            y=c(810,810,810,810,810), size=2, color="black")
 
 ```
 
