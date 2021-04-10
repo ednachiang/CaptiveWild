@@ -769,7 +769,16 @@ summary(aov(shannon ~ Group, data = adiv))
   # p-value = 0.847
 
 ### Prepare data for plot
-c
+shannon.sum <- adiv %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(shannon),
+            SE = se(shannon),
+            SD = sd(shannon),
+            Median = median(shannon))
+shannon.sum$YMAX <- shannon.sum$Mean + shannon.sum$SE
+shannon.sum$YMIN <- shannon.sum$Mean - shannon.sum$SE
+
+
 ### Plot
 shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
   geom_violin() +
@@ -806,7 +815,7 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
   geom_point(data = shannon.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
   geom_point(data = shannon.sum, aes(y= Mean), colour="white", size = 0.5, 
              show.legend = F) +
-  scale_fill_manual(values = c("#e60000", "#ec9393", "royalblue1", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  scale_fill_manual(values = c("#e60000", "#ec9393", "darkslateblue", "deepskyblue", "#6fdc6f"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(1.4, 5.75), breaks = c(1.4,2.26,3.12,3.98,4.84,5.7)) +
   scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   ylab("Shannon's Index") +
