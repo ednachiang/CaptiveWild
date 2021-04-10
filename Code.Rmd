@@ -566,7 +566,7 @@ mpd.sum$YMIN <- mpd.sum$Mean - mpd.sum$SE
 ########## PLOT PD & MPD ##########
 
 ### Plot PD ###
-pd.ann <- data.frame(lab = c("a", "b", "c", "bcd", "bd"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
+pd.ann <- data.frame(lab = c("a", "b", "c", "bc", "b"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
 
 pd.plot <- ggplot(pd.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_violin() +
@@ -887,7 +887,7 @@ uniq.otus.sum <- uniq.otus %>%
 uniq.otus.sum$YMAX <- uniq.otus.sum$Mean + uniq.otus.sum$SE
 uniq.otus.sum$YMIN <- uniq.otus.sum$Mean - uniq.otus.sum$SE
 
-otu.ann <- data.frame(lab = c("a", "bd", "c", "cd", "bd"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
+otu.ann <- data.frame(lab = c("a", "b", "c", "cd", "bd"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
 
 otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
   geom_violin() +
