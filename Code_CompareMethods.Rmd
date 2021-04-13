@@ -157,10 +157,10 @@ shapiro.test(TOST.otu.iso.t)
 
 ### RTOST ###
 # Low M1 vs. High M
-rtost(TOST.otu.iso.t, TOST.otu.co2.t, alpha = 0.05, epsilong = 0.25, tr = 0.2, paired = F)
+rtost(TOST.otu.iso.t, TOST.otu.co2.t, alpha = 0.05)
   # p-value = 4.339412e-38
   # Reject hypothesis that random & mean have non-equivalent means
-
+```
 
 
 
