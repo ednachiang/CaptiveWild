@@ -19,10 +19,7 @@ library(picante)
 library(phytools)
 library(tidyr)
 library(vegan)
-
-#library(gplots)
-#library(phangorn)
-#library(pgirmess)
+library(equivalence)
 
 theme_set(theme_bw())
 set.seed(1)
@@ -30,8 +27,6 @@ set.seed(1)
 
 ### Load Functions
 ```{r}
-source('scripts/simper_pretty.R')
-source('scripts/R_krusk.R')
 source('scripts/misc.R')
 ```
 
@@ -90,17 +85,85 @@ physeq <- merge_phyloseq(otu.rem.tab, tax_table(mothurdata), sample_data(meta),
 physeq <- subset_samples(physeq, ID != 3925)
 physeq <- subset_samples(physeq, ID != 3916)
 
-# Calculate relative abundance
-#physeq <- transform_sample_counts(physeq, function(x){(x/sum(x))*100})
-
 # Remove NA in "Anesthesia"
 physeq <- subset_samples(physeq, Anesthesia != "NA")
 
 # Subset out IBA
 physeq.iba <- subset_samples(physeq, Group == "IBA")
 
-
 ```
+
+
+### RTOST 
+```{r}
+# Code modified from Skarlupka, et al. (2019)
+# https://doi.org/10.1186/s40104-019-0375-0
+
+# Format OTU table
+TOST.otu <- data.frame(t(data.frame(otu_table(physeq.iba))))
+TOST.otu$Sample <- rownames(TOST.otu)
+TOST.otu$Anesthesia <- "Isoflurane"
+co2 <- c("CC1_883_I", "CC1_922_I", "CM1_883_I", "CM1_922_I")
+for(i in 1:length(co2)){
+  x <- which(TOST.otu$Sample == co2[i])
+  TOST.otu$Anesthesia[x] <- "CO2"
+}
+
+# Separate by anesthesia
+TOST.otu.iso <- TOST.otu[which(TOST.otu$Anesthesia == "Isoflurane"),]
+TOST.otu.co2 <- TOST.otu[which(TOST.otu$Anesthesia == "CO2"),]
+
+# Calculate mean OTUs for iso and co2; remove Sample and Anesthesia cols I made
+TOST.otu.iso.mean <- aggregate(TOST.otu.iso[ , 1: ( ncol(TOST.otu.iso)-2 ) ],
+                               list(TOST.otu.iso$Anesthesia), mean)
+TOST.otu.iso.mean <- TOST.otu.iso.mean[-1]
+TOST.otu.co2.mean <- aggregate(TOST.otu.co2[ , 1: ( ncol(TOST.otu.co2)-2 ) ],
+                               list(TOST.otu.co2$Anesthesia), mean)
+TOST.otu.co2.mean <- TOST.otu.co2.mean[-1]
+
+# Prepare data
+TOST.otu.iso.t <- t(as.matrix(sapply(TOST.otu.iso.mean[,1:1618], as.numeric)))
+TOST.otu.co2.t <- t(as.matrix(sapply(TOST.otu.co2.mean[,1:1618], as.numeric)))
+
+
+### Explore Data
+summary(as.vector(TOST.otu.iso.t))
+length(which(TOST.otu.iso.t > 100, arr.ind = T))
+  # 50 values above 100
+jj <- scale(as.vector(TOST.otu.iso.t))
+qqnorm(jj, main = "QQ-Plot for IBA Isoflurane")
+abline(0, 1, col="red")
+  # Not Normal
+plot(density(as.vector(TOST.otu.iso.t)), main="Density Plot for IBA Isoflurane")
+  # Skewed right
+shapiro.test(TOST.otu.iso.t)
+  # p-value < 2.2e-16
+
+summary(as.vector(TOST.otu.co2.t))
+length(which(TOST.otu.co2.t > 100, arr.ind = T))
+  # 40 values above 100
+jj <- scale(as.vector(TOST.otu.co2.t))
+qqnorm(jj, main = "QQ-Plot for IBA CO2")
+abline(0, 1, col="red")
+  # Not Normal
+plot(density(as.vector(TOST.otu.co2.t)), main="Density Plot for IBA CO2")
+  # Skewed right
+shapiro.test(TOST.otu.iso.t)
+  # p-value < 2.2e-16
+
+
+### Because data isn't Normally distributed, I'll use RTOST instead of TOST ###
+
+
+### RTOST ###
+# Low M1 vs. High M
+rtost(TOST.otu.iso.t, TOST.otu.co2.t, alpha = 0.05, epsilong = 0.25, tr = 0.2, paired = F)
+  # p-value = 4.339412e-38
+  # Reject hypothesis that random & mean have non-equivalent means
+
+
+
+
 
 
 
@@ -281,74 +344,3 @@ p$tab
 adonis(UF.w ~ Anesthesia, data = wUF.sampdf, permutations = 9999)
   # p-value = 0.3328
 ```
-
-
-
-
-### RTOST 
-```{r}
-# Code modified from Skarlupka, et al. (2019)
-# https://doi.org/10.1186/s40104-019-0375-0
-
-# Format OTU table
-TOST.otu <- data.frame(t(data.frame(otu_table(physeq.iba))))
-TOST.otu$Sample <- rownames(TOST.otu)
-TOST.otu$Anesthesia <- "Isoflurane"
-co2 <- c("CC1_883_I", "CC1_922_I", "CM1_883_I", "CM1_922_I")
-for(i in 1:length(co2)){
-  x <- which(TOST.otu$Sample == co2[i])
-  TOST.otu$Anesthesia[x] <- "CO2"
-}
-
-# Separate by anesthesia
-TOST.otu.iso <- TOST.otu[which(TOST.otu$Anesthesia == "Isoflurane"),]
-TOST.otu.co2 <- TOST.otu[which(TOST.otu$Anesthesia == "CO2"),]
-
-# Calculate mean OTUs for iso and co2; remove Sample and Anesthesia cols I made
-TOST.otu.iso.mean <- aggregate(TOST.otu.iso[ , 1: ( ncol(TOST.otu.iso)-2 ) ],
-                               list(TOST.otu.iso$Anesthesia), mean)
-TOST.otu.iso.mean <- TOST.otu.iso.mean[-1]
-TOST.otu.co2.mean <- aggregate(TOST.otu.co2[ , 1: ( ncol(TOST.otu.co2)-2 ) ],
-                               list(TOST.otu.co2$Anesthesia), mean)
-TOST.otu.co2.mean <- TOST.otu.co2.mean[-1]
-
-# Prepare data
-TOST.otu.iso.t <- t(as.matrix(sapply(TOST.otu.iso.mean[,1:1618], as.numeric)))
-TOST.otu.co2.t <- t(as.matrix(sapply(TOST.otu.co2.mean[,1:1618], as.numeric)))
-
-
-### Explore Data
-summary(as.vector(TOST.otu.iso.t))
-length(which(TOST.otu.iso.t > 100, arr.ind = T))
-  # 50 values above 100
-jj <- scale(as.vector(TOST.otu.iso.t))
-qqnorm(jj, main = "QQ-Plot for IBA Isoflurane")
-abline(0, 1, col="red")
-  # Not Normal
-plot(density(as.vector(TOST.otu.iso.t)), main="Density Plot for IBA Isoflurane")
-  # Skewed right
-shapiro.test(TOST.otu.iso.t)
-  # p-value < 2.2e-16
-
-summary(as.vector(TOST.otu.co2.t))
-length(which(TOST.otu.co2.t > 100, arr.ind = T))
-  # 40 values above 100
-jj <- scale(as.vector(TOST.otu.co2.t))
-qqnorm(jj, main = "QQ-Plot for IBA CO2")
-abline(0, 1, col="red")
-  # Not Normal
-plot(density(as.vector(TOST.otu.co2.t)), main="Density Plot for IBA CO2")
-  # Skewed right
-shapiro.test(TOST.otu.iso.t)
-  # p-value < 2.2e-16
-
-
-### Because data isn't Normally distributed, I'll use RTOST instead of TOST ###
-
-
-### RTOST ###
-# Low M1 vs. High M
-rtost(TOST.otu.iso.t, TOST.otu.co2.t, alpha = 0.05, epsilong = 0.25, tr = 0.2, paired = F)
-  # p-value = 4.339412e-38
-  # Reject hypothesis that random & mean have non-equivalent means
-
