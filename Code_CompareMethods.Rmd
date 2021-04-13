@@ -113,17 +113,23 @@ for(i in 1:length(co2)){
 TOST.otu.iso <- TOST.otu[which(TOST.otu$Anesthesia == "Isoflurane"),]
 TOST.otu.co2 <- TOST.otu[which(TOST.otu$Anesthesia == "CO2"),]
 
-# Calculate mean OTUs for iso and co2; remove Sample and Anesthesia cols I made
+# Calculate mean OTUs for iso and pull out CO2 samples; remove Sample and Anesthesia cols I made
 TOST.otu.iso.mean <- aggregate(TOST.otu.iso[ , 1: ( ncol(TOST.otu.iso)-2 ) ],
                                list(TOST.otu.iso$Anesthesia), mean)
 TOST.otu.iso.mean <- TOST.otu.iso.mean[-1]
-TOST.otu.co2.mean <- aggregate(TOST.otu.co2[ , 1: ( ncol(TOST.otu.co2)-2 ) ],
-                               list(TOST.otu.co2$Anesthesia), mean)
-TOST.otu.co2.mean <- TOST.otu.co2.mean[-1]
+
+TOST.883C <- TOST.otu.co2[1,]
+TOST.992C <- TOST.otu.co2[2,]
+TOST.883M <- TOST.otu.co2[3,]
+TOST.922M <- TOST.otu.co2[4,]
+
 
 # Prepare data
 TOST.otu.iso.t <- t(as.matrix(sapply(TOST.otu.iso.mean[,1:1618], as.numeric)))
-TOST.otu.co2.t <- t(as.matrix(sapply(TOST.otu.co2.mean[,1:1618], as.numeric)))
+TOST.883C.t <- t(as.matrix(sapply(TOST.883C[,1:1618], as.numeric)))
+TOST.992C.t <- t(as.matrix(sapply(TOST.992C[,1:1618], as.numeric)))
+TOST.883M.t <- t(as.matrix(sapply(TOST.883M[,1:1618], as.numeric)))
+TOST.922M.t <- t(as.matrix(sapply(TOST.922M[,1:1618], as.numeric)))
 
 
 ### Explore Data
@@ -139,16 +145,49 @@ plot(density(as.vector(TOST.otu.iso.t)), main="Density Plot for IBA Isoflurane")
 shapiro.test(TOST.otu.iso.t)
   # p-value < 2.2e-16
 
-summary(as.vector(TOST.otu.co2.t))
-length(which(TOST.otu.co2.t > 100, arr.ind = T))
-  # 40 values above 100
-jj <- scale(as.vector(TOST.otu.co2.t))
-qqnorm(jj, main = "QQ-Plot for IBA CO2")
+summary(as.vector(TOST.883C.t))
+length(which(TOST.883C.t > 100, arr.ind = T))
+  # 34 values above 100
+jj <- scale(as.vector(TOST.883C.t))
+qqnorm(jj, main = "QQ-Plot for 883C")
 abline(0, 1, col="red")
   # Not Normal
-plot(density(as.vector(TOST.otu.co2.t)), main="Density Plot for IBA CO2")
-  # Skewed right
-shapiro.test(TOST.otu.iso.t)
+plot(density(as.vector(TOST.883C.t)), main="Density Plot for 883C")
+shapiro.test(TOST.883C.t)
+  # p-value < 2.2e-16
+
+summary(as.vector(TOST.992C.t))
+length(which(TOST.992C.t > 100, arr.ind = T))
+  # 42 values above 100
+jj <- scale(as.vector(TOST.992C.t))
+qqnorm(jj, main = "QQ-Plot for 992C")
+abline(0, 1, col="red")
+  # Not Normal
+plot(density(as.vector(TOST.992C.t)), main="Density Plot for 992C")
+shapiro.test(TOST.992C.t)
+  # p-value < 2.2e-16
+
+summary(as.vector(TOST.922M.t))
+length(which(TOST.922M.t > 100, arr.ind = T))
+  # 54 values above 100
+jj <- scale(as.vector(TOST.922M.t))
+qqnorm(jj, main = "QQ-Plot for 922M")
+abline(0, 1, col="red")
+  # Not Normal
+plot(density(as.vector(TOST.922M.t)), main="Density Plot for 922M")
+shapiro.test(TOST.922M.t)
+  # p-value < 2.2e-16
+
+
+summary(as.vector(TOST.883M.t))
+length(which(TOST.883M.t > 100, arr.ind = T))
+  # 36 values above 100
+jj <- scale(as.vector(TOST.883M.t))
+qqnorm(jj, main = "QQ-Plot for 883M")
+abline(0, 1, col="red")
+  # Not Normal
+plot(density(as.vector(TOST.883M.t)), main="Density Plot for 883M")
+shapiro.test(TOST.883M.t)
   # p-value < 2.2e-16
 
 
@@ -156,9 +195,20 @@ shapiro.test(TOST.otu.iso.t)
 
 
 ### RTOST ###
-# Low M1 vs. High M
-rtost(TOST.otu.iso.t, TOST.otu.co2.t, alpha = 0.05)
-  # p-value = 4.339412e-38
+rtost(TOST.otu.iso.t, TOST.883C.t, alpha = 0.05)
+  # p-value = 2.535017e-29
+  # Reject hypothesis that random & mean have non-equivalent means
+
+rtost(TOST.otu.iso.t, TOST.992C.t, alpha = 0.05)
+  # p-value = 2.535017e-29
+  # Reject hypothesis that random & mean have non-equivalent means
+
+rtost(TOST.otu.iso.t, TOST.922M.t, alpha = 0.05)
+  # p-value = 2.535017e-29
+  # Reject hypothesis that random & mean have non-equivalent means
+
+rtost(TOST.otu.iso.t, TOST.883M.t, alpha = 0.05)
+  # p-value = 2.535017e-29
   # Reject hypothesis that random & mean have non-equivalent means
 ```
 
