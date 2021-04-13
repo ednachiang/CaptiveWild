@@ -1,0 +1,354 @@
+---
+title: "Compare Methods"
+author: "Edna Chiang"
+date: "4/12/2021"
+output: html_document
+---
+
+
+### Load Libraries
+```{r}
+library(ape)
+library(dplyr)
+library(dunn.test)
+library(ggplot2)
+library(grid)
+library(gridExtra)
+library(phyloseq)
+library(picante)
+library(phytools)
+library(tidyr)
+library(vegan)
+
+#library(gplots)
+#library(phangorn)
+#library(pgirmess)
+
+theme_set(theme_bw())
+set.seed(1)
+```
+
+### Load Functions
+```{r}
+source('scripts/simper_pretty.R')
+source('scripts/R_krusk.R')
+source('scripts/misc.R')
+```
+
+### Import Data
+```{r}
+# Link files
+shared = "mothur_output/final.shared"
+taxonomy = "mothur_output/final.taxonomy"
+tree = "mothur_output/final.tre"
+
+# Import mothur data
+mothurdata = import_mothur(
+  mothur_shared_file = shared,
+  mothur_constaxonomy_file = taxonomy,
+  mothur_tree_file = tree)
+
+# Add OTU column in taxonomy table
+tax_table(mothurdata) <- cbind(tax_table(mothurdata), 
+                               row.names(tax_table(mothurdata)))
+
+# Rename taxonomy table columns
+colnames(tax_table(mothurdata)) <- 
+  c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+
+# Remove OTUs that appear in < 3 samples
+otu <- data.frame(otu_table(mothurdata))
+otu.rem <- list()
+for(i in 1:nrow(otu)){
+  empty <- length(which(otu[i,] == 0))
+    # Identifies # of samples w/o OTU
+  if(empty > 54){
+    # If OTU appears in < 3 samples
+    otu.rem <- append(otu.rem, i)
+      # Create list of OTUs that appear in only 1 sample
+  }
+}
+otu.rem.row <- as.numeric(otu.rem)
+  # Convert list to numeric
+otu.rem.df <- otu[-otu.rem.row,]
+  # Remove OTUs
+otu.rem.tab <- otu_table(otu.rem.df, taxa_are_rows = T)
+  # Convert trimmed OTU table to otu_table
+
+# Add metadata
+meta <- read.csv("metadata_extra.csv")
+rownames(meta) <- meta$Sample
+divsum <- read.table("mothur_output/final.summary", header = T)
+meta[,13:22] <- divsum[,3:12]
+
+
+# Update phyloseq object
+physeq <- merge_phyloseq(otu.rem.tab, tax_table(mothurdata), sample_data(meta),
+                         phy_tree(mothurdata))
+
+# Remove outliers
+physeq <- subset_samples(physeq, ID != 3925)
+physeq <- subset_samples(physeq, ID != 3916)
+
+# Calculate relative abundance
+#physeq <- transform_sample_counts(physeq, function(x){(x/sum(x))*100})
+
+# Remove NA in "Anesthesia"
+physeq <- subset_samples(physeq, Anesthesia != "NA")
+
+# Subset out IBA
+physeq.iba <- subset_samples(physeq, Group == "IBA")
+
+
+```
+
+
+
+### Phylogenetic Diversity and SES MPD
+```{r}
+### Unweighted - Calculate phylogenetic diversity and MPD ###
+
+# Calculate Faith's phylogenetic diversity
+pd.res <- pd(t(data.frame(otu_table(physeq.iba))), phy_tree(physeq.iba), 
+             include.root = T)
+pd.df <- data.frame(pd.res)
+
+# Calculate MPD (Mean Pairwise Distance)
+pd.dist <- cophenetic(phy_tree(physeq.iba))
+  # Calculate cophenetic distance
+ses.mpd.res <- ses.mpd(t(data.frame(otu_table(physeq.iba))), pd.dist, 
+                       null.model = "taxa.labels", abundance.weighted = F, runs = 999)
+  # Calculate MPD
+  # This'll take a while to run-- be patient
+mpd <- data.frame(ses.mpd.res)
+  # Pull out MDP results
+
+
+### Prepare data for plotting ###
+mpd$SampleID <- row.names(mpd)
+pd.res$SampleID <- row.names(pd.res)
+  # Make sure all SampleID's match!
+
+# Pull out first Stat of each test
+# PD test = PD
+# MPD test = SES (Standardized Effect Size)
+pd.stats <- data.frame(pd.res$SampleID, pd.res$PD)
+pd.stats$Measure <- rep("PD", nrow(pd.df))
+colnames(pd.stats) <- c("Sample", "Stat", "Measure")
+mpd.stats <- data.frame(mpd$SampleID, mpd$mpd.obs.z)
+mpd.stats$Measure <- rep("MPD SES", nrow(pd.df))
+colnames(mpd.stats) <- c("Sample", "Stat", "Measure")
+
+
+
+### Prepare PD ###
+pd.ready <- merge(pd.stats, meta, by = "Sample")
+pd.ready$Anesthesia <- ordered(pd.ready$Anesthesia, c("Isoflurane", "CO2"))
+
+### Prepare MPD ###
+mpd.ready <- merge(mpd.stats, meta, by = "Sample")
+mpd.ready$Anesthesia <- ordered(mpd.ready$Anesthesia, c("Isoflurane", "CO2"))
+
+
+
+########## TESTING PD & MPD WITHIN GROUP ##########
+# Summer and Spring used only isoflurane, so I can only look at Torpor & IBA
+# Torpor = Isoflurane or CO2
+# IBA = CO2 or nothing (which is labeled as isoflurane by accident)
+# I have to examine them separately since IBA didn't use isoflurane
+pd.i <- pd.ready[which(pd.ready$Group == "IBA"),]
+
+mpd.i <- mpd.ready[which(mpd.ready$Group == "IBA"),]
+
+### PD
+hist(pd.i$Stat)
+qqnorm(pd.i$Stat)
+qqline(pd.i$Stat)
+shapiro.test(pd.i$Stat)
+  # p-value = 0.8052
+  # Normal
+
+t.test(Stat ~ Anesthesia, data = pd.i)
+  # p-value = 0.8052
+
+
+### Test MPD ###
+hist(mpd.i$Stat, breaks=10)
+qqnorm(mpd.i$Stat)
+qqline(mpd.i$Stat)
+shapiro.test(mpd.i$Stat)
+  # p-value = 0.4546
+  # Normal
+
+t.test(Stat ~ Anesthesia, data = mpd.i)
+  # p-value = 0.05197
+
+```
+
+
+### Alpha Diversity
+```{r}
+adiv.iba <- data.frame(sample_data(physeq.iba))
+
+########## Shannon ##########
+
+hist(adiv.iba$shannon, breaks=10)
+qqnorm(adiv.iba$shannon)
+qqline(adiv.iba$shannon)
+shapiro.test(adiv.iba$shannon)
+  # p-value = 0.3285
+  # Normal
+
+t.test(shannon ~ Anesthesia, data = adiv.iba)
+  # p-value = 0.2527
+
+
+
+
+
+
+
+
+
+
+########## Number of Unique OTUs ##########
+otus <- data.frame(otu_table(physeq.iba))
+sampNames <- colnames(otus)
+uniq.otus <- data.frame(matrix(nrow = nsamples(physeq.iba), ncol = 2))
+colnames(uniq.otus) <- c("Sample", "Unique_OTUs")
+for(n in 1:nsamples(physeq.iba)) {
+  COL <- otus[,n]
+  numUniq <- length(which(COL > 0))
+  uniq.otus$Sample[n] <- sampNames[n]
+  uniq.otus$Unique_OTUs[n] <- numUniq
+}
+uniq.otus$Anesthesia <- sample_data(physeq.iba)$Anesthesia
+rownames(uniq.otus) <- uniq.otus$Sample
+
+
+hist(uniq.otus$Unique_OTUs, breaks=10)
+qqnorm(uniq.otus$Unique_OTUs)
+qqline(uniq.otus$Unique_OTUs)
+shapiro.test(uniq.otus$Unique_OTUs)
+  # p-value = 0.1245
+  # Not Normal
+wilcox.test(Unique_OTUs ~ Anesthesia, data = uniq.otus)
+  # p-value = 1
+
+```
+
+
+
+### Beta Diversity
+```{r}
+########## Unweighted UniFrac ##########
+UF.u <- phyloseq::distance(physeq = physeq.iba, method = "unifrac")
+UF.u.pcoa <- ordinate(physeq = physeq.iba, method = "PCoA", distance = "unifrac")
+  # Variation explained = 49.7%
+plot_ordination(physeq = physeq.iba, ordination = UF.u.pcoa, axes = c(1,2),
+                title = "Unweighted UniFrac") +
+  geom_point(size = 2, aes(colour = Anesthesia))
+
+
+### PERMANOVA ###
+uUF.sampdf <- data.frame(sample_data(physeq.iba))
+beta.tax <- betadisper(d=UF.u, group=uUF.sampdf$Anesthesia)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.952
+adonis(UF.u ~ Anesthesia, data = uUF.sampdf, permutations = 9999)
+  # p-value = 0.0229
+
+
+
+
+########## Weighted UniFrac ##########
+UF.w <- phyloseq::distance(physeq = physeq.iba, method = "wunifrac")
+UF.w.pcoa <- ordinate(physeq = physeq.iba, method = "PCoA", distance = "wunifrac")
+  # Variation explained = 71.1&
+
+plot_ordination(physeq = physeq.iba, ordination = UF.w.pcoa, axes = c(1,2),
+                title = "Weighted UniFrac") +
+  geom_point(size = 2, aes(colour = Anesthesia))
+
+
+### PERMANOVA ###
+wUF.sampdf <- data.frame(sample_data(physeq.iba))
+beta.tax <- betadisper(d=UF.w, group=wUF.sampdf$Anesthesia)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.299
+adonis(UF.w ~ Anesthesia, data = wUF.sampdf, permutations = 9999)
+  # p-value = 0.3328
+```
+
+
+
+
+### RTOST 
+```{r}
+# Code modified from Skarlupka, et al. (2019)
+# https://doi.org/10.1186/s40104-019-0375-0
+
+# Format OTU table
+TOST.otu <- data.frame(t(data.frame(otu_table(physeq.iba))))
+TOST.otu$Sample <- rownames(TOST.otu)
+TOST.otu$Anesthesia <- "Isoflurane"
+co2 <- c("CC1_883_I", "CC1_922_I", "CM1_883_I", "CM1_922_I")
+for(i in 1:length(co2)){
+  x <- which(TOST.otu$Sample == co2[i])
+  TOST.otu$Anesthesia[x] <- "CO2"
+}
+
+# Separate by anesthesia
+TOST.otu.iso <- TOST.otu[which(TOST.otu$Anesthesia == "Isoflurane"),]
+TOST.otu.co2 <- TOST.otu[which(TOST.otu$Anesthesia == "CO2"),]
+
+# Calculate mean OTUs for iso and co2; remove Sample and Anesthesia cols I made
+TOST.otu.iso.mean <- aggregate(TOST.otu.iso[ , 1: ( ncol(TOST.otu.iso)-2 ) ],
+                               list(TOST.otu.iso$Anesthesia), mean)
+TOST.otu.iso.mean <- TOST.otu.iso.mean[-1]
+TOST.otu.co2.mean <- aggregate(TOST.otu.co2[ , 1: ( ncol(TOST.otu.co2)-2 ) ],
+                               list(TOST.otu.co2$Anesthesia), mean)
+TOST.otu.co2.mean <- TOST.otu.co2.mean[-1]
+
+# Prepare data
+TOST.otu.iso.t <- t(as.matrix(sapply(TOST.otu.iso.mean[,1:1618], as.numeric)))
+TOST.otu.co2.t <- t(as.matrix(sapply(TOST.otu.co2.mean[,1:1618], as.numeric)))
+
+
+### Explore Data
+summary(as.vector(TOST.otu.iso.t))
+length(which(TOST.otu.iso.t > 100, arr.ind = T))
+  # 50 values above 100
+jj <- scale(as.vector(TOST.otu.iso.t))
+qqnorm(jj, main = "QQ-Plot for IBA Isoflurane")
+abline(0, 1, col="red")
+  # Not Normal
+plot(density(as.vector(TOST.otu.iso.t)), main="Density Plot for IBA Isoflurane")
+  # Skewed right
+shapiro.test(TOST.otu.iso.t)
+  # p-value < 2.2e-16
+
+summary(as.vector(TOST.otu.co2.t))
+length(which(TOST.otu.co2.t > 100, arr.ind = T))
+  # 40 values above 100
+jj <- scale(as.vector(TOST.otu.co2.t))
+qqnorm(jj, main = "QQ-Plot for IBA CO2")
+abline(0, 1, col="red")
+  # Not Normal
+plot(density(as.vector(TOST.otu.co2.t)), main="Density Plot for IBA CO2")
+  # Skewed right
+shapiro.test(TOST.otu.iso.t)
+  # p-value < 2.2e-16
+
+
+### Because data isn't Normally distributed, I'll use RTOST instead of TOST ###
+
+
+### RTOST ###
+# Low M1 vs. High M
+rtost(TOST.otu.iso.t, TOST.otu.co2.t, alpha = 0.05, epsilong = 0.25, tr = 0.2, paired = F)
+  # p-value = 4.339412e-38
+  # Reject hypothesis that random & mean have non-equivalent means
+
