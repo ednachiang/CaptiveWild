@@ -17,10 +17,7 @@ library(picante)
 library(phytools)
 library(tidyr)
 library(vegan)
-
-#library(gplots)
-#library(phangorn)
-#library(pgirmess)
+library(equivalence)
 
 theme_set(theme_bw())
 set.seed(1)
@@ -28,8 +25,6 @@ set.seed(1)
 
 ### Load Functions
 ```{r}
-source('scripts/simper_pretty.R')
-source('scripts/R_krusk.R')
 source('scripts/misc.R')
 ```
 
@@ -113,6 +108,75 @@ physeq.muc <- subset_samples(physeq.pair, Sample_Type == "Mucosa")
 
 ```
 
+
+
+
+### RTOST 
+```{r}
+# Code modified from Skarlupka, et al. (2019)
+# https://doi.org/10.1186/s40104-019-0375-0
+
+# Format OTU table
+TOST.otu <- data.frame(t(data.frame(otu_table(physeq.pair))))
+TOST.otu$Sample <- rownames(TOST.otu)
+TOST.otu$Sample_Type <- substr(rownames(TOST.otu), start = 2, stop = 2)
+
+
+# Separate by sample type
+TOST.otu.con <- TOST.otu[which(TOST.otu$Sample_Type == "C"),]
+TOST.otu.muc <- TOST.otu[which(TOST.otu$Sample_Type == "M"),]
+
+# Calculate OTU means; remove Sample and Sample Type cols I made
+TOST.otu.con.mean <- aggregate(TOST.otu.con[ , 1 : ( ncol(TOST.otu.con) - 2) ],
+                               list(TOST.otu.con$Sample_Type), mean)
+TOST.otu.con.mean <- TOST.otu.con.mean[-1]
+TOST.otu.muc.mean <- aggregate(TOST.otu.muc[ , 1 : ( ncol(TOST.otu.muc) - 2) ],
+                               list(TOST.otu.muc$Sample_Type), mean)
+TOST.otu.muc.mean <- TOST.otu.muc.mean[-1]
+
+
+# Prepare data
+TOST.otu.con.t <- t(as.matrix(sapply(TOST.otu.con.mean[,1:1618], as.numeric)))
+TOST.otu.muc.t <- t(as.matrix(sapply(TOST.otu.muc.mean[,1:1618], as.numeric)))
+
+
+### Explore Data
+summary(as.vector(TOST.otu.con.t))
+length(which(TOST.otu.con.t > 100, arr.ind = T))
+  # 38 values above 100
+jj <- scale(as.vector(TOST.otu.con.t))
+qqnorm(jj, main = "QQ-Plot for Content Samples")
+abline(0, 1, col="red")
+  # Not Normal
+plot(density(as.vector(TOST.otu.con.t)), main="Density Plot for Content Samples")
+  # Skewed right
+shapiro.test(TOST.otu.con.t)
+  # p-value < 2.2e-16
+
+summary(as.vector(TOST.otu.muc.t))
+length(which(TOST.otu.muc.t > 100, arr.ind = T))
+  # 32 values above 100
+jj <- scale(as.vector(TOST.otu.muc.t))
+qqnorm(jj, main = "QQ-Plot for Content Samples")
+abline(0, 1, col="red")
+  # Not Normal
+plot(density(as.vector(TOST.otu.muc.t)), main="Density Plot for Mucosa Samples")
+  # Skewed right
+shapiro.test(TOST.otu.muc.t)
+  # p-value < 2.2e-16
+
+
+### Because data isn't Normally distributed, I'll use RTOST instead of TOST ###
+
+
+### RTOST ###
+# Low M1 vs. High M
+rtost(TOST.otu.con.t, TOST.otu.muc.t, alpha = 0.05)
+  # p-value = 0.01946279
+  # Reject hypothesis that random & mean have non-equivalent means
+```
+
+
 ### Phylogenetic Diversity and SES MPD
 ```{r}
 ### Unweighted - Calculate phylogenetic diversity and MPD ###
@@ -186,11 +250,11 @@ hist(mpd.ready$Stat, breaks=10)
 qqnorm(mpd.ready$Stat)
 qqline(mpd.ready$Stat)
 shapiro.test(mpd.ready$Stat)
-  # p-value = 0.08911
+  # p-value = 0.06388
   # Normal
 
 t.test(Stat ~ Sample_Type, data = mpd.ready, paired = T)
-  # p-value = 0.8007
+  # p-value = 0.7998
 ```
 
 ### Alpha Diversity
@@ -211,8 +275,8 @@ adiv.spr <- adiv[which(adiv$Group == "Spring"),]
 hist(adiv$shannon, breaks=10)
 qqnorm(adiv$shannon)
 qqline(adiv$shannon)
-shapiro.test(adiv.wild$shannon)
-  # p-value = 0.4148
+shapiro.test(adiv$shannon)
+  # p-value = 0.4637
   # Normal
 
 ### T-Test ###
@@ -241,8 +305,8 @@ qqline(uniq.otus$Unique_OTUs)
 shapiro.test(uniq.otus$Unique_OTUs)
   # p-value = 5.043e-06
   # Not Normal
-wilcox.test(Unique_OTUs ~ Sample_Type, data = uniq.otus)
-  # p-value = 0.6554
+wilcox.test(Unique_OTUs ~ Sample_Type, data = uniq.otus, paired = T)
+  # p-value = 0.9036
 
 ```
 
@@ -258,15 +322,14 @@ plot_ordination(physeq = physeq.pair, ordination = UF.u.pcoa, axes = c(1,2),
                 title = "Unweighted UniFrac") +
   geom_point(size = 2, aes(colour = Sample_Type))
 
-
-### PERMANOVA ###
+### Test
 pair.sampdf <- data.frame(sample_data(physeq.pair))
 beta.tax <- betadisper(d=UF.u, group=pair.sampdf$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.232
+  # p-value = 0.236
 adonis(UF.u ~ Sample_Type, data = pair.sampdf, permutations = 9999)
-  # p-value = 0.9998
+  # p-value = 0.9991
 
 
 
@@ -286,7 +349,7 @@ pair.sampdf <- data.frame(sample_data(physeq.pair))
 beta.tax <- betadisper(d=UF.w, group=pair.sampdf$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.113
+  # p-value = 0.088
 adonis(UF.w ~ Sample_Type, data = pair.sampdf, permutations = 9999)
-  # p-value = 0.9957
+  # p-value = 0.9964
 ```
