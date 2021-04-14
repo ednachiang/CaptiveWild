@@ -23,10 +23,6 @@ theme_set(theme_bw())
 set.seed(1)
 ```
 
-### Load Functions
-```{r}
-source('scripts/misc.R')
-```
 
 ### Import Data
 ```{r}
@@ -140,40 +136,308 @@ TOST.otu.con.t <- t(as.matrix(sapply(TOST.otu.con.mean[,1:1618], as.numeric)))
 TOST.otu.muc.t <- t(as.matrix(sapply(TOST.otu.muc.mean[,1:1618], as.numeric)))
 
 
-### Explore Data
-summary(as.vector(TOST.otu.con.t))
-length(which(TOST.otu.con.t > 100, arr.ind = T))
-  # 38 values above 100
-jj <- scale(as.vector(TOST.otu.con.t))
-qqnorm(jj, main = "QQ-Plot for Content Samples")
-abline(0, 1, col="red")
-  # Not Normal
-plot(density(as.vector(TOST.otu.con.t)), main="Density Plot for Content Samples")
-  # Skewed right
-shapiro.test(TOST.otu.con.t)
-  # p-value < 2.2e-16
-
-summary(as.vector(TOST.otu.muc.t))
-length(which(TOST.otu.muc.t > 100, arr.ind = T))
-  # 32 values above 100
-jj <- scale(as.vector(TOST.otu.muc.t))
-qqnorm(jj, main = "QQ-Plot for Content Samples")
-abline(0, 1, col="red")
-  # Not Normal
-plot(density(as.vector(TOST.otu.muc.t)), main="Density Plot for Mucosa Samples")
-  # Skewed right
-shapiro.test(TOST.otu.muc.t)
-  # p-value < 2.2e-16
 
 
-### Because data isn't Normally distributed, I'll use RTOST instead of TOST ###
 
 
-### RTOST ###
-# Low M1 vs. High M
-rtost(TOST.otu.con.t, TOST.otu.muc.t, alpha = 0.05)
-  # p-value = 0.01946279
-  # Reject hypothesis that random & mean have non-equivalent means
+rtost.output.df <- data.frame(matrix(NA, ncol = 3, nrow = nrow(TOST.otu.muc)))
+colnames(rtost.output.df) <- c("Sample1", "Sample2", "P")
+
+for(i in 1:nrow(TOST.otu.muc)){
+  sample1 <- rownames(TOST.otu.muc)[i]
+  sample1Split <- strsplit(sample1, "_")
+  ID1 <- sample1Split[[1]][[2]]
+  #print(i)
+  #print(ID1)
+  
+  for(j in 1:nrow(TOST.otu.con)){
+    sample2 <- rownames(TOST.otu.con)[j]
+    sample2Split <- strsplit(sample2, "_")
+    ID2 <- sample2Split[[1]][[2]]
+    
+    if(ID1 == ID2){
+      #print(j)
+      #print(ID2)
+      muc.t <- t(as.matrix(sapply(TOST.otu.muc[i,1:(ncol(TOST.otu.muc)-2)], as.numeric)))
+      con.t <- t(as.matrix(sapply(TOST.otu.con[j,1:(ncol(TOST.otu.con)-2)], as.numeric)))
+      rtostOutput <- rtost(muc.t, con.t, paired = T, alpha = 0.05, epsilon = 0.25, tr = 0.15)
+      print(rtostOutput)
+
+      
+      rtost.output.df$Sample1[i] = sample1
+      rtost.output.df$Sample2[i] = sample2
+      rtost.output.df$P[i] = rtostOutput$p.value
+    }
+  }
+  
+}
+
+# Lots of errors saying standard deviation is zero. Will this test still work if sd = 0?
+
+rtost.output.df$Padj <- p.adjust(rtost.output.df$P, "fdr")
+
+#write.csv(rtost.output.df, "rtost.output.df.csv")
+
+
+
+################ By Group ################
+
+#Format OTU table
+TOST.otu.w <- data.frame(t(data.frame(otu_table(physeq.wild))))
+TOST.otu.w$Sample <- rownames(TOST.otu.w)
+TOST.otu.w$Sample_Type <- substr(rownames(TOST.otu.w), start = 2, stop = 2)
+
+# Separate by sample type
+TOST.otu.w.con <- TOST.otu.w[which(TOST.otu.w$Sample_Type == "C"),]
+TOST.otu.w.muc <- TOST.otu.w[which(TOST.otu.w$Sample_Type == "M"),]
+
+# Calculate OTU means; remove Sample and Sample Type cols I made
+TOST.otu.w.con.mean <- aggregate(TOST.otu.w.con[ , 1 : ( ncol(TOST.otu.w.con) - 2) ],
+                               list(TOST.otu.w.con$Sample_Type), mean)
+TOST.otu.w.con.mean <- TOST.otu.w.con.mean[-1]
+TOST.otu.w.muc.mean <- aggregate(TOST.otu.w.muc[ , 1 : ( ncol(TOST.otu.w.muc) - 2) ],
+                               list(TOST.otu.w.muc$Sample_Type), mean)
+TOST.otu.w.muc.mean <- TOST.otu.w.muc.mean[-1]
+
+
+# Prepare data
+TOST.otu.w.con.t <- t(as.matrix(sapply(TOST.otu.w.con.mean[,1:(ncol(TOST.otu.w.con)-2)], as.numeric)))
+TOST.otu.w.muc.t <- t(as.matrix(sapply(TOST.otu.w.muc.mean[,1:(ncol(TOST.otu.w.muc)-2)], as.numeric)))
+
+rtost.w.output.df <- data.frame(matrix(NA, ncol = 3, nrow = nrow(TOST.otu.w.muc)))
+colnames(rtost.w.output.df) <- c("Sample1", "Sample2", "P")
+
+
+for(i in 1:nrow(TOST.otu.w.muc)){
+  sample1 <- rownames(TOST.otu.w.muc)[i]
+  sample1Split <- strsplit(sample1, "_")
+  ID1 <- sample1Split[[1]][[2]]
+  
+  muc.t <- t(as.matrix(sapply(TOST.otu.muc[i,1:(ncol(TOST.otu.muc)-2)], as.numeric)))
+  rtostOutput <- rtost(muc.t, TOST.otu.w.con.t, paired = F, epsilon = 0.25, tr = 0.15)
+      
+  rtost.w.output.df$Sample1[i] = sample1
+  rtost.w.output.df$Sample2[i] = "Wild Content"
+  rtost.w.output.df$P[i] = rtostOutput$p.value
+}
+
+rtost.w.output.df$Padj <- p.adjust(rtost.w.output.df$P, "fdr")
+
+
+#Format OTU table
+TOST.otu.s <- data.frame(t(data.frame(otu_table(physeq.sum))))
+TOST.otu.s$Sample <- rownames(TOST.otu.s)
+TOST.otu.s$Sample_Type <- substr(rownames(TOST.otu.s), start = 2, stop = 2)
+
+# Separate by sample type
+TOST.otu.s.con <- TOST.otu.s[which(TOST.otu.s$Sample_Type == "C"),]
+TOST.otu.s.muc <- TOST.otu.s[which(TOST.otu.s$Sample_Type == "M"),]
+
+# Calculate OTU means; remove Sample and Sample Type cols I made
+TOST.otu.s.con.mean <- aggregate(TOST.otu.s.con[ , 1 : ( ncol(TOST.otu.s.con) - 2) ],
+                               list(TOST.otu.s.con$Sample_Type), mean)
+TOST.otu.s.con.mean <- TOST.otu.s.con.mean[-1]
+TOST.otu.s.muc.mean <- aggregate(TOST.otu.s.muc[ , 1 : ( ncol(TOST.otu.s.muc) - 2) ],
+                               list(TOST.otu.s.muc$Sample_Type), mean)
+TOST.otu.s.muc.mean <- TOST.otu.s.muc.mean[-1]
+
+
+# Prepare data
+TOST.otu.s.con.t <- t(as.matrix(sapply(TOST.otu.s.con.mean[,1:(ncol(TOST.otu.s.con)-2)], as.numeric)))
+TOST.otu.s.muc.t <- t(as.matrix(sapply(TOST.otu.s.muc.mean[,1:(ncol(TOST.otu.s.muc)-2)], as.numeric)))
+
+rtost.s.output.df <- data.frame(matrix(NA, ncol = 3, nrow = nrow(TOST.otu.s.muc)))
+colnames(rtost.s.output.df) <- c("Sample1", "Sample2", "P")
+
+
+for(i in 1:nrow(TOST.otu.s.muc)){
+  sample1 <- rownames(TOST.otu.s.muc)[i]
+  sample1Split <- strsplit(sample1, "_")
+  ID1 <- sample1Split[[1]][[2]]
+  
+  muc.t <- t(as.matrix(sapply(TOST.otu.muc[i,1:(ncol(TOST.otu.muc)-2)], as.numeric)))
+  rtostOutput <- rtost(muc.t, TOST.otu.s.con.t, paired = F, epsilon = 0.25, tr = 0.15)
+      
+  rtost.s.output.df$Sample1[i] = sample1
+  rtost.s.output.df$Sample2[i] = "Summer Content"
+  rtost.s.output.df$P[i] = rtostOutput$p.value
+}
+
+rtost.s.output.df$Padj <- p.adjust(rtost.s.output.df$P, "fdr")
+
+
+
+#Format OTU table
+TOST.otu.t <- data.frame(t(data.frame(otu_table(physeq.tor))))
+TOST.otu.t$Sample <- rownames(TOST.otu.t)
+TOST.otu.t$Sample_Type <- substr(rownames(TOST.otu.t), start = 2, stop = 2)
+
+# Separate by sample type
+TOST.otu.t.con <- TOST.otu.t[which(TOST.otu.t$Sample_Type == "C"),]
+TOST.otu.t.muc <- TOST.otu.t[which(TOST.otu.t$Sample_Type == "M"),]
+
+# Calculate OTU means; remove Sample and Sample Type cols I made
+TOST.otu.t.con.mean <- aggregate(TOST.otu.t.con[ , 1 : ( ncol(TOST.otu.t.con) - 2) ],
+                               list(TOST.otu.t.con$Sample_Type), mean)
+TOST.otu.t.con.mean <- TOST.otu.t.con.mean[-1]
+TOST.otu.t.muc.mean <- aggregate(TOST.otu.t.muc[ , 1 : ( ncol(TOST.otu.t.muc) - 2) ],
+                               list(TOST.otu.t.muc$Sample_Type), mean)
+TOST.otu.t.muc.mean <- TOST.otu.t.muc.mean[-1]
+
+
+# Prepare data
+TOST.otu.t.con.t <- t(as.matrix(sapply(TOST.otu.t.con.mean[,1:(ncol(TOST.otu.t.con)-2)], as.numeric)))
+TOST.otu.t.muc.t <- t(as.matrix(sapply(TOST.otu.t.muc.mean[,1:(ncol(TOST.otu.t.muc)-2)], as.numeric)))
+
+rtost.t.output.df <- data.frame(matrix(NA, ncol = 3, nrow = nrow(TOST.otu.t.muc)))
+colnames(rtost.t.output.df) <- c("Sample1", "Sample2", "P")
+
+
+for(i in 1:nrow(TOST.otu.t.muc)){
+  sample1 <- rownames(TOST.otu.t.muc)[i]
+  sample1Split <- strsplit(sample1, "_")
+  ID1 <- sample1Split[[1]][[2]]
+  
+  muc.t <- t(as.matrix(sapply(TOST.otu.muc[i,1:(ncol(TOST.otu.muc)-2)], as.numeric)))
+  rtostOutput <- rtost(muc.t, TOST.otu.t.con.t, paired = F, epsilon = 0.25, tr = 0.15)
+      
+  rtost.t.output.df$Sample1[i] = sample1
+  rtost.t.output.df$Sample2[i] = "Torpor Content"
+  rtost.t.output.df$P[i] = rtostOutput$p.value
+}
+
+rtost.t.output.df$Padj <- p.adjust(rtost.t.output.df$P, "fdr")
+
+
+
+#Format OTU table
+TOST.otu.i <- data.frame(t(data.frame(otu_table(physeq.iba))))
+TOST.otu.i$Sample <- rownames(TOST.otu.i)
+TOST.otu.i$Sample_Type <- substr(rownames(TOST.otu.i), start = 2, stop = 2)
+
+# Separate by sample type
+TOST.otu.i.con <- TOST.otu.i[which(TOST.otu.i$Sample_Type == "C"),]
+TOST.otu.i.muc <- TOST.otu.i[which(TOST.otu.i$Sample_Type == "M"),]
+
+# Calculate OTU means; remove Sample and Sample Type cols I made
+TOST.otu.i.con.mean <- aggregate(TOST.otu.i.con[ , 1 : ( ncol(TOST.otu.i.con) - 2) ],
+                               list(TOST.otu.i.con$Sample_Type), mean)
+TOST.otu.i.con.mean <- TOST.otu.i.con.mean[-1]
+TOST.otu.i.muc.mean <- aggregate(TOST.otu.i.muc[ , 1 : ( ncol(TOST.otu.i.muc) - 2) ],
+                               list(TOST.otu.i.muc$Sample_Type), mean)
+TOST.otu.i.muc.mean <- TOST.otu.i.muc.mean[-1]
+
+
+# Prepare data
+TOST.otu.i.con.i <- t(as.matrix(sapply(TOST.otu.i.con.mean[,1:(ncol(TOST.otu.i.con)-2)], as.numeric)))
+TOST.otu.i.muc.i <- t(as.matrix(sapply(TOST.otu.i.muc.mean[,1:(ncol(TOST.otu.i.muc)-2)], as.numeric)))
+
+rtost.i.output.df <- data.frame(matrix(NA, ncol = 3, nrow = nrow(TOST.otu.i.muc)))
+colnames(rtost.i.output.df) <- c("Sample1", "Sample2", "P")
+
+
+for(i in 1:nrow(TOST.otu.i.muc)){
+  sample1 <- rownames(TOST.otu.i.muc)[i]
+  sample1Split <- strsplit(sample1, "_")
+  ID1 <- sample1Split[[1]][[2]]
+  
+  muc.i <- t(as.matrix(sapply(TOST.otu.muc[i,1:(ncol(TOST.otu.muc)-2)], as.numeric)))
+  rtostOutput <- rtost(muc.i, TOST.otu.i.con.i, paired = F, epsilon = 0.25, tr = 0.15)
+      
+  rtost.i.output.df$Sample1[i] = sample1
+  rtost.i.output.df$Sample2[i] = "IBA Content"
+  rtost.i.output.df$P[i] = rtostOutput$p.value
+}
+
+rtost.i.output.df$Padj <- p.adjust(rtost.i.output.df$P, "fdr")
+
+
+
+
+#Format OTU table
+TOST.otu.t <- data.frame(t(data.frame(otu_table(physeq.tor))))
+TOST.otu.t$Sample <- rownames(TOST.otu.t)
+TOST.otu.t$Sample_Type <- substr(rownames(TOST.otu.t), start = 2, stop = 2)
+
+# Separate by sample type
+TOST.otu.t.con <- TOST.otu.t[which(TOST.otu.t$Sample_Type == "C"),]
+TOST.otu.t.muc <- TOST.otu.t[which(TOST.otu.t$Sample_Type == "M"),]
+
+# Calculate OTU means; remove Sample and Sample Type cols I made
+TOST.otu.t.con.mean <- aggregate(TOST.otu.t.con[ , 1 : ( ncol(TOST.otu.t.con) - 2) ],
+                               list(TOST.otu.t.con$Sample_Type), mean)
+TOST.otu.t.con.mean <- TOST.otu.t.con.mean[-1]
+TOST.otu.t.muc.mean <- aggregate(TOST.otu.t.muc[ , 1 : ( ncol(TOST.otu.t.muc) - 2) ],
+                               list(TOST.otu.t.muc$Sample_Type), mean)
+TOST.otu.t.muc.mean <- TOST.otu.t.muc.mean[-1]
+
+
+# Prepare data
+TOST.otu.t.con.t <- t(as.matrix(sapply(TOST.otu.t.con.mean[,1:(ncol(TOST.otu.t.con)-2)], as.numeric)))
+TOST.otu.t.muc.t <- t(as.matrix(sapply(TOST.otu.t.muc.mean[,1:(ncol(TOST.otu.t.muc)-2)], as.numeric)))
+
+rtost.t.output.df <- data.frame(matrix(NA, ncol = 3, nrow = nrow(TOST.otu.t.muc)))
+colnames(rtost.t.output.df) <- c("Sample1", "Sample2", "P")
+
+
+for(i in 1:nrow(TOST.otu.t.muc)){
+  sample1 <- rownames(TOST.otu.t.muc)[i]
+  sample1Split <- strsplit(sample1, "_")
+  ID1 <- sample1Split[[1]][[2]]
+  
+  muc.t <- t(as.matrix(sapply(TOST.otu.muc[i,1:(ncol(TOST.otu.muc)-2)], as.numeric)))
+  rtostOutput <- rtost(muc.t, TOST.otu.t.con.t, paired = F, epsilon = 0.25, tr = 0.15)
+      
+  rtost.t.output.df$Sample1[i] = sample1
+  rtost.t.output.df$Sample2[i] = "Torpor Content"
+  rtost.t.output.df$P[i] = rtostOutput$p.value
+}
+
+rtost.t.output.df$Padj <- p.adjust(rtost.t.output.df$P, "fdr")
+
+
+
+#Format OTU table
+TOST.otu.p <- data.frame(t(data.frame(otu_table(physeq.spr))))
+TOST.otu.p$Sample <- rownames(TOST.otu.p)
+TOST.otu.p$Sample_Type <- substr(rownames(TOST.otu.p), start = 2, stop = 2)
+
+# Separate by sample type
+TOST.otu.p.con <- TOST.otu.p[which(TOST.otu.p$Sample_Type == "C"),]
+TOST.otu.p.muc <- TOST.otu.p[which(TOST.otu.p$Sample_Type == "M"),]
+
+# Calculate OTU means; remove Sample and Sample Type cols I made
+TOST.otu.p.con.mean <- aggregate(TOST.otu.p.con[ , 1 : ( ncol(TOST.otu.p.con) - 2) ],
+                               list(TOST.otu.p.con$Sample_Type), mean)
+TOST.otu.p.con.mean <- TOST.otu.p.con.mean[-1]
+TOST.otu.p.muc.mean <- aggregate(TOST.otu.p.muc[ , 1 : ( ncol(TOST.otu.p.muc) - 2) ],
+                               list(TOST.otu.p.muc$Sample_Type), mean)
+TOST.otu.p.muc.mean <- TOST.otu.p.muc.mean[-1]
+
+
+# Prepare data
+TOST.otu.p.con.p <- t(as.matrix(sapply(TOST.otu.p.con.mean[,1:(ncol(TOST.otu.p.con)-2)], as.numeric)))
+TOST.otu.p.muc.p <- t(as.matrix(sapply(TOST.otu.p.muc.mean[,1:(ncol(TOST.otu.p.muc)-2)], as.numeric)))
+
+rtost.p.output.df <- data.frame(matrix(NA, ncol = 3, nrow = nrow(TOST.otu.p.muc)))
+colnames(rtost.p.output.df) <- c("Sample1", "Sample2", "P")
+
+
+for(i in 1:nrow(TOST.otu.p.muc)){
+  sample1 <- rownames(TOST.otu.p.muc)[i]
+  sample1Split <- strsplit(sample1, "_")
+  ID1 <- sample1Split[[1]][[2]]
+  
+  muc.p <- t(as.matrix(sapply(TOST.otu.muc[i,1:(ncol(TOST.otu.muc)-2)], as.numeric)))
+  rtostOutput <- rtost(muc.p, TOST.otu.p.con.p, paired = T, epsilon = 0.25, tr = 0.15)
+      
+  rtost.p.output.df$Sample1[i] = sample1
+  rtost.p.output.df$Sample2[i] = "IBA Content"
+  rtost.p.output.df$P[i] = rtostOutput$p.value
+}
+
+rtost.p.output.df$Padj <- p.adjust(rtost.p.output.df$P, "fdr")
+
 ```
 
 
