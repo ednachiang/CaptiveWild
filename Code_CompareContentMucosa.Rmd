@@ -107,6 +107,11 @@ physeq.muc <- subset_samples(physeq.pair, Sample_Type == "Mucosa")
 
 
 
+### Load Functions
+```{r}
+source('scripts/misc.R')
+```
+
 ### RTOST 
 ```{r}
 # Code modified from Skarlupka, et al. (2019)
@@ -213,4 +218,421 @@ p$tab
 adonis(UF.u ~ ID + Sample_Type, data = sampdf, permutations = 9999)
   # ID P = 0.05, R2 = 0.40122
   # Sample_Type P = 0.6056; R2 = 0.08301
+```
+
+
+
+
+################# SUPP PLOTS #################
+### Alpha Div - Phylogenetic Diversity and MPD
+```{r}
+# Calculate Faith's phylogenetic diversity
+pd.res <- pd(t(data.frame(otu_table(physeq.pair))), phy_tree(physeq.pair), 
+             include.root = T)
+pd.df <- data.frame(pd.res)
+
+# Calculate MPD (Mean Pairwise Distance)
+pd.dist <- cophenetic(phy_tree(physeq.pair))
+  # Calculate cophenetic distance
+
+ses.mpd.res <- ses.mpd(t(data.frame(otu_table(physeq.pair))), pd.dist, 
+                       null.model = "taxa.labels", abundance.weighted = F, runs = 999)
+  # Calculate MPD
+  # This'll take a while to run-- be patient
+
+mpd <- data.frame(ses.mpd.res)
+  # Pull out MDP results
+
+
+### Prepare data for plotting ###
+mpd$SampleID <- row.names(mpd)
+pd.res$SampleID <- row.names(pd.res)
+  # Make sure all SampleID's match!
+
+
+# Pull out first Stat of each test
+# PD test = PD
+# MPD test = SES (Standardized Effect Size)
+pd.stats <- data.frame(pd.res$SampleID, pd.res$PD)
+pd.stats$Measure <- rep("PD", nrow(pd.df))
+colnames(pd.stats) <- c("Sample", "Stat", "Measure")
+mpd.stats <- data.frame(mpd$SampleID, mpd$mpd.obs.z)
+mpd.stats$Measure <- rep("MPD SES", nrow(pd.df))
+colnames(mpd.stats) <- c("Sample", "Stat", "Measure")
+
+
+### Prepare PD ###
+pd.ready <- merge(pd.stats, meta, by = "Sample")
+pd.sum <- pd.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.sum$YMAX <- pd.sum$Mean + pd.sum$SE
+pd.sum$YMIN <- pd.sum$Mean - pd.sum$SE
+
+
+### Prepare MPD ###
+mpd.ready <- merge(mpd.stats, meta, by = "Sample")
+mpd.sum <- mpd.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.sum$YMAX <- mpd.sum$Mean + mpd.sum$SE
+mpd.sum$YMIN <- mpd.sum$Mean - mpd.sum$SE
+
+
+########## TESTING PD & MPD ##########
+# For the paired tests, the tests assume that your samples are in the same order (same order of ID for both content and mucosa)
+# Make sure you check ID orders!!!
+### Test PD ###
+hist(pd.ready$Stat, breaks=10)
+qqnorm(pd.ready$Stat)
+qqline(pd.ready$Stat)
+shapiro.test(pd.ready$Stat)
+  # p-value = 9.477e-06
+  # Not Normal
+wilcox.test(Stat ~ Sample_Type, data = pd.ready, paired = T)
+  # p-value = 0.5782
+
+### Test MPD ###
+hist(mpd.ready$Stat, breaks=10)
+qqnorm(mpd.ready$Stat)
+qqline(mpd.ready$Stat)
+shapiro.test(mpd.ready$Stat)
+  # p-value = 0.1108
+  # Normal
+t.test(Stat ~ Sample_Type, data = mpd.ready, paired = T)
+  # p-value = 0.7634
+
+
+
+
+########## PLOT ###########
+
+### PLOT PD ###
+
+pd.plot <- ggplot(pd.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
+  geom_violin() +
+  geom_segment(aes(x = 1, y = pd.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = pd.sum$YMAX[1]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = pd.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = pd.sum$YMAX[2]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 1, y = pd.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = pd.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = pd.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = pd.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_point(data = pd.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
+  geom_point(data = pd.sum, aes(y= Mean), colour="white", size = 0.5, 
+             show.legend = F) +
+  scale_fill_manual(values = c("chocolate4", "darkgoldenrod2")) +
+  scale_y_continuous(limits = c(13,39), breaks = c(13,18,23,28,33,38))  +
+  ylab("Faith's Phylogenetic Diversity") + labs(fill = "Sample Type") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        legend.position = "none",
+        plot.margin = margin(t=1, r=1, b=1.5, l=1, unit = "mm")) +
+  annotate("text", x = 1.5, y = 39, label = "ns", size = 2)
+
+
+### PLOT MPD ###
+mpd.plot <- ggplot(mpd.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
+  geom_violin() +
+  geom_segment(aes(x = 1, y = mpd.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = mpd.sum$YMAX[1]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = mpd.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = mpd.sum$YMAX[2]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 1, y = mpd.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = mpd.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = mpd.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = mpd.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_point(data = mpd.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
+  geom_point(data = mpd.sum, aes(y= Mean), colour="white", size = 0.5, 
+             show.legend = F) +
+  scale_fill_manual(values = c("chocolate4", "darkgoldenrod2")) +
+  scale_y_continuous(limits = c(-7,5.5), breaks = c(-7, -4.5, -2, 0.5, 3, 5.5))  +
+  ylab("Phylogenetic Evenness (MPD)") + labs(fill = "Sample Type") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        legend.position = "none",
+        plot.margin = margin(t=1, r=1, b=1.5, l=1, unit = "mm")) +
+  annotate("text", x = 1.5, y = 5.5, label = "ns", size = 2)
+  
+```
+### Alpha Div - # OTUs, Shannon
+```{r}
+adiv <- data.frame(sample_data(physeq.pair))
+
+########## Shannon ##########
+
+
+### Prepare data for plot
+shannon.sum <- adiv %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(shannon),
+            SE = se(shannon),
+            SD = sd(shannon),
+            Median = median(shannon))
+shannon.sum$YMAX <- shannon.sum$Mean + shannon.sum$SE
+shannon.sum$YMIN <- shannon.sum$Mean - shannon.sum$SE
+
+
+### Plot
+shannon.plot <- ggplot(adiv, aes(x = Sample_Type, y = shannon, fill = Sample_Type)) +
+  geom_violin() +
+  geom_segment(aes(x = 1, y = shannon.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = shannon.sum$YMAX[1]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = shannon.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = shannon.sum$YMAX[2]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 1, y = shannon.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = shannon.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = shannon.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = shannon.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_point(data = shannon.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
+  geom_point(data = shannon.sum, aes(y= Mean), colour="white", size = 0.5, 
+             show.legend = F) +
+  scale_fill_manual(values = c("chocolate4", "darkgoldenrod2")) +
+  scale_y_continuous(limits = c(1.4,5.9), breaks = c(1.4,2.3,3.2,4.1,5.0, 5.9))  +
+  ylab("Shannon's Diversity Index") + labs(fill = "Sample Type") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        legend.title = element_text(face="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        legend.text = element_text(size=6),
+        legend.key.height = unit(3, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-7,-10,-10),
+        plot.margin = margin(t=1, r=1, b=1.5, l=0, unit = "mm")) +
+  annotate("text", x = 1.5, y = 5.8, label = "ns", size = 2)
+
+
+
+
+########## Number of Unique OTUs ##########
+otus <- data.frame(otu_table(physeq.pair))
+sampNames <- colnames(otus)
+uniq.otus <- data.frame(matrix(nrow = nsamples(physeq.pair), ncol = 2))
+colnames(uniq.otus) <- c("Sample", "Unique_OTUs")
+for(n in 1:nsamples(physeq.pair)) {
+  COL <- otus[,n]
+  numUniq <- length(which(COL > 0))
+  uniq.otus$Sample[n] <- sampNames[n]
+  uniq.otus$Unique_OTUs[n] <- numUniq
+}
+uniq.otus$Sample_Type <- sample_data(physeq.pair)$Sample_Type
+rownames(uniq.otus) <- uniq.otus$Sample
+
+uniq.otus.sum <- uniq.otus %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Unique_OTUs),
+            SE = se(Unique_OTUs),
+            SD = sd(Unique_OTUs),
+            Median = median(Unique_OTUs))
+uniq.otus.sum$YMAX <- uniq.otus.sum$Mean + uniq.otus.sum$SE
+uniq.otus.sum$YMIN <- uniq.otus.sum$Mean - uniq.otus.sum$SE
+
+
+
+otu.plot <- ggplot(uniq.otus, aes(x = Sample_Type, y = Unique_OTUs, fill = Sample_Type)) +
+  geom_violin() +
+  geom_segment(aes(x = 1, y = uniq.otus.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = uniq.otus.sum$YMAX[1]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = uniq.otus.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = uniq.otus.sum$YMAX[2]+0.1), color = "black", size = 1, 
+               show.legend = F) +
+  geom_segment(aes(x = 1, y = uniq.otus.sum$YMIN[1]-0.1, xend = 1, 
+                   yend = uniq.otus.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_segment(aes(x = 2, y = uniq.otus.sum$YMIN[2]-0.1, xend = 2, 
+                   yend = uniq.otus.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
+               show.legend = F) +
+  geom_point(data = uniq.otus.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
+  geom_point(data = uniq.otus.sum, aes(y= Mean), colour="white", size = 0.5, 
+             show.legend = F) +
+  scale_fill_manual(values = c("chocolate4", "darkgoldenrod2")) +
+  scale_y_continuous(limits = c(200,800), breaks = c(200,320,440,560,680,800))  +
+  ylab("Number of Unique OTUs") + labs(fill = "Sample Type") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        legend.title = element_text(face="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        legend.position = "none",
+        plot.margin = margin(t=1, r=1, b=1.5, l=1, unit = "mm")
+        ) +
+  annotate("text", x = 1.5, y = 800, label = "ns", size = 2)
+
+
+
+### Testing ###
+hist(adiv$shannon, breaks=10)
+qqnorm(adiv$shannon)
+qqline(adiv$shannon)
+shapiro.test(adiv$shannon)
+  # p-value = 0.4637
+  # Normal
+t.test(shannon ~ Sample_Type, data = adiv, paired = T)
+  # p-value = 0.8903
+
+
+hist(uniq.otus$Unique_OTUs, breaks=10)
+qqnorm(uniq.otus$Unique_OTUs)
+qqline(uniq.otus$Unique_OTUs)
+shapiro.test(uniq.otus$Unique_OTUs)
+  # p-value =  5.043e-06
+  # Not Normal
+wilcox.test(Unique_OTUs ~ Sample_Type, data = uniq.otus, paired = T)
+  # 0.9036
+
+```
+
+
+
+### Beta Div
+```{r}
+########## Unweighted UniFrac ##########
+UF.u <- phyloseq::distance(physeq = physeq.pair, method = "unifrac")
+UF.u.pcoa <- ordinate(physeq = physeq.pair, method = "PCoA", distance = "unifrac")
+  # Variation explained = 27.7%
+
+
+u.plot <- plot_ordination(physeq = physeq.pair, ordination = UF.u.pcoa, axes = c(1,2),
+                title = "Unweighted UniFrac", color = "Sample_Type", shape = "Group") +
+  geom_point(size = 2) +
+  #stat_ellipse(aes(colour = Sample_Type), size = 1, level = 0.95) +
+  scale_color_manual(values = c("chocolate4", "darkgoldenrod2"), labels = c("Content", "Mucosa")) +
+  scale_shape_manual(values = c(1,16,2,17,4), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) + 
+  labs(color = "Sample Type") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black", vjust = 0.5),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8),
+        legend.title = element_text(size = 6, face = "bold"),
+        legend.text = element_text(size = 6),
+        legend.key.height = unit(3.5, 'mm'),
+        legend.box.margin=margin(-15,-10,-10,-10)
+        )
+
+
+### Test
+pair.sampdf <- data.frame(sample_data(physeq.pair))
+beta.tax <- betadisper(d=UF.u, group=pair.sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.236
+adonis(UF.u ~ Sample_Type, data = pair.sampdf, permutations = 9999)
+  # p-value = 0.9991
+
+
+
+
+########## Weighted UniFrac ##########
+UF.w <- phyloseq::distance(physeq = physeq.pair, method = "wunifrac")
+UF.w.pcoa <- ordinate(physeq = physeq.pair, method = "PCoA", distance = "wunifrac")
+  # Variation explained = 35.7%
+
+w.plot <- plot_ordination(physeq = physeq.pair, ordination = UF.w.pcoa, axes = c(1,2),
+                title = "Weighted UniFrac", color = "Sample_Type", shape = "Group") +
+  geom_point(size = 2) +
+  #stat_ellipse(aes(colour = Sample_Type), size = 1, level = 0.95) +
+  scale_color_manual(values = c("chocolate4", "darkgoldenrod2"), labels = c("Content", "Mucosa")) +
+  scale_shape_manual(values = c(1,16,2,17,4), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) + 
+  labs(color = "Sample Type") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8),
+        legend.position = "none",
+        plot.margin = margin(t=2, r=5, b=2, l=3, unit = "mm")
+        )
+
+
+### PERMANOVA ###
+pair.sampdf <- data.frame(sample_data(physeq.pair))
+beta.tax <- betadisper(d=UF.w, group=pair.sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.088
+adonis(UF.w ~ Sample_Type, data = pair.sampdf, permutations = 9999)
+  # p-value = 0.9964
+```
+### PLOT
+```{r}
+tiff("ContentMucosaComp.tiff", width = 170, height = 120, units = "mm", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=grid.layout(4,4, widths = c(1, 1, 1, 1.3), heights = c(0.07, 1.5, 0.07, 1.5))))
+
+grid.text("A", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
+          gp=gpar(fontsize=10,fontface="bold"))
+print(otu.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+grid.text("B", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),
+          gp=gpar(fontsize=10,fontface="bold"))
+print(pd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=2))
+grid.text("C", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=3),
+          gp=gpar(fontsize=10,fontface="bold"))
+print(mpd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
+grid.text("D", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
+          gp=gpar(fontsize=10,fontface="bold"))
+print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
+
+
+
+print(w.plot, vp=viewport(layout.pos.row=4, layout.pos.col=1:2))
+grid.text("E", x=unit(0.1, "npc"), y=unit(-1, "npc"), 
+          vp=viewport(layout.pos.row=3, layout.pos.col=1), gp=gpar(fontsize=10,fontface="bold"))
+print(u.plot, vp=viewport(layout.pos.row=4, layout.pos.col=3:4))
+grid.text("F", x=unit(0.1, "npc"), y=unit(-1, "npc"),
+          vp=viewport(layout.pos.row=3,layout.pos.col=3), gp=gpar(fontsize=10,fontface="bold"))
+
+dev.off()
+```
 ```
