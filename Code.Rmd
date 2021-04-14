@@ -19,10 +19,6 @@ library(phytools)
 library(tidyr)
 library(vegan)
 
-#library(gplots)
-#library(phangorn)
-#library(pgirmess)
-
 theme_set(theme_bw())
 set.seed(1)
 ```
@@ -406,7 +402,7 @@ kruskal.test(formula = RelAbund ~ Group, data=elu.df)
   # p-value = 0.01184
 dunn.test(x = as.numeric(elu.df$RelAbund), g = as.factor(elu.df$Group), method = "bh", label = T)
   # Wild-Lab = 0.0421
-  # Wild-Torpor = 0.360
+  # Wild-Torpor = 0.0360
   # Wild-IBA = 0.2571
   # Wild-Spring = 0.0185*
   # Lab-Torpor = 0.4673
@@ -468,15 +464,17 @@ phy.sum <- phy99.df %>%
             SD = sd(Abundance),
             SE = se(Abundance),
             iqr = IQR(Abundance))
-
+group.renamed <- as_labeller(c(`Summer_Wild` = "Summer Wild", `Summer_Lab` = "Summer Lab",
+                      `Torpor` = "Torpor", `IBA` = "IBA", `Spring` = "Spring"))
 
 ### Plot
 #tiff("phyla.tiff", width=170, height=200, units="mm", res=600)
 ggplot(phy.sum, aes(x = Phylum, y = Mean, fill = Phylum)) +
-  facet_wrap(Group ~ ., strip.position = "top", nrow = 5, scale = "free_y") +
+  facet_wrap(Group ~ ., strip.position = "top", nrow = 5, scale = "free_y",
+             labeller = group.renamed) +
   geom_bar(stat = "identity", color = "black") +
   geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), width = 0.2) +
-  xlab("Phyla") + ylab("Relative Abundance (%)") +
+  xlab("Phylum") + ylab("Relative Abundance (%)") +
   scale_fill_manual(values=c("#ed5e61", "#629fd0", "#ffff33", "#bd87c5", "gray60", "orange", "lawngreen", "rosybrown1", "#cd6b32", "gold", "lightyellow")) +
   scale_y_continuous(breaks=equal_breaks(n = 4)) +
   theme(panel.grid.major = element_blank(),
@@ -496,7 +494,7 @@ ggplot(phy.sum, aes(x = Phylum, y = Mean, fill = Phylum)) +
   )
 #dev.off()
 ```
-### Phylogenetic Diversity and SES MPD
+### Alpha-Diversity - Phylogenetic Diversity and SES MPD
 ```{r}
 ### Unweighted - Calculate phylogenetic diversity and MPD ###
 
@@ -698,10 +696,6 @@ shapiro.test(pd.ready$Stat)
   # p-value = 3.843e-06
   # Not Normal
 
-# Female vs. Male
-kruskal.test(formula = Stat ~ Sex, data = pd.ready)
-  # p-value = 0.4484
-
 # Run Kruskal-Wallis
 kruskal.test(formula = Stat ~ Group, data = pd.ready)
   # p-value = 5.022e-06
@@ -730,10 +724,6 @@ shapiro.test(mpd.ready$Stat)
   # p-value = 0.1652
   # Normal
 
-# Female vs. Male
-wilcox.test(formula = Stat ~ Sex, data = mpd.ready)
-  # p-value = 0.02257
-
 # Run ANOVA
 summary(aov(Stat ~ Group, data = mpd.ready))
   # p-value = 0.000829
@@ -752,7 +742,7 @@ TukeyHSD(aov(Stat ~ Group, data = mpd.ready))
 
 ```
 
-### Alpha Diversity
+### Alpha Diversity - Shannon & # OTUs
 ```{r}
 adiv <- data.frame(sample_data(physeq))
 
@@ -944,7 +934,7 @@ otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
 
 ```
 
-### Plot - PD, SES MPD, Alpha Div
+### Plot - Alpha-Diversity
 ```{r}
 tiff("adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
@@ -993,23 +983,23 @@ sampdf <- data.frame(sample_data(physeq))
 beta.tax <- betadisper(d=UF.w, group=sampdf$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.009
+  # p-value = 0.004
 anosim(UF.w, sampdf$Group, permutations = 9999)
   # p-value = 1e-04
 
 
 
 # Separate out pairwise comparisons
-#phy.ws <- merge_phyloseq(physeq.wild, physeq.sum)
-#phy.st <- merge_phyloseq(physeq.sum, physeq.tor)
-#phy.si <- merge_phyloseq(physeq.sum, physeq.iba)
-#phy.sp <- merge_phyloseq(physeq.sum, physeq.spr)
-#phy.ti <- merge_phyloseq(physeq.tor, physeq.iba)
-#phy.tp <- merge_phyloseq(physeq.tor, physeq.spr)
-#phy.ip <- merge_phyloseq(physeq.iba, physeq.spr)
-#phy.wt <- merge_phyloseq(physeq.wild, physeq.tor)
-#phy.wi <- merge_phyloseq(physeq.wild, physeq.iba)
-#phy.wp <- merge_phyloseq(physeq.wild, physeq.spr)
+phy.ws <- merge_phyloseq(physeq.wild, physeq.sum)
+phy.st <- merge_phyloseq(physeq.sum, physeq.tor)
+phy.si <- merge_phyloseq(physeq.sum, physeq.iba)
+phy.sp <- merge_phyloseq(physeq.sum, physeq.spr)
+phy.ti <- merge_phyloseq(physeq.tor, physeq.iba)
+phy.tp <- merge_phyloseq(physeq.tor, physeq.spr)
+phy.ip <- merge_phyloseq(physeq.iba, physeq.spr)
+phy.wt <- merge_phyloseq(physeq.wild, physeq.tor)
+phy.wi <- merge_phyloseq(physeq.wild, physeq.iba)
+phy.wp <- merge_phyloseq(physeq.wild, physeq.spr)
 
 
 # Summer Wild vs. Summer Lab
@@ -1018,7 +1008,7 @@ sampdf.ws<- data.frame(sample_data(phy.ws))
 beta.tax <- betadisper(d=ws.w, group=sampdf.ws$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.001
+  # p-value = 0.005
 anosim(ws.w, sampdf.ws$Group, permutations = 9999)
   # p-value = 0.0039
 
@@ -1185,16 +1175,16 @@ anosim(UF.u, sampdf$Group, permutations = 9999)
 
 
 # Separate out pairwise comparisons
-phy.ws <- merge_phyloseq(physeq.wild, physeq.sum)
-phy.st <- merge_phyloseq(physeq.sum, physeq.tor)
-phy.si <- merge_phyloseq(physeq.sum, physeq.iba)
-phy.sp <- merge_phyloseq(physeq.sum, physeq.spr)
-phy.ti <- merge_phyloseq(physeq.tor, physeq.iba)
-phy.tp <- merge_phyloseq(physeq.tor, physeq.spr)
-phy.ip <- merge_phyloseq(physeq.iba, physeq.spr)
-phy.wt <- merge_phyloseq(physeq.wild, physeq.tor)
-phy.wi <- merge_phyloseq(physeq.wild, physeq.iba)
-phy.wp <- merge_phyloseq(physeq.wild, physeq.spr)
+#phy.ws <- merge_phyloseq(physeq.wild, physeq.sum)
+#phy.st <- merge_phyloseq(physeq.sum, physeq.tor)
+#phy.si <- merge_phyloseq(physeq.sum, physeq.iba)
+#phy.sp <- merge_phyloseq(physeq.sum, physeq.spr)
+#phy.ti <- merge_phyloseq(physeq.tor, physeq.iba)
+#phy.tp <- merge_phyloseq(physeq.tor, physeq.spr)
+#phy.ip <- merge_phyloseq(physeq.iba, physeq.spr)
+#phy.wt <- merge_phyloseq(physeq.wild, physeq.tor)
+#phy.wi <- merge_phyloseq(physeq.wild, physeq.iba)
+#phy.wp <- merge_phyloseq(physeq.wild, physeq.spr)
 
 
 # Summer Wild vs. Summer Lab
@@ -1415,32 +1405,31 @@ w.sig.df <- psmelt(w.sig.phy)
 w.sig.sum <- w.sig.df %>%
   group_by(Group, Species) %>%
   summarize(Mean = mean(Abundance))
-w.sig.sum$Species <- ordered(w.sig.sum$Species, levels = c("Otu00140", "Otu00055", "Otu00163", "Otu00166", "Otu00096", "Otu00119", "Otu00111"))
+w.sig.sum$Species <- ordered(w.sig.sum$Species, levels = c("Otu00166", "Otu00096", "Otu00055", "Otu00163", "Otu00140", "Otu00111", "Otu00119"))
 
 s.sig.df <- psmelt(s.sig.phy)
 s.sig.sum <- s.sig.df %>%
   group_by(Group, Species) %>%
   summarize(Mean = mean(Abundance))
-s.sig.sum$Species <- ordered(s.sig.sum$Species, levels = c("Otu00019", "Otu00033", "Otu00027", "Otu00017", "Otu00003", "Otu00035"))
+s.sig.sum$Species <- ordered(s.sig.sum$Species, levels = c("Otu00003", "Otu00017", "Otu00027", "Otu00033", "Otu00019", "Otu00035"))
 
 t.sig.df <- psmelt(t.sig.phy)
 t.sig.sum <- t.sig.df %>%
   group_by(Group, Species) %>%
   summarize(Mean = mean(Abundance))
-t.sig.sum$Species <- ordered(t.sig.sum$Species, levels = c("Otu00004", "Otu00016", "Otu00013"))
+t.sig.sum$Species <- ordered(t.sig.sum$Species, levels = c("Otu00016", "Otu00013", "Otu00004"))
 
 i.sig.df <- psmelt(i.sig.phy)
 i.sig.sum <- i.sig.df %>%
   group_by(Group, Species) %>%
   summarize(Mean = mean(Abundance))
-i.sig.sum$Species <- ordered(i.sig.sum$Species, levels = c("Otu00009", "Otu00001", "Otu00004"))
+i.sig.sum$Species <- ordered(i.sig.sum$Species, levels = c("Otu00004", "Otu00009", "Otu00001"))
 
 p.sig.df <- psmelt(p.sig.phy)
 p.sig.sum <- p.sig.df %>%
   group_by(Group, Species) %>%
   summarize(Mean = mean(Abundance))
-p.sig.sum$Species <- ordered(p.sig.sum$Species, levels = c("Otu00044", "Otu00015", "Otu00002", "Otu00008", "Otu00005"))
-
+p.sig.sum$Species <- ordered(p.sig.sum$Species, levels = c("Otu00015", "Otu00002", "Otu00044", "Otu00005", "Otu00008"))
 
 
 ########## SIMPER HEATMAP ##########
@@ -1449,11 +1438,11 @@ p.sig.sum$Species <- ordered(p.sig.sum$Species, levels = c("Otu00044", "Otu00015
 w.simp.plot <- ggplot(w.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") + coord_equal() +
   geom_text(size = 3, aes(label=sprintf("%0.1f", round(Mean, digits=1)))) +
-  scale_y_discrete(labels = c(expression(italic("Ruminiclostridium 6")^"SummerLab,IBA,Spring"),
+  scale_y_discrete(labels = c(expression("Lachnospiraceae"^"SummerLab"),
+                              expression("Lachnospiraceae"^"SummerLab"),
                               expression(italic("Prevotellaceae UCG-003")^"IBA"),
                               expression(italic("Lachnospiraceae NK4A136")^"SummerLab,Spring"),
-                              expression("Lachnospiraceae"^"SummerLab"),
-                              expression("Lachnospiraceae"^"SummerLab"),
+                              expression(italic("Ruminiclostridium 6")^"SummerLab,IBA,Spring"),
                               expression("Lachnospiraceae"^"All"),
                               expression("Lachnospiraceae"^"All")),
                    position = "right") +
@@ -1483,11 +1472,11 @@ w.simp.plot <- ggplot(w.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
 s.simp.plot <- ggplot(s.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") + coord_equal() +
   geom_text(size = 3, aes(label=sprintf("%0.1f", round(Mean, digits=1)))) +
-  scale_y_discrete(labels = c(expression("Lachnospiraceae"^"SummerWild,Torpor,IBA"),
-                              expression("Bacteroidales"^"SummerWild,Torpor,IBA"), 
+  scale_y_discrete(labels = c(expression("Lachnospiraceae"^"Torpor"),
+                              expression(italic("Ruminococcus 1"^"Torpor,IBA")),
                               expression(italic("Lachnospiraceae NK4A469")^"Torpor,IBA"),
-                              expression(italic("Ruminococcus 1"^"Torpor,IBA")), 
-                              expression("Lachnospiraceae"^"Torpor"), 
+                              expression("Lachnospiraceae"^"SummerWild,Torpor,IBA"),
+                              expression("Bacteroidales"^"SummerWild,Torpor,IBA"),
                               expression(italic("Lactobacillus")^"All")),
                    position = "right") +
   scale_fill_gradientn(name = "Mean Relative\nAbundance (%)", limits = c(0, 12),
@@ -1516,9 +1505,9 @@ s.simp.plot <- ggplot(s.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
 t.simp.plot <- ggplot(t.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") + coord_equal() +
   geom_text(size = 3, aes(label=sprintf("%0.1f", round(Mean, digits=1)))) +
-  scale_y_discrete(labels = c(expression(italic("Odoribacter")^"SummerWild,SummerLab,Spring"),
-                              expression(italic("Bacteroides")^"SummerWild,SummerLab"),
-                              expression("WCHB1-41"^"SummerLab")),
+  scale_y_discrete(labels = c(expression(italic("Bacteroides")^"SummerWild,SummerLab"),
+                              expression("WCHB1-41"^"SummerLab"),
+                              expression(italic("Odoribacter")^"SummerWild,SummerLab,Spring")),
                    position = "right") +
   scale_fill_gradientn(name = "Mean Relative\nAbundance (%)", limits = c(0, 11.4),
                        breaks = c(0, 5.7, 11.4),
@@ -1547,9 +1536,9 @@ t.simp.plot <- ggplot(t.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
 i.simp.plot <- ggplot(i.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") + coord_equal() +
   geom_text(size = 3, aes(label=sprintf("%0.1f", round(Mean, digits=1)))) +
-  scale_y_discrete(labels = c(expression("Muribaculaceae"^"SummerWild,SummerLab"),
-                              expression(italic("Akkermansia")^"SummerWild,SummerLab"),
-                              expression(italic("Odoribacter")^"SummerLab")),
+  scale_y_discrete(labels = c(expression(italic("Odoribacter")^"SummerLab"),
+                              expression("Muribaculaceae"^"SummerWild,SummerLab"),
+                              expression(italic("Akkermansia")^"SummerWild,SummerLab")),
                    position = "right") +
   scale_fill_gradientn(name = "Mean Relative\nAbundance (%)", limits = c(0, 17.6),
                        breaks = c(0, 8.8, 17.6),
@@ -1577,11 +1566,11 @@ i.simp.plot <- ggplot(i.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
 p.simp.plot <- ggplot(p.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") + coord_equal() +
   geom_text(size = 3, aes(label=sprintf("%0.1f", round(Mean, digits=1)))) +
-  scale_y_discrete(labels = c(expression(italic("Lactobacillus")^"SummerWild,Torpor"),
-                              expression(italic("Coprococcus 2")^"SummerWild,Torpor"),
+  scale_y_discrete(labels = c(expression(italic("Coprococcus 2")^"SummerWild,Torpor"),
                               expression(italic("Bacteroides")^"SummerWild"),
-                              expression(italic("Prevotellaceae UCG-001")^"All"),
-                              expression("Lachnospiraceae"^"All")),
+                              expression(italic("Lactobacillus")^"SummerWild,Torpor"),
+                              expression("Lachnospiraceae"^"All"),
+                              expression(italic("Prevotellaceae UCG-001")^"All")),
                    position = "right") +
   scale_fill_gradientn(name = "Mean Relative\nAbundance (%)", limits = c(0, 6.8),
                        breaks = c(0, 3.4, 6.8),
