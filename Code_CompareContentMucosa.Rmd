@@ -184,21 +184,6 @@ UF.w <- phyloseq::distance(physeq = physeq.wild, method = "wunifrac")
 UF.w.pcoa <- ordinate(physeq = physeq.wild, method = "PCoA", distance = "wunifrac")
   # Variation explained = 34.9%
 
-wUF.plot <- plot_ordination(physeq = physeq.wild, ordination = UF.w.pcoa, axes = c(1,2),
-                title = "Weighted UniFrac", color = "Sample_Type") +
-  #stat_ellipse(aes(colour = Sample_Type), size = 1, level = 0.95) +
-  #scale_colour_manual(values = c("#e60000", "#ec9393", "#1c41b0", "deepskyblue", "#74b300"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_blank(),
-        axis.title.x = element_text(size = 8),
-        axis.title.y = element_text(size = 8),
-        axis.text.x = element_text(size = 8, colour = "black"),
-        axis.text.y = element_text(size = 8, colour = "black"),
-        plot.title = element_text(hjust = 0.5, size = 10),
-        legend.position = "none"
-        )
-
 
 ### PERMANOVA ###
 sampdf <- data.frame(sample_data(physeq.wild))
@@ -218,22 +203,6 @@ adonis(UF.w ~ ID + Sample_Type, data = sampdf, permutations = 9999)
 UF.u <- phyloseq::distance(physeq = physeq.wild, method = "unifrac")
 UF.u.pcoa <- ordinate(physeq = physeq.wild, method = "PCoA", distance = "unifrac")
   # Variation explained = 34.9%
-
-uUF.plot <- plot_ordination(physeq = physeq.wild, ordination = UF.w.pcoa, axes = c(1,2),
-                title = "Weighted UniFrac", color = "Sample_Type") +
-  #stat_ellipse(aes(colour = Sample_Type), size = 1, level = 0.95) +
-  #scale_colour_manual(values = c("#e60000", "#ec9393", "#1c41b0", "deepskyblue", "#74b300"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_blank(),
-        axis.title.x = element_text(size = 8),
-        axis.title.y = element_text(size = 8),
-        axis.text.x = element_text(size = 8, colour = "black"),
-        axis.text.y = element_text(size = 8, colour = "black"),
-        plot.title = element_text(hjust = 0.5, size = 10),
-        legend.position = "none"
-        )
-
 
 ### PERMANOVA ###
 sampdf <- data.frame(sample_data(physeq.wild))
