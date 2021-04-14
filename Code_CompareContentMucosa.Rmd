@@ -177,179 +177,71 @@ rtost.output.df$Padj <- p.adjust(rtost.output.df$P, "fdr")
 ```
 
 
-### Phylogenetic Diversity and SES MPD
-```{r}
-### Unweighted - Calculate phylogenetic diversity and MPD ###
-
-# Calculate Faith's phylogenetic diversity
-pd.res <- pd(t(data.frame(otu_table(physeq.pair))), phy_tree(physeq.pair), 
-             include.root = T)
-pd.df <- data.frame(pd.res)
-
-# Calculate MPD (Mean Pairwise Distance)
-pd.dist <- cophenetic(phy_tree(physeq.pair))
-  # Calculate cophenetic distance
-ses.mpd.res <- ses.mpd(t(data.frame(otu_table(physeq.pair))), pd.dist, 
-                       null.model = "taxa.labels", abundance.weighted = F, runs = 999)
-  # Calculate MPD
-  # This'll take a while to run-- be patient
-mpd <- data.frame(ses.mpd.res)
-  # Pull out MDP results
-
-
-### Prepare data for plotting ###
-mpd$SampleID <- row.names(mpd)
-pd.res$SampleID <- row.names(pd.res)
-  # Make sure all SampleID's match!
-
-# Pull out first Stat of each test
-# PD test = PD
-# MPD test = SES (Standardized Effect Size)
-pd.stats <- data.frame(pd.res$SampleID, pd.res$PD)
-pd.stats$Measure <- rep("PD", nrow(pd.df))
-colnames(pd.stats) <- c("Sample", "Stat", "Measure")
-mpd.stats <- data.frame(mpd$SampleID, mpd$mpd.obs.z)
-mpd.stats$Measure <- rep("MPD SES", nrow(pd.df))
-colnames(mpd.stats) <- c("Sample", "Stat", "Measure")
-
-
-
-### Prepare PD ###
-pd.ready <- merge(pd.stats, meta, by = "Sample")
-pd.ready$Group <- ordered(pd.ready$Group, levels = c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring"))
-
-
-### Prepare MPD ###
-mpd.ready <- merge(mpd.stats, meta, by = "Sample")
-mpd.ready$Group <- ordered(mpd.ready$Group, levels = c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring"))
-
-
-
-
-
-########## TESTING PD & MPD ##########
-
-# For the paired tests, the tests assume that your samples are in the same order (same order of ID for both content and mucosa)
-# Make sure you check ID orders!!!
-
-### Test PD ###
-hist(pd.ready$Stat, breaks=10)
-qqnorm(pd.ready$Stat)
-qqline(pd.ready$Stat)
-shapiro.test(pd.ready$Stat)
-  # p-value = 9.477e-06
-  # Not Normal
-
-wilcox.test(Stat ~ Sample_Type, data = pd.ready, paired = T)
-  # p-value = 0.5782
-
-
-
-### Test MPD ###
-hist(mpd.ready$Stat, breaks=10)
-qqnorm(mpd.ready$Stat)
-qqline(mpd.ready$Stat)
-shapiro.test(mpd.ready$Stat)
-  # p-value = 0.06388
-  # Normal
-
-t.test(Stat ~ Sample_Type, data = mpd.ready, paired = T)
-  # p-value = 0.7998
-```
-
-### Alpha Diversity
-```{r}
-adiv <- data.frame(sample_data(physeq.pair))
-
-########## Compare Con vs. Muc within Group ##########
-
-# Separate by season
-adiv.wild <- adiv[which(adiv$Group == "Summer_Wild"),]
-adiv.sum <- adiv[which(adiv$Group == "Summer_Lab"),]
-adiv.tor <- adiv[which(adiv$Group == "Torpor"),]
-adiv.iba <- adiv[which(adiv$Group == "IBA"),]
-adiv.spr <- adiv[which(adiv$Group == "Spring"),]
-
-
-########## Shannon ##########
-hist(adiv$shannon, breaks=10)
-qqnorm(adiv$shannon)
-qqline(adiv$shannon)
-shapiro.test(adiv$shannon)
-  # p-value = 0.4637
-  # Normal
-
-### T-Test ###
-t.test(shannon ~ Sample_Type, data = adiv, paired = T)
-  # p-value = 0.8903
-
-
-
-########## Number of Unique OTUs ##########
-otus <- data.frame(otu_table(physeq.pair))
-sampNames <- colnames(otus)
-uniq.otus <- data.frame(matrix(nrow = nsamples(physeq.pair), ncol = 2))
-colnames(uniq.otus) <- c("Sample", "Unique_OTUs")
-for(n in 1:nsamples(physeq.pair)) {
-  COL <- otus[,n]
-  numUniq <- length(which(COL > 0))
-  uniq.otus$Sample[n] <- sampNames[n]
-  uniq.otus$Unique_OTUs[n] <- numUniq
-}
-uniq.otus$Sample_Type <- sample_data(physeq.pair)$Sample_Type
-rownames(uniq.otus) <- uniq.otus$Sample
-
-hist(uniq.otus$Unique_OTUs, breaks=10)
-qqnorm(uniq.otus$Unique_OTUs)
-qqline(uniq.otus$Unique_OTUs)
-shapiro.test(uniq.otus$Unique_OTUs)
-  # p-value = 5.043e-06
-  # Not Normal
-wilcox.test(Unique_OTUs ~ Sample_Type, data = uniq.otus, paired = T)
-  # p-value = 0.9036
-
-```
-
-
-
 ### Beta Diversity
 ```{r}
-########## Unweighted UniFrac ##########
-UF.u <- phyloseq::distance(physeq = physeq.pair, method = "unifrac")
-UF.u.pcoa <- ordinate(physeq = physeq.pair, method = "PCoA", distance = "unifrac")
-  # Variation explained = 27.7%
-plot_ordination(physeq = physeq.pair, ordination = UF.u.pcoa, axes = c(1,2),
-                title = "Unweighted UniFrac") +
-  geom_point(size = 2, aes(colour = Sample_Type))
-
-### Test
-pair.sampdf <- data.frame(sample_data(physeq.pair))
-beta.tax <- betadisper(d=UF.u, group=pair.sampdf$Sample_Type)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.236
-adonis(UF.u ~ Sample_Type, data = pair.sampdf, permutations = 9999)
-  # p-value = 0.9991
-
-
-
-
 ########## Weighted UniFrac ##########
-UF.w <- phyloseq::distance(physeq = physeq.pair, method = "wunifrac")
-UF.w.pcoa <- ordinate(physeq = physeq.pair, method = "PCoA", distance = "wunifrac")
-  # Variation explained = 35.7%
+UF.w <- phyloseq::distance(physeq = physeq.wild, method = "wunifrac")
+UF.w.pcoa <- ordinate(physeq = physeq.wild, method = "PCoA", distance = "wunifrac")
+  # Variation explained = 34.9%
 
-plot_ordination(physeq = physeq.pair, ordination = UF.w.pcoa, axes = c(1,2),
-                title = "Weighted UniFrac") +
-  geom_point(size = 2, aes(colour = Sample_Type))
+wUF.plot <- plot_ordination(physeq = physeq.wild, ordination = UF.w.pcoa, axes = c(1,2),
+                title = "Weighted UniFrac", color = "Sample_Type") +
+  #stat_ellipse(aes(colour = Sample_Type), size = 1, level = 0.95) +
+  #scale_colour_manual(values = c("#e60000", "#ec9393", "#1c41b0", "deepskyblue", "#74b300"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8, colour = "black"),
+        axis.text.y = element_text(size = 8, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 10),
+        legend.position = "none"
+        )
 
 
 ### PERMANOVA ###
-pair.sampdf <- data.frame(sample_data(physeq.pair))
-beta.tax <- betadisper(d=UF.w, group=pair.sampdf$Sample_Type)
+sampdf <- data.frame(sample_data(physeq.wild))
+beta.tax <- betadisper(d=UF.w, group=sampdf$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.088
-adonis(UF.w ~ Sample_Type, data = pair.sampdf, permutations = 9999)
-  # p-value = 0.9964
+  # p-value = 0.9013889
+adonis(UF.w ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID P = 0.01667, R2 = 0.53348
+  # Sample_Type P = 0.60556; R2 = 0.07401
+
+
+
+
+
+########## Unweighted UniFrac ##########
+UF.u <- phyloseq::distance(physeq = physeq.wild, method = "unifrac")
+UF.u.pcoa <- ordinate(physeq = physeq.wild, method = "PCoA", distance = "unifrac")
+  # Variation explained = 34.9%
+
+uUF.plot <- plot_ordination(physeq = physeq.wild, ordination = UF.w.pcoa, axes = c(1,2),
+                title = "Weighted UniFrac", color = "Sample_Type") +
+  #stat_ellipse(aes(colour = Sample_Type), size = 1, level = 0.95) +
+  #scale_colour_manual(values = c("#e60000", "#ec9393", "#1c41b0", "deepskyblue", "#74b300"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8, colour = "black"),
+        axis.text.y = element_text(size = 8, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 10),
+        legend.position = "none"
+        )
+
+
+### PERMANOVA ###
+sampdf <- data.frame(sample_data(physeq.wild))
+beta.tax <- betadisper(d=UF.u, group=sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.1013889
+adonis(UF.u ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID P = 0.05, R2 = 0.40122
+  # Sample_Type P = 0.6056; R2 = 0.08301
 ```
