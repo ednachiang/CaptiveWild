@@ -808,7 +808,7 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
   scale_fill_manual(values = c("#e60000", "#ec9393", "#1c41b0", "deepskyblue", "#74b300"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(1.4, 5.75), breaks = c(1.4,2.26,3.12,3.98,4.84,5.7)) +
   scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  ylab("Shannon's Index") +
+  ylab("Shannon's Diversity Index") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
@@ -1438,13 +1438,13 @@ p.sig.sum$Species <- ordered(p.sig.sum$Species, levels = c("Otu00015", "Otu00002
 w.simp.plot <- ggplot(w.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") + coord_equal() +
   geom_text(size = 3, aes(label=sprintf("%0.1f", round(Mean, digits=1)))) +
-  scale_y_discrete(labels = c(expression("Lachnospiraceae"^"SummerLab"),
-                              expression("Lachnospiraceae"^"SummerLab"),
+  scale_y_discrete(labels = c(expression(italic("Lachnospiraceae")^"SummerLab"),
+                              expression(italic("Lachnospiraceae")^"SummerLab"),
                               expression(italic("Prevotellaceae UCG-003")^"IBA"),
                               expression(italic("Lachnospiraceae NK4A136")^"SummerLab,Spring"),
                               expression(italic("Ruminiclostridium 6")^"SummerLab,IBA,Spring"),
-                              expression("Lachnospiraceae"^"All"),
-                              expression("Lachnospiraceae"^"All")),
+                              expression(italic("Lachnospiraceae")^"All"),
+                              expression(italic("Lachnospiraceae")^"All")),
                    position = "right") +
   scale_fill_gradientn(name = "Mean Relative\nAbundance (%)", limits = c(0, 2.5),
                        breaks = c(0, 1.25, 2.5),
@@ -1472,11 +1472,11 @@ w.simp.plot <- ggplot(w.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
 s.simp.plot <- ggplot(s.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") + coord_equal() +
   geom_text(size = 3, aes(label=sprintf("%0.1f", round(Mean, digits=1)))) +
-  scale_y_discrete(labels = c(expression("Lachnospiraceae"^"Torpor"),
+  scale_y_discrete(labels = c(expression(italic("Lachnospiraceae")^"Torpor"),
                               expression(italic("Ruminococcus 1"^"Torpor,IBA")),
                               expression(italic("Lachnospiraceae NK4A469")^"Torpor,IBA"),
-                              expression("Lachnospiraceae"^"SummerWild,Torpor,IBA"),
-                              expression("Bacteroidales"^"SummerWild,Torpor,IBA"),
+                              expression(italic("Lachnospiraceae")^"SummerWild,Torpor,IBA"),
+                              expression(italic("Bacteroidales")^"SummerWild,Torpor,IBA"),
                               expression(italic("Lactobacillus")^"All")),
                    position = "right") +
   scale_fill_gradientn(name = "Mean Relative\nAbundance (%)", limits = c(0, 12),
@@ -1506,7 +1506,7 @@ t.simp.plot <- ggplot(t.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") + coord_equal() +
   geom_text(size = 3, aes(label=sprintf("%0.1f", round(Mean, digits=1)))) +
   scale_y_discrete(labels = c(expression(italic("Bacteroides")^"SummerWild,SummerLab"),
-                              expression("WCHB1-41"^"SummerLab"),
+                              expression(italic("WCHB1-41")^"SummerLab"),
                               expression(italic("Odoribacter")^"SummerWild,SummerLab,Spring")),
                    position = "right") +
   scale_fill_gradientn(name = "Mean Relative\nAbundance (%)", limits = c(0, 11.4),
@@ -1537,7 +1537,7 @@ i.simp.plot <- ggplot(i.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   geom_tile(colour = "gray40") + coord_equal() +
   geom_text(size = 3, aes(label=sprintf("%0.1f", round(Mean, digits=1)))) +
   scale_y_discrete(labels = c(expression(italic("Odoribacter")^"SummerLab"),
-                              expression("Muribaculaceae"^"SummerWild,SummerLab"),
+                              expression(italic("Muribaculaceae")^"SummerWild,SummerLab"),
                               expression(italic("Akkermansia")^"SummerWild,SummerLab")),
                    position = "right") +
   scale_fill_gradientn(name = "Mean Relative\nAbundance (%)", limits = c(0, 17.6),
@@ -1569,7 +1569,7 @@ p.simp.plot <- ggplot(p.sig.sum, aes(x = Group, y = Species, fill = Mean)) +
   scale_y_discrete(labels = c(expression(italic("Coprococcus 2")^"SummerWild,Torpor"),
                               expression(italic("Bacteroides")^"SummerWild"),
                               expression(italic("Lactobacillus")^"SummerWild,Torpor"),
-                              expression("Lachnospiraceae"^"All"),
+                              expression(italic("Lachnospiraceae")^"All"),
                               expression(italic("Prevotellaceae UCG-001")^"All")),
                    position = "right") +
   scale_fill_gradientn(name = "Mean Relative\nAbundance (%)", limits = c(0, 6.8),
