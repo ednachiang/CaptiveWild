@@ -1974,4 +1974,9 @@ core3 <- intersect(core2, rownames(iba.core))
 core4 <- intersect(core3, rownames(spr.core))
 # 8 CORE core OTUs
 # "Otu00026" "Otu00197" "Otu00200" "Otu00093" "Otu00067" "Otu00068" "Otu00011" "Otu00137"
+
+
+### Physeq object with only core OTUs
+phy.core <- merge_phyloseq(phy.wild.core, phy.sum.core, phy.tor.core, phy.iba.core, phy.spr.core)
+#write.csv(data.frame(tax_table(phy.core)), "coreOTUs.csv")
 ```
