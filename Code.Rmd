@@ -1156,10 +1156,7 @@ uUF.plot <- plot_ordination(physeq = physeq, ordination = UF.u.pcoa, axes = c(1,
         axis.text.x = element_text(size = 8, colour = "black"),
         axis.text.y = element_text(size = 8, colour = "black"),
         plot.title = element_text(hjust = 0.5, size = 10),
-        legend.title = element_text(size = 8, face = "bold"),
-        legend.text = element_text(size = 8),
-        legend.key.height = unit(4, 'mm'),
-        legend.box.margin=margin(-10,-10,-10,-10)
+        legend.position  = "none"
         )
 
 
@@ -1320,20 +1317,217 @@ p.adjust(c(1e-04,1e-04,1e-04,0.4146,0.1647,0.0012,0.0122,1e-04,1e-04,5e-04),
 
 
 
+
+
+
+
+########## Bray-Curtis ##########
+bray.pcoa <- ordinate(physeq=physeq, method="PCoA", distance="bray")
+  # Variation explained = 27.4%
+
+bc.plot <- plot_ordination(physeq=physeq, ordination=bray.pcoa, color="Group",
+                           title = "Bray-Curtis Dissimilarity") +
+  stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
+  scale_colour_manual(values = c("#e60000", "#ec9393", "#1c41b0", "deepskyblue", "#74b300"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8, colour = "black"),
+        axis.text.y = element_text(size = 8, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 10),
+        legend.position = "none"
+        #legend.title = element_text(size = 8, face = "bold"),
+        #legend.text = element_text(size = 8),
+        #legend.key.height = unit(4, 'mm'),
+        #legend.box.margin=margin(-10,-10,-10,-10)
+        )
+
+
+ord.legend <- g_legend(bc.plot)
+
+
+### TEST ###
+sampdf <- data.frame(sample_data(physeq))
+bray <- phyloseq::distance(physeq = physeq, method = "bray")
+beta.tax <- betadisper(d = bray, group = sampdf$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.008
+anosim(bray, sampdf$Group, permutations = 9999)
+  # p-value = 1e-04
+
+
+### Summer Wild vs. Summer Lab ###
+sampdf.ws <- data.frame(sample_data(phy.ws))
+bray.ws <- phyloseq::distance(physeq = phy.ws, method = "bray")
+beta.tax <- betadisper(d = bray.ws, group = sampdf.ws$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.002
+anosim(bray.ws, sampdf.ws$Group, permutations = 9999)
+  # p-value = 1e-04
+
+
+### Summer Wild vs. Torpor ###
+sampdf.wt <- data.frame(sample_data(phy.wt))
+bray.wt <- phyloseq::distance(physeq = phy.wt, method = "bray")
+beta.tax <- betadisper(d = bray.wt, group = sampdf.wt$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.002
+anosim(bray.wt, sampdf.wt$Group, permutations = 9999)
+  # p-value = 1e-04
+
+
+### Summer Wild vs. IBA ###
+sampdf.wi <- data.frame(sample_data(phy.wi))
+bray.wi <- phyloseq::distance(physeq = phy.wi, method = "bray")
+beta.tax <- betadisper(d = bray.wi, group = sampdf.wi$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.047
+anosim(bray.wi, sampdf.wi$Group, permutations = 9999)
+  # p-value = 1e-04
+
+
+### Summer Wild vs. Spring ###
+sampdf.wp <- data.frame(sample_data(phy.wp))
+bray.wp <- phyloseq::distance(physeq = phy.wp, method = "bray")
+beta.tax <- betadisper(d = bray.wp, group = sampdf.wp$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.304
+anosim(bray.wp, sampdf.wp$Group, permutations = 9999)
+  # p-value = 8e-04
+
+
+### Summer Lab vs. Torpor ###
+sampdf.st <- data.frame(sample_data(phy.st))
+bray.st <- phyloseq::distance(physeq = phy.st, method = "bray")
+beta.tax <- betadisper(d = bray.st, group = sampdf.st$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.436
+anosim(bray.st, sampdf.st$Group, permutations = 9999)
+  # p-value = 1e-04
+
+
+### Summer Lab vs. IBA ###
+sampdf.si <- data.frame(sample_data(phy.si))
+bray.si <- phyloseq::distance(physeq = phy.si, method = "bray")
+beta.tax <- betadisper(d = bray.si, group = sampdf.si$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.221
+anosim(bray.si, sampdf.si$Group, permutations = 9999)
+  # p-value = 1e-04
+
+
+### Summer Lab vs. Spring ###
+sampdf.sp <- data.frame(sample_data(phy.sp))
+bray.sp <- phyloseq::distance(physeq = phy.sp, method = "bray")
+beta.tax <- betadisper(d = bray.sp, group = sampdf.sp$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.036
+anosim(bray.sp, sampdf.sp$Group, permutations = 9999)
+  # p-value = 0.0944
+
+
+### Torpor vs. IBA ###
+sampdf.ti <- data.frame(sample_data(phy.ti))
+bray.ti <- phyloseq::distance(physeq = phy.ti, method = "bray")
+beta.tax <- betadisper(d = bray.ti, group = sampdf.ti$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.556
+anosim(bray.ti, sampdf.ti$Group, permutations = 9999)
+  # p-value = 0.8569
+
+
+### Torpor vs. Spring ###
+sampdf.tp <- data.frame(sample_data(phy.tp))
+bray.tp <- phyloseq::distance(physeq = phy.tp, method = "bray")
+beta.tax <- betadisper(d = bray.tp, group = sampdf.tp$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.041
+anosim(bray.tp, sampdf.tp$Group, permutations = 9999)
+  # p-value = 2e-04
+
+
+### IBA vs. Spring ###
+sampdf.ip <- data.frame(sample_data(phy.ip))
+bray.ip <- phyloseq::distance(physeq = phy.ip, method = "bray")
+beta.tax <- betadisper(d = bray.ip, group = sampdf.ip$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.255
+anosim(bray.ip, sampdf.ip$Group, permutations = 9999)
+  # p-value = 1e-04
+
+
+
+### Adjust betadisper p-values
+p.adjust(c(0.002, 0.002, 0.047, 0.304, 0.436, 0.221, 0.036, 0.556, 0.041, 0.255), 
+         method = "fdr")
+  # Summer Wild vs. Summer Lab = 0.01*
+  # Summer Wild vs. Torpor = 0.01*
+  # Summer Wild vs. IBA = 0.094
+  # Summer Wild vs. Spring = 0.38
+  # Summer Lab vs. Torpor = 0.4844
+  # Summer Lab vs. IBA = 0.3642857
+  # Summer Lab vs. Spring = 0.094
+  # Torpor vs. IBA = 0.556
+  # Torpor vs. Spring = 0.094
+  # IBA vs. Spring = 0.364
+
+
+
+### Adjust ANOSIM p-values
+p.adjust(c(1e-04, 1e-04, 1e-04, 8e-04, 1e-04, 1e-04, 0.0944, 0.8569, 2e-04, 1e-04), 
+         method = "fdr")
+  # Summer Wild vs. Summer Lab = 0.0001667*
+  # Summer Wild vs. Torpor = 0.0001667*
+  # Summer Wild vs. IBA = 0.0001667*
+  # Summer Wild vs. Spring = 0.001*
+  # Summer Lab vs. Torpor = 0.0001667*
+  # Summer Lab vs. IBA = 0.0001667*
+  # Summer Lab vs. Spring = 0.104889
+  # Torpor vs. IBA = 0.8569
+  # Torpor vs. Spring = 0.0002857143*
+  # IBA vs. Spring = 0.0001667*
+
 ```
 
 
-### Plot - UniFrac Ordinations
+### Plot - Beta-div Ordinations
 ```{r}
-tiff("bdiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+tiff("bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
 grid.newpage()
-pushViewport(viewport(layout=grid.layout(2,2, widths = c(0.73, 1), heights = c(0.1, 1.5))))
-grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
+pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 0.45), heights = c(1, 1, 1))))
+
+print(wUF.plot, vp=viewport(layout.pos.row=1, layout.pos.col=1))
+print(uUF.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+print(bc.plot, vp=viewport(layout.pos.row=3, layout.pos.col=1))
+
+
+ord.legend$vp <- viewport(layout.pos.row = 1:3, layout.pos.col = 2)
+grid.draw(ord.legend)
+
+
+grid.text("A", x=unit(0.05, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.pos.row=1,
+                                                                  layout.pos.col=1),
           gp=gpar(fontsize=12,fontface="bold"))
-print(wUF.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
-grid.text("B", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),
+grid.text("B", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos.row=2,
+                                                                   layout.pos.col=1),
           gp=gpar(fontsize=12,fontface="bold"))
-print(uUF.plot, vp=viewport(layout.pos.row=2, layout.pos.col=2))
+grid.text("C", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos.row=3,
+                                                                   layout.pos.col=1),
+          gp=gpar(fontsize=12,fontface="bold"))
+
 dev.off()
 ```
 
@@ -1624,7 +1818,7 @@ grid.text("Spring", x=unit(0.15, "npc"), y = unit(0.5, "npc"),
           vp=viewport(layout.pos.row=6, layout.pos.col=1),
           gp=gpar(fontsize=12), just = "right")
 
-grid.text("Season with overrepresentation", x=unit(0.02, "npc"), y = unit(0.5, "npc"),
+grid.text("Season with higher relative abundance", x=unit(0.02, "npc"), y = unit(0.5, "npc"),
           vp=viewport(layout.pos.row=2:6, layout.pos.col=1),
           gp=gpar(fontsize=14,fontface="bold"), rot = 90)
 grid.text("OTU Taxonomic Classification", x=unit(0.78, "npc"), y = unit(0.5, "npc"),
