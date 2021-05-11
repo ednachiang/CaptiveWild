@@ -332,8 +332,8 @@ pd.plot <- ggplot(pd.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) 
   geom_point(data = pd.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
   geom_point(data = pd.sum, aes(y= Mean), colour="white", size = 0.5, 
              show.legend = F) +
-  scale_fill_manual(values = c("chocolate4", "darkgoldenrod2")) +
-  scale_y_continuous(limits = c(13,39), breaks = c(13,18,23,28,33,38))  +
+  scale_fill_manual(values = c("gray25", "gray75")) +
+  scale_y_continuous(limits = c(13,38), breaks = c(13,18,23,28,33,38))  +
   ylab("Faith's Phylogenetic Diversity") + labs(fill = "Sample Type") +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -346,7 +346,7 @@ pd.plot <- ggplot(pd.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) 
         axis.text.y = element_text(size=6),
         legend.position = "none",
         plot.margin = margin(t=1, r=1, b=1.5, l=1, unit = "mm")) +
-  annotate("text", x = 1.5, y = 39, label = "ns", size = 2)
+  annotate("text", x = 1.5, y = 37, label = "ns", size = 2)
 
 
 ### PLOT MPD ###
@@ -367,8 +367,8 @@ mpd.plot <- ggplot(mpd.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)
   geom_point(data = mpd.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
   geom_point(data = mpd.sum, aes(y= Mean), colour="white", size = 0.5, 
              show.legend = F) +
-  scale_fill_manual(values = c("chocolate4", "darkgoldenrod2")) +
-  scale_y_continuous(limits = c(-7,5.5), breaks = c(-7, -4.5, -2, 0.5, 3, 5.5))  +
+  scale_fill_manual(values = c("gray25", "gray75")) +
+  scale_y_continuous(limits = c(-7.1,5), breaks = c(-7, -4, -1, 1, 5))  +
   ylab("Phylogenetic Evenness (MPD)") + labs(fill = "Sample Type") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -381,7 +381,7 @@ mpd.plot <- ggplot(mpd.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)
         axis.text.y = element_text(size=6),
         legend.position = "none",
         plot.margin = margin(t=1, r=1, b=1.5, l=1, unit = "mm")) +
-  annotate("text", x = 1.5, y = 5.5, label = "ns", size = 2)
+  annotate("text", x = 1.5, y = 5, label = "ns", size = 2)
   
 ```
 ### Alpha Div - # OTUs, Shannon
@@ -420,8 +420,8 @@ shannon.plot <- ggplot(adiv, aes(x = Sample_Type, y = shannon, fill = Sample_Typ
   geom_point(data = shannon.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
   geom_point(data = shannon.sum, aes(y= Mean), colour="white", size = 0.5, 
              show.legend = F) +
-  scale_fill_manual(values = c("chocolate4", "darkgoldenrod2")) +
-  scale_y_continuous(limits = c(1.4,5.9), breaks = c(1.4,2.3,3.2,4.1,5.0, 5.9))  +
+  scale_fill_manual(values = c("gray25", "gray75")) +
+  scale_y_continuous(limits = c(1.4,5.65), breaks = c(1.4,2.8, 4.2, 5.6))  +
   ylab("Shannon's Diversity Index") + labs(fill = "Sample Type") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -438,7 +438,7 @@ shannon.plot <- ggplot(adiv, aes(x = Sample_Type, y = shannon, fill = Sample_Typ
         legend.key.width = unit(3, "mm"),
         legend.box.margin=margin(-10,-7,-10,-10),
         plot.margin = margin(t=1, r=1, b=1.5, l=0, unit = "mm")) +
-  annotate("text", x = 1.5, y = 5.8, label = "ns", size = 2)
+  annotate("text", x = 1.5, y = 5.6, label = "ns", size = 2)
 
 
 
@@ -485,7 +485,7 @@ otu.plot <- ggplot(uniq.otus, aes(x = Sample_Type, y = Unique_OTUs, fill = Sampl
   geom_point(data = uniq.otus.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
   geom_point(data = uniq.otus.sum, aes(y= Mean), colour="white", size = 0.5, 
              show.legend = F) +
-  scale_fill_manual(values = c("chocolate4", "darkgoldenrod2")) +
+  scale_fill_manual(values = c("gray25", "gray75")) +
   scale_y_continuous(limits = c(200,800), breaks = c(200,320,440,560,680,800))  +
   ylab("Number of Unique OTUs") + labs(fill = "Sample Type") +
     theme(panel.grid.major = element_blank(),
@@ -528,6 +528,26 @@ wilcox.test(Unique_OTUs ~ Sample_Type, data = uniq.otus, paired = T)
 ```
 
 
+### Plot - Alpha-Diversity
+```{r}
+tiff("adiv.samptype.tiff", width = 170, height = 60, units = "mm", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
+grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(otu.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+grid.text("B", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(pd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=2))
+grid.text("C", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=3),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(mpd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
+grid.text("D", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
+dev.off()
+```
+
 
 ### Beta Div
 ```{r}
@@ -537,11 +557,11 @@ UF.u.pcoa <- ordinate(physeq = physeq.pair, method = "PCoA", distance = "unifrac
   # Variation explained = 27.7%
 
 
-u.plot <- plot_ordination(physeq = physeq.pair, ordination = UF.u.pcoa, axes = c(1,2),
+u2.plot <- plot_ordination(physeq = physeq.pair, ordination = UF.u.pcoa, axes = c(1,2),
                 title = "Unweighted UniFrac", color = "Sample_Type", shape = "Group") +
   geom_point(size = 2) +
   #stat_ellipse(aes(colour = Sample_Type), size = 1, level = 0.95) +
-  scale_color_manual(values = c("chocolate4", "darkgoldenrod2"), labels = c("Content", "Mucosa")) +
+  scale_color_manual(values = c("gray75", "gray25"), labels = c("Content", "Mucosa")) +
   scale_shape_manual(values = c(1,16,2,17,4), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) + 
   labs(color = "Sample Type") +
   theme(panel.grid.major = element_blank(),
@@ -565,8 +585,10 @@ beta.tax <- betadisper(d=UF.u, group=pair.sampdf$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.236
-adonis(UF.u ~ Sample_Type, data = pair.sampdf, permutations = 9999)
-  # p-value = 0.9991
+adonis(UF.u ~ ID + Sample_Type, data = pair.sampdf, permutations = 9999)
+  # ID P = 0.0001; R2 = 0.12705
+  # Sample Type P = 0.9980; R2 - 0.00790
+
 
 
 
@@ -576,11 +598,11 @@ UF.w <- phyloseq::distance(physeq = physeq.pair, method = "wunifrac")
 UF.w.pcoa <- ordinate(physeq = physeq.pair, method = "PCoA", distance = "wunifrac")
   # Variation explained = 35.7%
 
-w.plot <- plot_ordination(physeq = physeq.pair, ordination = UF.w.pcoa, axes = c(1,2),
+w2.plot <- plot_ordination(physeq = physeq.pair, ordination = UF.w.pcoa, axes = c(1,2),
                 title = "Weighted UniFrac", color = "Sample_Type", shape = "Group") +
   geom_point(size = 2) +
   #stat_ellipse(aes(colour = Sample_Type), size = 1, level = 0.95) +
-  scale_color_manual(values = c("chocolate4", "darkgoldenrod2"), labels = c("Content", "Mucosa")) +
+  scale_color_manual(values = c("gray75", "gray25"), labels = c("Content", "Mucosa")) +
   scale_shape_manual(values = c(1,16,2,17,4), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) + 
   labs(color = "Sample Type") +
   theme(panel.grid.major = element_blank(),
@@ -602,8 +624,9 @@ beta.tax <- betadisper(d=UF.w, group=pair.sampdf$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.088
-adonis(UF.w ~ Sample_Type, data = pair.sampdf, permutations = 9999)
-  # p-value = 0.9964
+adonis(UF.w ~ ID + Sample_Type, data = pair.sampdf, permutations = 9999)
+  # ID P = 0.0001; R2 = 0.08040
+  # Sample Type P = 0.9937 ; R2= 0.00675
 ```
 ### PLOT
 ```{r}
@@ -626,10 +649,10 @@ print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
 
 
 
-print(w.plot, vp=viewport(layout.pos.row=4, layout.pos.col=1:2))
+print(w2.plot, vp=viewport(layout.pos.row=4, layout.pos.col=1:2))
 grid.text("E", x=unit(0.1, "npc"), y=unit(-1, "npc"), 
           vp=viewport(layout.pos.row=3, layout.pos.col=1), gp=gpar(fontsize=10,fontface="bold"))
-print(u.plot, vp=viewport(layout.pos.row=4, layout.pos.col=3:4))
+print(u2.plot, vp=viewport(layout.pos.row=4, layout.pos.col=3:4))
 grid.text("F", x=unit(0.1, "npc"), y=unit(-1, "npc"),
           vp=viewport(layout.pos.row=3,layout.pos.col=3), gp=gpar(fontsize=10,fontface="bold"))
 
