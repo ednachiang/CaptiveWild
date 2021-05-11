@@ -24,8 +24,6 @@ set.seed(1)
 
 ### Load Functions
 ```{r}
-source('scripts/simper_pretty.R')
-source('scripts/R_krusk.R')
 source('scripts/misc.R')
 ```
 
@@ -522,11 +520,153 @@ t.test(Unique_OTUs ~ Sample_Type, data = uniq.otus.sum, paired = T)
 ```
 
 
-### Adjust P-values
+### Adjust A-div P-values
 ```{r}
 
 ### Paired T-test or Wilcoxon
 p.adjust(c(0.98070,0.37500,0.63790,0.90630,0.41030,0.41100,0.07536,0.21240,0.77640,0.68750,0.35350,0.71010), method = "fdr")
 
   # 0.98070 0.82200 0.93168 0.98070 0.82200 0.82200 0.82200 0.82200 0.93168 0.93168 0.82200 0.93168
+```
+### Summer Wild & Captive - Compare Content and Mucosa - Beta Div
+```{r}
+### Weighted UniFrac ###
+UF.w <- phyloseq::distance(physeq = phy.pair, method = "wunifrac")
+
+pair.sampdf <- data.frame(sample_data(phy.pair))
+beta.tax <- betadisper(d=UF.w, group=pair.sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.209
+adonis(UF.w ~ Diet + ID + Sample_Type, data = pair.sampdf, permutations = 9999)
+  # Diet: P = 0.0001, R2 = 0.21139
+  # ID: P = 0.0001; R2 = 0.16181
+  # Sample Type: P = 0.8127, R2 = 0.02347
+
+
+### Unweighted UniFrac ###
+UF.u <- phyloseq::distance(physeq = phy.pair, method = "unifrac")
+
+pair.sampdf <- data.frame(sample_data(phy.pair))
+beta.tax <- betadisper(d=UF.u, group=pair.sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.764
+adonis(UF.u ~ Diet + ID + Sample_Type, data = pair.sampdf, permutations = 9999)
+  # Diet: P = 0.0001, R2 = 0.28273
+  # ID: P = 0.0008; R2 = 0.15363
+  # Sample Type: P = 0.9697, R2 = 0.01261
+
+
+### Bray-Curtis Dissimilarity ###
+pair.sampdf <- data.frame(sample_data(phy.pair))
+bray <- phyloseq::distance(physeq = phy.pair, method = "bray")
+beta.tax <- betadisper(d = bray, group = pair.sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.454
+adonis(bray ~ Diet + ID + Sample_Type, data = pair.sampdf, permutations = 9999)
+  # Diet: P = 0.0001; R2 = 0.22235
+  # ID: P = 0.0003, R2 = 0.13828
+  # Sample Type = 0.9663, R2 = 0.01555
+```
+
+### Summer Wild  - Compare Content and Mucosa - Beta Div
+```{r}
+### Weighted UniFrac ###
+UF.w.wild <- phyloseq::distance(physeq = phy.wild, method = "wunifrac")
+
+wild.sampdf <- data.frame(sample_data(phy.wild))
+beta.tax <- betadisper(d=UF.w.wild, group=wild.sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.9013889
+adonis(UF.w.wild ~ ID + Sample_Type, data = wild.sampdf, permutations = 9999)
+  # ID: P = 0.01667; R2 = 0.53377
+  # Sample Type: P = 0.60556, R2 = 0.07407
+
+
+### Unweighted UniFrac ###
+UF.u.wild <- phyloseq::distance(physeq = phy.wild, method = "unifrac")
+
+wild.sampdf <- data.frame(sample_data(phy.wild))
+beta.tax <- betadisper(d=UF.u.wild, group=wild.sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.1013889
+adonis(UF.u.wild ~ ID + Sample_Type, data = wild.sampdf, permutations = 9999)
+  # ID: P = 0.06111; R2 = 0.40345
+  # Sample Type: P = 0.60556, R2 = 0.07551
+
+
+### Bray-Curtis Dissimilarity ###
+wild.sampdf <- data.frame(sample_data(phy.wild))
+bray.wild <- phyloseq::distance(physeq = phy.wild, method = "bray")
+beta.tax <- betadisper(d = bray.wild, group = wild.sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.9013889
+adonis(bray.wild ~ ID + Sample_Type, data = wild.sampdf, permutations = 9999)
+  # ID: P = 0.04444, R2 = 0.5076
+  # Sample Type: P = 0.60556, R2 = 0.0392
+```
+
+### Summer Captive  - Compare Content and Mucosa - Beta Div
+```{r}
+### Weighted UniFrac ###
+UF.w.sum <- phyloseq::distance(physeq = phy.sum, method = "wunifrac")
+
+sum.sampdf <- data.frame(sample_data(phy.sum))
+beta.tax <- betadisper(d=UF.w.sum, group=sum.sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.122
+adonis(UF.w.sum ~ ID + Sample_Type, data = sum.sampdf, permutations = 9999)
+  # ID: P = 0.0003; R2 = 0.24497
+  # Sample Type: P = 0.5520, R2 = 0.05571
+
+
+### Unweighted UniFrac ###
+UF.u.sum <- phyloseq::distance(physeq = phy.sum, method = "unifrac")
+
+sum.sampdf <- data.frame(sample_data(phy.sum))
+beta.tax <- betadisper(d=UF.u.sum, group=sum.sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.843
+adonis(UF.u.sum ~ ID + Sample_Type, data = sum.sampdf, permutations = 9999)
+  # ID: P = 0.0001; R2 = 0.25101
+  # Sample Type: P = 0.9491, R2 = 0.02260
+
+
+### Bray-Curtis Dissimilarity ###
+sum.sampdf <- data.frame(sample_data(phy.sum))
+bray.sum <- phyloseq::distance(physeq = phy.sum, method = "bray")
+beta.tax <- betadisper(d = bray.sum, group = sum.sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.391
+adonis(bray.sum ~ ID + Sample_Type, data = sum.sampdf, permutations = 9999)
+  # ID: P = 0.0002, R2 = 0.22400
+  # Sample Type: P = 0.9078, R2 = 0.03314
+```
+### Adjust B-div P-values
+```{r}
+# Betadisper
+p.adjust(c(0.209,0.76,0.45,0.90,0.10,0.90,0.12,0.843,0.39), method = "fdr")
+  # 0.627 0.900 0.810 0.900 0.540 0.900 0.540 0.900 0.810
+
+# PERMANOVA
+p.adjust(c(0.0001,0.0001,0.8127,
+           0.0001,0.0008,0.9697,
+           0.0001,0.0003,0.9663,
+           0.01667,0.60556,
+           0.06111,0.60556,
+           0.04444,0.0556,
+           0.0003,0.5520,
+           0.0001,0.9491,
+           0.0002,0.9078), method = "fdr")
+
+  # 0.000420000 0.000420000 0.969700000 0.000420000 0.001866667 0.969700000 0.000420000 0.000787500 0.969700000 0.035007000 0.794797500 0.098716154 0.794797500 0.084840000 0.097300000 0.000787500 0.794797500 0.000420000 0.969700000 0.000700000 0.969700000
+
 ```
