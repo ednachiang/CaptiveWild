@@ -681,6 +681,8 @@ anosim(UF.u, sampdf$Group, permutations = 9999)
 
 
 
+
+
 ########## Bray-Curtis ##########
 bray.pcoa <- ordinate(physeq=phy.con, method="PCoA", distance="bray")
   # Variation explained = 27.4%
@@ -719,6 +721,19 @@ p$tab
   # p-value = 0.001
 anosim(bray, sampdf$Group, permutations = 9999)
   # p-value = 0.013
+
+
+
+
+##### Adjust P-values #####
+
+# Betadisper
+p.adjust(c(0.006, 0.005, 0.001), method = "fdr")
+  # 0.006 0.006 0.003
+
+# ANOSIM
+p.adjust(c(0.1864, 0.0064, 0.013), method = "fdr")
+  # 0.1864 0.0192 0.0195
 ```
 
 
@@ -749,4 +764,44 @@ grid.text("C", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos
           gp=gpar(fontsize=12,fontface="bold"))
 
 #dev.off()
+```
+### Content - Simper
+```{r}
+# Change Group names to be compatible (no "_")
+#rename <- data.frame(sample_data(phy.con))
+#rename$GroupRename <- rep(NA, nrow(rename))
+#sum.rename$GroupRename[which(sum.rename$Group == "Summer_Wild")] <- "SummerWild"
+#sum.rename$GroupRename[which(sum.rename$Group == "Summer_Lab")] <- "SummerLab"
+#sum.rename$GroupRename[which(sum.rename$Group == "Torpor")] <- "Torpor"
+#sum.rename$GroupRename[which(sum.rename$Group == "IBA")] <- "IBA"
+#sum.rename$GroupRename[which(sum.rename$Group == "Spring")] <- "Spring"
+#sum.rename$GroupRename <- ordered(sum.rename$GroupRename, levels = c("SummerWild", "SummerLab", "Torpor", "IBA", "Spring"))
+#physeq.simp <- merge_phyloseq(otu_table(physeq), sample_data(sum.rename), tax_table(physeq))
+
+
+# Group
+#simper.pretty(data.frame(otu_table(phy.con)),
+              data.frame(sample_data(phy.con)),
+              c("Diet"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='wild.captive')
+group.simper <- read.csv("wild.captive_clean_simper.csv")
+kruskal.pretty(data.frame(otu_table(phy.con)),
+               data.frame(sample_data(phy.con)),
+               csv = group.simper,
+               c("Diet"),
+               output_name = 'wild.captive',
+               taxonomy = data.frame(tax_table(phy.con)))
+#group.simper.kw <- read.csv("wild.captive_krusk_simper.csv")
+#for(i in 1:nrow(group.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(phy.con))) == group.simper.kw$OTU[i])
+  group.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(phy.con))[save,2], "-",
+          data.frame(tax_table(phy.con))[save,3], "-",
+          data.frame(tax_table(phy.con))[save,4], "-",
+          data.frame(tax_table(phy.con))[save,5], "-",
+          data.frame(tax_table(phy.con))[save,6])
+}
+#write.table(group.simper.kw, "wild.captive_krusk_simper.csv", sep=",")
+#group.simper.kw <- read.csv("group_clean_simper.csv", row.names = 1)
 ```
