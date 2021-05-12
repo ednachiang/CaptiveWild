@@ -587,7 +587,7 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
 
 ### Content - Plot - Alpha-Diversity
 ```{r}
-tiff("wild.captive.con.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+#tiff("wild.captive.con.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -602,44 +602,25 @@ print(mpd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
 grid.text("D", x=unit(0.045, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
           gp=gpar(fontsize=8,fontface="bold"))
 print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
-dev.off()
+#dev.off()
 ```
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Beta Diversity
+### Content - Beta Diversity
 ```{r}
 
 ########## Weighted UniFrac ##########
-UF.w <- phyloseq::distance(physeq = physeq, method = "wunifrac")
-UF.w.pcoa <- ordinate(physeq = physeq, method = "PCoA", distance = "wunifrac")
-  # Variation explained = 34.9%
+UF.w <- phyloseq::distance(physeq = phy.con, method = "wunifrac")
+UF.w.pcoa <- ordinate(physeq = phy.con, method = "PCoA", distance = "wunifrac")
+  # Variation explained = 45.9%
 
-wUF.plot <- plot_ordination(physeq = physeq, ordination = UF.w.pcoa, axes = c(1,2),
-                title = "Weighted UniFrac", color = "Group") +
-  stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
-  scale_colour_manual(values = c("#e60000", "#ec9393", "#1c41b0", "deepskyblue", "#74b300"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+wUF.plot <- plot_ordination(physeq = phy.con, ordination = UF.w.pcoa, axes = c(1,2),
+                title = "Weighted UniFrac", color = "Diet") +
+  #stat_ellipse(aes(colour = Diet), size = 1, level = 0.95) +
+  scale_colour_manual(values = c("#e60000", "#ec9393"), labels = c("Captive", "Lab")) +
+  labs(color = "Group") +  geom_point(size = 3) +
+  geom_point(size=3, colour = "black", shape = 21) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
@@ -653,175 +634,29 @@ wUF.plot <- plot_ordination(physeq = physeq, ordination = UF.w.pcoa, axes = c(1,
 
 
 ### PERMANOVA ###
-sampdf <- data.frame(sample_data(physeq))
+sampdf <- data.frame(sample_data(phy.con))
 beta.tax <- betadisper(d=UF.w, group=sampdf$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.004
+  # p-value = 0.006
 anosim(UF.w, sampdf$Group, permutations = 9999)
-  # p-value = 1e-04
-
-
-
-# Separate out pairwise comparisons
-phy.ws <- merge_phyloseq(physeq.wild, physeq.sum)
-phy.st <- merge_phyloseq(physeq.sum, physeq.tor)
-phy.si <- merge_phyloseq(physeq.sum, physeq.iba)
-phy.sp <- merge_phyloseq(physeq.sum, physeq.spr)
-phy.ti <- merge_phyloseq(physeq.tor, physeq.iba)
-phy.tp <- merge_phyloseq(physeq.tor, physeq.spr)
-phy.ip <- merge_phyloseq(physeq.iba, physeq.spr)
-phy.wt <- merge_phyloseq(physeq.wild, physeq.tor)
-phy.wi <- merge_phyloseq(physeq.wild, physeq.iba)
-phy.wp <- merge_phyloseq(physeq.wild, physeq.spr)
-
-
-# Summer Wild vs. Summer Lab
-ws.w <- phyloseq::distance(physeq = phy.ws, method = "wunifrac")
-sampdf.ws<- data.frame(sample_data(phy.ws))
-beta.tax <- betadisper(d=ws.w, group=sampdf.ws$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.005
-anosim(ws.w, sampdf.ws$Group, permutations = 9999)
-  # p-value = 0.0039
-
-# Summer Lab vs Torpor
-st.w <- phyloseq::distance(physeq = phy.st, method = "wunifrac")
-sampdf.st<- data.frame(sample_data(phy.st))
-beta.tax <- betadisper(d=st.w, group=sampdf.st$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.906
-anosim(st.w, sampdf.st$Group, permutations = 9999)
-  # p-value = 1e-04
-
-
-# Summer Lab vs IBA
-si.w <- phyloseq::distance(physeq = phy.si, method = "wunifrac")
-sampdf.si<- data.frame(sample_data(phy.si))
-beta.tax <- betadisper(d=si.w, group=sampdf.si$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.502
-anosim(si.w, sampdf.si$Group, permutations = 9999)
-  # p-value = 1e-04
-
-
-# Summer Lab vs Spring
-sp.w <- phyloseq::distance(physeq = phy.sp, method = "wunifrac")
-sampdf.sp<- data.frame(sample_data(phy.sp))
-beta.tax <- betadisper(d=sp.w, group=sampdf.sp$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.188
-anosim(sp.w, sampdf.sp$Group, permutations = 9999)
-  # p-value = 0.0374
-
-
-# Torpor vs IBA
-ti.w <- phyloseq::distance(physeq = phy.ti, method = "wunifrac")
-sampdf.ti<- data.frame(sample_data(phy.ti))
-beta.tax <- betadisper(d=ti.w, group=sampdf.ti$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.48
-anosim(ti.w, sampdf.ti$Group, permutations = 9999)
-  # p-value = 0.7029
-
-# Torpor vs Spring
-tp.w <- phyloseq::distance(physeq = phy.tp, method = "wunifrac")
-sampdf.tp<- data.frame(sample_data(phy.tp))
-beta.tax <- betadisper(d=tp.w, group=sampdf.tp$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.159
-anosim(tp.w, sampdf.tp$Group, permutations = 9999)
-  # p-value = 2e-04
-
-# IBA vs Spring
-ip.w <- phyloseq::distance(physeq = phy.ip, method = "wunifrac")
-sampdf.ip<- data.frame(sample_data(phy.ip))
-beta.tax <- betadisper(d=ip.w, group=sampdf.ip$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.362
-anosim(ip.w, sampdf.ip$Group, permutations = 9999)
-  # p-value = 1e-04
-
-# Summer Wild vs. Torpor
-wt.w <- phyloseq::distance(physeq = phy.wt, method = "wunifrac")
-sampdf.wt<- data.frame(sample_data(phy.wt))
-beta.tax <- betadisper(d=wt.w, group=sampdf.wt$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.004
-anosim(wt.w, sampdf.wt$Group, permutations = 9999)
-  # p-value = 1e-04 
-
-# Summer Wild vs. IBA
-wi.w <- phyloseq::distance(physeq = phy.wi, method = "wunifrac")
-sampdf.wi<- data.frame(sample_data(phy.wi))
-beta.tax <- betadisper(d=wi.w, group=sampdf.wi$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.004
-anosim(wi.w, sampdf.wi$Group, permutations = 9999)
-  # p-value = 1e-04
-
-# Summer Wild vs. Spring
-wp.w <- phyloseq::distance(physeq = phy.wp, method = "wunifrac")
-sampdf.wp<- data.frame(sample_data(phy.wp))
-beta.tax <- betadisper(d=wp.w, group=sampdf.wp$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.078
-anosim(wp.w, sampdf.wp$Group, permutations = 9999)
-  # p-value = 5e-04
-
-
-# Adjust betadisper p-values
-p.adjust(c(0.001,0.906,0.502,0.188,0.48,0.159,0.362,0.004,0.004,0.078),
-         method = "fdr")
-  # Summer Wild vs. Summer Lab = 0.01*
-  # Summer Lab vs. Torpor = 0.906
-  # Summer Lab vs. IBA = 0.55778
-  # Summer Lab vs. Spring = 0.3133
-  # Torpor vs. IBA = 0.55778
-  # Torpor vs. Spring = 0.3133
-  # IBA vs. Spring = 0.51714286
-  # Summer Wild vs. Torpor = 0.0133*
-  # Summer Wild vs. IBA = 0.0133*
-  # Summer Wild vs. Spring = 0.195
-
-# Adjust ANOSIM p-values
-p.adjust(c(0.0039,1e-04,1e-04,0.0374,0.7029,2e-04,1e-04,1e-04,1e-04,5e-04),
-         method = "fdr")
-  # Summer Wild vs. Summer Lab = 0.004875*
-  # Summer Lab vs. Torpor = 0.0002*
-  # Summer Lab vs. IBA = 0.0002*
-  # Summer Lab vs. Spring = 0.041556*
-  # Torpor vs. IBA = 0.7029
-  # Torpor vs. Spring = 0.00033*
-  # IBA vs. Spring = 0.0002*
-  # Summer Wild vs. Torpor = 0.0002*
-  # Summer Wild vs. IBA = 0.0002*
-  # Summer Wild vs. Spring = 0.0007142857*
-
+  # p-value = 0.1864
 
 
 
 
 
 ########## Unweighted UniFrac ##########
-UF.u <- phyloseq::distance(physeq = physeq, method = "unifrac")
-UF.u.pcoa <- ordinate(physeq = physeq, method = "PCoA", distance = "unifrac")
+UF.u <- phyloseq::distance(physeq = phy.con, method = "unifrac")
+UF.u.pcoa <- ordinate(physeq = phy.con, method = "PCoA", distance = "unifrac")
   # Variation explained = 22.4%
 
-uUF.plot <- plot_ordination(physeq = physeq, ordination = UF.u.pcoa, axes = c(1,2),
-                title = "Unweighted UniFrac", color = "Group") +
-  stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
-  scale_colour_manual(values = c("#e60000", "#ec9393", "#1c41b0", "deepskyblue", "#74b300"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+uUF.plot <- plot_ordination(physeq = phy.con, ordination = UF.u.pcoa, axes = c(1,2),
+                title = "Unweighted UniFrac", color = "Diet") +
+  #stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
+  scale_colour_manual(values = c("#e60000", "#ec9393"), labels = c("Captive", "Lab")) +
+  labs(color = "Group") +  geom_point(size = 3) +
+  geom_point(size=3, colour = "black", shape = 21) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
@@ -835,174 +670,27 @@ uUF.plot <- plot_ordination(physeq = physeq, ordination = UF.u.pcoa, axes = c(1,
 
 
 ### PERMANOVA ###
-sampdf <- data.frame(sample_data(physeq))
+sampdf <- data.frame(sample_data(phy.con))
 beta.tax <- betadisper(d=UF.u, group=sampdf$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.001
+  # p-value = 0.005
 anosim(UF.u, sampdf$Group, permutations = 9999)
-  # p-value = 1e-04 
-
-
-
-# Separate out pairwise comparisons
-#phy.ws <- merge_phyloseq(physeq.wild, physeq.sum)
-#phy.st <- merge_phyloseq(physeq.sum, physeq.tor)
-#phy.si <- merge_phyloseq(physeq.sum, physeq.iba)
-#phy.sp <- merge_phyloseq(physeq.sum, physeq.spr)
-#phy.ti <- merge_phyloseq(physeq.tor, physeq.iba)
-#phy.tp <- merge_phyloseq(physeq.tor, physeq.spr)
-#phy.ip <- merge_phyloseq(physeq.iba, physeq.spr)
-#phy.wt <- merge_phyloseq(physeq.wild, physeq.tor)
-#phy.wi <- merge_phyloseq(physeq.wild, physeq.iba)
-#phy.wp <- merge_phyloseq(physeq.wild, physeq.spr)
-
-
-# Summer Wild vs. Summer Lab
-ws.u <- phyloseq::distance(physeq = phy.ws, method = "unifrac")
-sampdf.ws<- data.frame(sample_data(phy.ws))
-beta.tax <- betadisper(d=ws.u, group=sampdf.ws$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.001
-anosim(ws.u, sampdf.ws$Group, permutations = 9999)
-  # p-value = 1e-04
-
-# Summer Lab vs Torpor
-st.u <- phyloseq::distance(physeq = phy.st, method = "unifrac")
-sampdf.st<- data.frame(sample_data(phy.st))
-beta.tax <- betadisper(d=st.u, group=sampdf.st$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.181
-anosim(st.u, sampdf.st$Group, permutations = 9999)
-  # p-value = 1e-04
-
-# Summer Lab vs IBA
-si.u <- phyloseq::distance(physeq = phy.si, method = "unifrac")
-sampdf.si<- data.frame(sample_data(phy.si))
-beta.tax <- betadisper(d=si.u, group=sampdf.si$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.244
-anosim(si.u, sampdf.si$Group, permutations = 9999)
-  # p-value = 1e-04
-
-# Summer Lab vs Spring
-sp.u <- phyloseq::distance(physeq = phy.sp, method = "unifrac")
-sampdf.sp<- data.frame(sample_data(phy.sp))
-beta.tax <- betadisper(d=sp.u, group=sampdf.sp$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.02
-anosim(sp.u, sampdf.sp$Group, permutations = 9999)
-  # p-value = 0.4146
-
-# Torpor vs IBA
-ti.u <- phyloseq::distance(physeq = phy.ti, method = "unifrac")
-sampdf.ti<- data.frame(sample_data(phy.ti))
-beta.tax <- betadisper(d=ti.u, group=sampdf.ti$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.922
-anosim(ti.u, sampdf.ti$Group, permutations = 9999)
-  # p-value = 0.1647
-
-# Torpor vs Spring
-tp.u <- phyloseq::distance(physeq = phy.tp, method = "unifrac")
-sampdf.tp<- data.frame(sample_data(phy.tp))
-beta.tax <- betadisper(d=tp.u, group=sampdf.tp$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.004
-anosim(tp.u, sampdf.tp$Group, permutations = 9999)
-  # p-value = 0.0012
-
-# IBA vs Spring
-ip.u <- phyloseq::distance(physeq = phy.ip, method = "unifrac")
-sampdf.ip<- data.frame(sample_data(phy.ip))
-beta.tax <- betadisper(d=ip.u, group=sampdf.ip$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.144
-anosim(ip.u, sampdf.ip$Group, permutations = 9999)
-  # p-value = 0.0122
-
-
-# Summer Wild vs. Torpor
-wt.u <- phyloseq::distance(physeq = phy.wt, method = "unifrac")
-sampdf.wt<- data.frame(sample_data(phy.wt))
-beta.tax <- betadisper(d=wt.u, group=sampdf.wt$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.001
-anosim(wt.u, sampdf.wt$Group, permutations = 9999)
-  # p-value = 1e-04 
-
-# Summer Wild vs. IBA
-wi.u <- phyloseq::distance(physeq = phy.wi, method = "unifrac")
-sampdf.wi<- data.frame(sample_data(phy.wi))
-beta.tax <- betadisper(d=wi.u, group=sampdf.wi$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.002
-anosim(wi.u, sampdf.wi$Group, permutations = 9999)
-  # p-value = 1e-04 
-
-# Summer Wild vs. Spring
-wp.u <- phyloseq::distance(physeq = phy.wp, method = "unifrac")
-sampdf.wp<- data.frame(sample_data(phy.wp))
-beta.tax <- betadisper(d=wp.u, group=sampdf.wp$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.003
-anosim(wp.u, sampdf.wp$Group, permutations = 9999)
-  # p-value = 5e-04
-
-
-# Adjust betadisper p-values
-p.adjust(c(0.001,0.181,0.244,0.02,0.922,0.004,0.144,0.001,0.002,0.003),
-         method = "fdr")
-  # Summer Wild vs. Summer Lab = 0.005*
-  # Summer Lab vs. Torpor = 0.22625
-  # Summer Lab vs. IBA = 0.2711
-  # Summer Lab vs. Spring = 0.0333*
-  # Torpor vs. IBA = 0.9220
-  # Torpor vs. Spring = 0.008*
-  # IBA vs. Spring = 0.205714286
-  # Summer Wild vs. Torpor = 0.005*
-  # Summer Wild vs. IBA = 0.00667*
-  # Summer Wild vs. Spring = 0.0075*
-
-
-# Adjust ANOSIM p-values
-p.adjust(c(1e-04,1e-04,1e-04,0.4146,0.1647,0.0012,0.0122,1e-04,1e-04,5e-04),
-         method = "fdr")
-  # Summer Wild vs. Summer Lab = 0.0002*
-  # Summer Lab vs. Torpor = 0.0002*
-  # Summer Lab vs. IBA = 0.0002*
-  # Summer Lab vs. Spring = 0.4146
-  # Torpor vs. IBA = 0.183
-  # Torpor vs. Spring = 0.0017142857*
-  # IBA vs. Spring = 0.01525*
-  # Summer Wild vs. Torpor = 0.0002*
-  # Summer Wild vs. IBA = 0.0002*
-  # Summer Wild vs. Spring = 0.000833*
-
-
-
+  # p-value = 0.0064
 
 
 
 
 ########## Bray-Curtis ##########
-bray.pcoa <- ordinate(physeq=physeq, method="PCoA", distance="bray")
+bray.pcoa <- ordinate(physeq=phy.con, method="PCoA", distance="bray")
   # Variation explained = 27.4%
 
-bc.plot <- plot_ordination(physeq=physeq, ordination=bray.pcoa, color="Group",
+bc.plot <- plot_ordination(physeq=phy.con, ordination=bray.pcoa, color="Group",
                            title = "Bray-Curtis Dissimilarity") +
-  stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
-  scale_colour_manual(values = c("#e60000", "#ec9393", "#1c41b0", "deepskyblue", "#74b300"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  #stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
+  scale_colour_manual(values = c("#e60000", "#ec9393"), labels = c("Captive", "Wild")) +
+  labs(color = "Group") + geom_point(size = 3) +
+  geom_point(size=3, colour = "black", shape = 21) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
@@ -1023,155 +711,42 @@ ord.legend <- g_legend(bc.plot)
 
 
 ### TEST ###
-sampdf <- data.frame(sample_data(physeq))
-bray <- phyloseq::distance(physeq = physeq, method = "bray")
+sampdf <- data.frame(sample_data(phy.con))
+bray <- phyloseq::distance(physeq = phy.con, method = "bray")
 beta.tax <- betadisper(d = bray, group = sampdf$Group)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.008
+  # p-value = 0.001
 anosim(bray, sampdf$Group, permutations = 9999)
-  # p-value = 1e-04
-
-
-### Summer Wild vs. Summer Lab ###
-sampdf.ws <- data.frame(sample_data(phy.ws))
-bray.ws <- phyloseq::distance(physeq = phy.ws, method = "bray")
-beta.tax <- betadisper(d = bray.ws, group = sampdf.ws$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.002
-anosim(bray.ws, sampdf.ws$Group, permutations = 9999)
-  # p-value = 1e-04
-
-
-### Summer Wild vs. Torpor ###
-sampdf.wt <- data.frame(sample_data(phy.wt))
-bray.wt <- phyloseq::distance(physeq = phy.wt, method = "bray")
-beta.tax <- betadisper(d = bray.wt, group = sampdf.wt$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.002
-anosim(bray.wt, sampdf.wt$Group, permutations = 9999)
-  # p-value = 1e-04
-
-
-### Summer Wild vs. IBA ###
-sampdf.wi <- data.frame(sample_data(phy.wi))
-bray.wi <- phyloseq::distance(physeq = phy.wi, method = "bray")
-beta.tax <- betadisper(d = bray.wi, group = sampdf.wi$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.047
-anosim(bray.wi, sampdf.wi$Group, permutations = 9999)
-  # p-value = 1e-04
-
-
-### Summer Wild vs. Spring ###
-sampdf.wp <- data.frame(sample_data(phy.wp))
-bray.wp <- phyloseq::distance(physeq = phy.wp, method = "bray")
-beta.tax <- betadisper(d = bray.wp, group = sampdf.wp$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.304
-anosim(bray.wp, sampdf.wp$Group, permutations = 9999)
-  # p-value = 8e-04
-
-
-### Summer Lab vs. Torpor ###
-sampdf.st <- data.frame(sample_data(phy.st))
-bray.st <- phyloseq::distance(physeq = phy.st, method = "bray")
-beta.tax <- betadisper(d = bray.st, group = sampdf.st$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.436
-anosim(bray.st, sampdf.st$Group, permutations = 9999)
-  # p-value = 1e-04
-
-
-### Summer Lab vs. IBA ###
-sampdf.si <- data.frame(sample_data(phy.si))
-bray.si <- phyloseq::distance(physeq = phy.si, method = "bray")
-beta.tax <- betadisper(d = bray.si, group = sampdf.si$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.221
-anosim(bray.si, sampdf.si$Group, permutations = 9999)
-  # p-value = 1e-04
-
-
-### Summer Lab vs. Spring ###
-sampdf.sp <- data.frame(sample_data(phy.sp))
-bray.sp <- phyloseq::distance(physeq = phy.sp, method = "bray")
-beta.tax <- betadisper(d = bray.sp, group = sampdf.sp$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.036
-anosim(bray.sp, sampdf.sp$Group, permutations = 9999)
-  # p-value = 0.0944
-
-
-### Torpor vs. IBA ###
-sampdf.ti <- data.frame(sample_data(phy.ti))
-bray.ti <- phyloseq::distance(physeq = phy.ti, method = "bray")
-beta.tax <- betadisper(d = bray.ti, group = sampdf.ti$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.556
-anosim(bray.ti, sampdf.ti$Group, permutations = 9999)
-  # p-value = 0.8569
-
-
-### Torpor vs. Spring ###
-sampdf.tp <- data.frame(sample_data(phy.tp))
-bray.tp <- phyloseq::distance(physeq = phy.tp, method = "bray")
-beta.tax <- betadisper(d = bray.tp, group = sampdf.tp$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.041
-anosim(bray.tp, sampdf.tp$Group, permutations = 9999)
-  # p-value = 2e-04
-
-
-### IBA vs. Spring ###
-sampdf.ip <- data.frame(sample_data(phy.ip))
-bray.ip <- phyloseq::distance(physeq = phy.ip, method = "bray")
-beta.tax <- betadisper(d = bray.ip, group = sampdf.ip$Group)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.255
-anosim(bray.ip, sampdf.ip$Group, permutations = 9999)
-  # p-value = 1e-04
+  # p-value = 0.013
+```
 
 
 
-### Adjust betadisper p-values
-p.adjust(c(0.002, 0.002, 0.047, 0.304, 0.436, 0.221, 0.036, 0.556, 0.041, 0.255), 
-         method = "fdr")
-  # Summer Wild vs. Summer Lab = 0.01*
-  # Summer Wild vs. Torpor = 0.01*
-  # Summer Wild vs. IBA = 0.094
-  # Summer Wild vs. Spring = 0.38
-  # Summer Lab vs. Torpor = 0.4844
-  # Summer Lab vs. IBA = 0.3642857
-  # Summer Lab vs. Spring = 0.094
-  # Torpor vs. IBA = 0.556
-  # Torpor vs. Spring = 0.094
-  # IBA vs. Spring = 0.364
+### Content - Plot - Beta-Diversity
+```{r}
+#tiff("wild.captive.con.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 0.45), heights = c(1, 1, 1))))
+
+print(wUF.plot, vp=viewport(layout.pos.row=1, layout.pos.col=1))
+print(uUF.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+print(bc.plot, vp=viewport(layout.pos.row=3, layout.pos.col=1))
 
 
+ord.legend$vp <- viewport(layout.pos.row = 1:3, layout.pos.col = 2)
+grid.draw(ord.legend)
 
-### Adjust ANOSIM p-values
-p.adjust(c(1e-04, 1e-04, 1e-04, 8e-04, 1e-04, 1e-04, 0.0944, 0.8569, 2e-04, 1e-04), 
-         method = "fdr")
-  # Summer Wild vs. Summer Lab = 0.0001667*
-  # Summer Wild vs. Torpor = 0.0001667*
-  # Summer Wild vs. IBA = 0.0001667*
-  # Summer Wild vs. Spring = 0.001*
-  # Summer Lab vs. Torpor = 0.0001667*
-  # Summer Lab vs. IBA = 0.0001667*
-  # Summer Lab vs. Spring = 0.104889
-  # Torpor vs. IBA = 0.8569
-  # Torpor vs. Spring = 0.0002857143*
-  # IBA vs. Spring = 0.0001667*
 
+grid.text("A", x=unit(0.05, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.pos.row=1,
+                                                                  layout.pos.col=1),
+          gp=gpar(fontsize=12,fontface="bold"))
+grid.text("B", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos.row=2,
+                                                                   layout.pos.col=1),
+          gp=gpar(fontsize=12,fontface="bold"))
+grid.text("C", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos.row=3,
+                                                                   layout.pos.col=1),
+          gp=gpar(fontsize=12,fontface="bold"))
+
+#dev.off()
 ```
