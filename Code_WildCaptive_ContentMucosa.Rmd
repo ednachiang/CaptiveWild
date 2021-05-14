@@ -237,6 +237,11 @@ shapiro.test(uniq.otus$Unique_OTUs)
   # Normal
 t.test(Unique_OTUs ~ Sample_Type, data = uniq.otus, paired = T)
   # P = 0.9807
+
+### Adjust p-values
+p.adjust(c(0.375,0.6379, 0.9063,0.9807), method = "fdr")
+  # PD, MPD, S, OTU
+  # All adjusted p-values = 0.9807
 ```
 
 ### Summer Wild - Compare Content and Mucosa - Alpha Div
