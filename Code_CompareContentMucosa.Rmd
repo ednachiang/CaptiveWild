@@ -23,6 +23,10 @@ theme_set(theme_bw())
 set.seed(1)
 ```
 
+### Load Functions
+```{r}
+source('scripts/misc.R')
+```
 
 ### Import Data
 ```{r}
@@ -80,7 +84,7 @@ sample_data(physeq)$Season <- ordered(sample_data(physeq)$Season,
 sample_data(physeq)$Metabolism <- ordered(sample_data(physeq)$Metabolism,
                                      levels=c("Active", "Torpor", "IBA"))
 sample_data(physeq)$Group <- ordered(sample_data(physeq)$Group,
-                                     levels=c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring"))
+                                     levels=c("Summer_Wild", "Summer_Captive", "Torpor", "IBA", "Spring"))
 
 # Remove outliers
 physeq <- subset_samples(physeq, ID != 3925)
@@ -93,7 +97,7 @@ physeq.pair <- subset_samples(physeq.pair, ID != 4057)
 
 # Separate by season
 physeq.wild <- subset_samples(physeq.pair, Group == "Summer_Wild")
-physeq.sum <- subset_samples(physeq.pair, Group == "Summer_Lab")
+physeq.sum <- subset_samples(physeq.pair, Group == "Summer_Captive")
 physeq.tor <- subset_samples(physeq.pair, Group == "Torpor")
 physeq.iba <- subset_samples(physeq.pair, Group == "IBA")
 physeq.spr <- subset_samples(physeq.pair, Group == "Spring")
@@ -107,555 +111,971 @@ physeq.muc <- subset_samples(physeq.pair, Sample_Type == "Mucosa")
 
 
 
-### Load Functions
+
+
+
+### Alpha Div - Summer Wild
 ```{r}
-source('scripts/misc.R')
-```
+########## FAITH'S PHYLOGENETIC DIVERSITY AND PHYLOGENETIC EVENNESS (MPD) ##########
 
-### RTOST 
-```{r}
-# Code modified from Skarlupka, et al. (2019)
-# https://doi.org/10.1186/s40104-019-0375-0
-
-# Format OTU table
-TOST.otu <- data.frame(t(data.frame(otu_table(physeq.pair))))
-TOST.otu$Sample <- rownames(TOST.otu)
-TOST.otu$Sample_Type <- substr(rownames(TOST.otu), start = 2, stop = 2)
-
-
-# Separate by sample type
-TOST.otu.con <- TOST.otu[which(TOST.otu$Sample_Type == "C"),]
-TOST.otu.muc <- TOST.otu[which(TOST.otu$Sample_Type == "M"),]
-
-# Calculate OTU means; remove Sample and Sample Type cols I made
-TOST.otu.con.mean <- aggregate(TOST.otu.con[ , 1 : ( ncol(TOST.otu.con) - 2) ],
-                               list(TOST.otu.con$Sample_Type), mean)
-TOST.otu.con.mean <- TOST.otu.con.mean[-1]
-TOST.otu.muc.mean <- aggregate(TOST.otu.con[ , 1 : ( ncol(TOST.otu.con) - 2) ],
-                               list(TOST.otu.con$Sample_Type), mean)
-TOST.otu.muc.mean <- TOST.otu.muc.mean[-1]
-
-# Prepare data
-TOST.otu.con.t <- t(as.matrix(sapply(TOST.otu.con.mean[,1:1618], as.numeric)))
-TOST.otu.muc.t <- t(as.matrix(sapply(TOST.otu.muc.mean[,1:1618], as.numeric)))
-
-
-#rtost(TOST.otu.muc.t, TOST.otu.con.t, alpha = 0.05, epsilon = 0.25, tr = 0.15)
-  # p-value = 0.02576371
-
-
-rtost.output.df <- data.frame(matrix(NA, ncol = 3, nrow = nrow(TOST.otu.muc)))
-colnames(rtost.output.df) <- c("Sample1", "Sample2", "P")
-
-for(i in 1:nrow(TOST.otu.muc)){
-  sample1 <- rownames(TOST.otu.muc)[i]
-  sample1Split <- strsplit(sample1, "_")
-  ID1 <- sample1Split[[1]][[2]]
-  #print(i)
-  #print(ID1)
-  
-  for(j in 1:nrow(TOST.otu.con)){
-    sample2 <- rownames(TOST.otu.con)[j]
-    sample2Split <- strsplit(sample2, "_")
-    ID2 <- sample2Split[[1]][[2]]
-    
-    if(ID1 == ID2){
-      #print(j)
-      #print(ID2)
-      muc.t <- t(as.matrix(sapply(TOST.otu.muc[i,1:(ncol(TOST.otu.muc)-2)], as.numeric)))
-      con.t <- t(as.matrix(sapply(TOST.otu.con[j,1:(ncol(TOST.otu.con)-2)], as.numeric)))
-      rtostOutput <- rtost(muc.t, con.t, paired = T, alpha = 0.05, epsilon = 0.25, tr = 0.15)
-      print(rtostOutput)
-
-      
-      rtost.output.df$Sample1[i] = sample1
-      rtost.output.df$Sample2[i] = sample2
-      rtost.output.df$P[i] = rtostOutput$p.value
-    }
-  }
-  
-}
-
-rtost.output.df$Padj <- p.adjust(rtost.output.df$P, "fdr")
-
-#write.csv(rtost.output.df, "rtost.output.df.csv")
-```
-
-
-### Beta Diversity
-```{r}
-########## Weighted UniFrac ##########
-UF.w <- phyloseq::distance(physeq = physeq.wild, method = "wunifrac")
-UF.w.pcoa <- ordinate(physeq = physeq.wild, method = "PCoA", distance = "wunifrac")
-  # Variation explained = 34.9%
-
-
-### PERMANOVA ###
-sampdf <- data.frame(sample_data(physeq.wild))
-beta.tax <- betadisper(d=UF.w, group=sampdf$Sample_Type)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.9013889
-adonis(UF.w ~ ID + Sample_Type, data = sampdf, permutations = 9999)
-  # ID P = 0.01667, R2 = 0.53348
-  # Sample_Type P = 0.60556; R2 = 0.07401
-
-
-
-
-
-########## Unweighted UniFrac ##########
-UF.u <- phyloseq::distance(physeq = physeq.wild, method = "unifrac")
-UF.u.pcoa <- ordinate(physeq = physeq.wild, method = "PCoA", distance = "unifrac")
-  # Variation explained = 34.9%
-
-### PERMANOVA ###
-sampdf <- data.frame(sample_data(physeq.wild))
-beta.tax <- betadisper(d=UF.u, group=sampdf$Sample_Type)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.1013889
-adonis(UF.u ~ ID + Sample_Type, data = sampdf, permutations = 9999)
-  # ID P = 0.05, R2 = 0.40122
-  # Sample_Type P = 0.6056; R2 = 0.08301
-```
-
-
-
-
-################# SUPP PLOTS #################
-### Alpha Div - Phylogenetic Diversity and MPD
-```{r}
 # Calculate Faith's phylogenetic diversity
-pd.res <- pd(t(data.frame(otu_table(physeq.pair))), phy_tree(physeq.pair), 
+pd.wild.res <- pd(t(data.frame(otu_table(physeq.wild))), phy_tree(physeq.wild), 
              include.root = T)
-pd.df <- data.frame(pd.res)
+pd.wild.df <- data.frame(pd.wild.res)
 
 # Calculate MPD (Mean Pairwise Distance)
-pd.dist <- cophenetic(phy_tree(physeq.pair))
+pd.wild.dist <- cophenetic(phy_tree(physeq.wild))
   # Calculate cophenetic distance
 
-ses.mpd.res <- ses.mpd(t(data.frame(otu_table(physeq.pair))), pd.dist, 
+ses.mpd.wild.res <- ses.mpd(t(data.frame(otu_table(physeq.wild))), pd.wild.dist, 
                        null.model = "taxa.labels", abundance.weighted = F, runs = 999)
-  # Calculate MPD
+  # Calculate Mpd.wild
   # This'll take a while to run-- be patient
 
-mpd <- data.frame(ses.mpd.res)
+mpd.wild <- data.frame(ses.mpd.wild.res)
   # Pull out MDP results
 
-
 ### Prepare data for plotting ###
-mpd$SampleID <- row.names(mpd)
-pd.res$SampleID <- row.names(pd.res)
+mpd.wild$SampleID <- row.names(mpd.wild)
+pd.wild.res$SampleID <- row.names(pd.wild.res)
   # Make sure all SampleID's match!
 
 
 # Pull out first Stat of each test
 # PD test = PD
 # MPD test = SES (Standardized Effect Size)
-pd.stats <- data.frame(pd.res$SampleID, pd.res$PD)
-pd.stats$Measure <- rep("PD", nrow(pd.df))
-colnames(pd.stats) <- c("Sample", "Stat", "Measure")
-mpd.stats <- data.frame(mpd$SampleID, mpd$mpd.obs.z)
-mpd.stats$Measure <- rep("MPD SES", nrow(pd.df))
-colnames(mpd.stats) <- c("Sample", "Stat", "Measure")
+pd.wild.stats <- data.frame(pd.wild.res$SampleID, pd.wild.res$PD)
+pd.wild.stats$Measure <- rep("PD.wild", nrow(pd.wild.df))
+colnames(pd.wild.stats) <- c("Sample", "Stat", "Measure")
+mpd.wild.stats <- data.frame(mpd.wild$SampleID, mpd.wild$mpd.obs.z)
+mpd.wild.stats$Measure <- rep("MPD SES", nrow(pd.wild.df))
+colnames(mpd.wild.stats) <- c("Sample", "Stat", "Measure")
 
 
 ### Prepare PD ###
-pd.ready <- merge(pd.stats, meta, by = "Sample")
-pd.sum <- pd.ready %>%
+pd.wild.ready <- merge(pd.wild.stats, meta, by = "Sample")
+pd.wild.sum <- pd.wild.ready %>%
   group_by(Sample_Type) %>%
   summarize(Mean = mean(Stat),
             SE = se(Stat),
             SD = sd(Stat),
             Median = median(Stat))
-pd.sum$YMAX <- pd.sum$Mean + pd.sum$SE
-pd.sum$YMIN <- pd.sum$Mean - pd.sum$SE
+pd.wild.sum$YMAX <- pd.wild.sum$Mean + pd.wild.sum$SE
+pd.wild.sum$YMIN <- pd.wild.sum$Mean - pd.wild.sum$SE
 
 
 ### Prepare MPD ###
-mpd.ready <- merge(mpd.stats, meta, by = "Sample")
-mpd.sum <- mpd.ready %>%
+mpd.wild.ready <- merge(mpd.wild.stats, meta, by = "Sample")
+mpd.wild.sum <- mpd.wild.ready %>%
   group_by(Sample_Type) %>%
   summarize(Mean = mean(Stat),
             SE = se(Stat),
             SD = sd(Stat),
             Median = median(Stat))
-mpd.sum$YMAX <- mpd.sum$Mean + mpd.sum$SE
-mpd.sum$YMIN <- mpd.sum$Mean - mpd.sum$SE
+mpd.wild.sum$YMAX <- mpd.wild.sum$Mean + mpd.wild.sum$SE
+mpd.wild.sum$YMIN <- mpd.wild.sum$Mean - mpd.wild.sum$SE
 
 
-########## TESTING PD & MPD ##########
+####### TESTING PD & MPD #######
 # For the paired tests, the tests assume that your samples are in the same order (same order of ID for both content and mucosa)
 # Make sure you check ID orders!!!
+
 ### Test PD ###
-hist(pd.ready$Stat, breaks=10)
-qqnorm(pd.ready$Stat)
-qqline(pd.ready$Stat)
-shapiro.test(pd.ready$Stat)
-  # p-value = 9.477e-06
-  # Not Normal
-wilcox.test(Stat ~ Sample_Type, data = pd.ready, paired = T)
-  # p-value = 0.5782
+hist(pd.wild.ready$Stat, breaks=10)
+qqnorm(pd.wild.ready$Stat)
+qqline(pd.wild.ready$Stat)
+shapiro.test(pd.wild.ready$Stat)
+  # p-value = 0.9677
+  # Normal
+t.test(Stat ~ Sample_Type, data = pd.wild.ready, paired = T)
+  # p-value = 0.4559
 
 ### Test MPD ###
-hist(mpd.ready$Stat, breaks=10)
-qqnorm(mpd.ready$Stat)
-qqline(mpd.ready$Stat)
-shapiro.test(mpd.ready$Stat)
-  # p-value = 0.1108
+hist(mpd.wild.ready$Stat, breaks=10)
+qqnorm(mpd.wild.ready$Stat)
+qqline(mpd.wild.ready$Stat)
+shapiro.test(mpd.wild.ready$Stat)
+  # p-value = 0.5751
   # Normal
-t.test(Stat ~ Sample_Type, data = mpd.ready, paired = T)
-  # p-value = 0.7634
+t.test(Stat ~ Sample_Type, data = mpd.wild.ready, paired = T)
+  # p-value = 0.07543
 
 
 
 
-########## PLOT ###########
+########## SHANNON ##########
+adiv.wild <- data.frame(sample_data(physeq.wild))
 
-### PLOT PD ###
-
-pd.plot <- ggplot(pd.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
-  geom_violin() +
-  geom_segment(aes(x = 1, y = pd.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = pd.sum$YMAX[1]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = pd.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = pd.sum$YMAX[2]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 1, y = pd.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = pd.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = pd.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = pd.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_point(data = pd.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
-  geom_point(data = pd.sum, aes(y= Mean), colour="white", size = 0.5, 
-             show.legend = F) +
-  scale_fill_manual(values = c("gray25", "gray75")) +
-  scale_y_continuous(limits = c(13,38), breaks = c(13,18,23,28,33,38))  +
-  ylab("Faith's Phylogenetic Diversity") + labs(fill = "Sample Type") +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_blank(),
-        strip.text = element_text(face="bold", size=6),
-        strip.text.x = element_text(face ="bold", size=6),
-        axis.title.x = element_text(face="bold", size=6),
-        axis.title.y = element_text(face="bold", size=6),
-        axis.text.x = element_text(size=6),
-        axis.text.y = element_text(size=6),
-        legend.position = "none",
-        plot.margin = margin(t=1, r=1, b=1.5, l=1, unit = "mm")) +
-  annotate("text", x = 1.5, y = 37, label = "ns", size = 2)
-
-
-### PLOT MPD ###
-mpd.plot <- ggplot(mpd.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
-  geom_violin() +
-  geom_segment(aes(x = 1, y = mpd.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = mpd.sum$YMAX[1]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = mpd.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = mpd.sum$YMAX[2]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 1, y = mpd.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = mpd.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = mpd.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = mpd.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_point(data = mpd.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
-  geom_point(data = mpd.sum, aes(y= Mean), colour="white", size = 0.5, 
-             show.legend = F) +
-  scale_fill_manual(values = c("gray25", "gray75")) +
-  scale_y_continuous(limits = c(-7.1,5), breaks = c(-7, -4, -1, 1, 5))  +
-  ylab("Phylogenetic Evenness (MPD)") + labs(fill = "Sample Type") +
-    theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_blank(),
-        strip.text = element_text(face="bold", size=6),
-        strip.text.x = element_text(face ="bold", size=6),
-        axis.title.x = element_text(face="bold", size=6),
-        axis.title.y = element_text(face="bold", size=6),
-        axis.text.x = element_text(size=6),
-        axis.text.y = element_text(size=6),
-        legend.position = "none",
-        plot.margin = margin(t=1, r=1, b=1.5, l=1, unit = "mm")) +
-  annotate("text", x = 1.5, y = 5, label = "ns", size = 2)
-  
-```
-### Alpha Div - # OTUs, Shannon
-```{r}
-adiv <- data.frame(sample_data(physeq.pair))
-
-########## Shannon ##########
-
-
-### Prepare data for plot
-shannon.sum <- adiv %>%
-  group_by(Sample_Type) %>%
-  summarize(Mean = mean(shannon),
-            SE = se(shannon),
-            SD = sd(shannon),
-            Median = median(shannon))
-shannon.sum$YMAX <- shannon.sum$Mean + shannon.sum$SE
-shannon.sum$YMIN <- shannon.sum$Mean - shannon.sum$SE
-
-
-### Plot
-shannon.plot <- ggplot(adiv, aes(x = Sample_Type, y = shannon, fill = Sample_Type)) +
-  geom_violin() +
-  geom_segment(aes(x = 1, y = shannon.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = shannon.sum$YMAX[1]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = shannon.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = shannon.sum$YMAX[2]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 1, y = shannon.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = shannon.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = shannon.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = shannon.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_point(data = shannon.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
-  geom_point(data = shannon.sum, aes(y= Mean), colour="white", size = 0.5, 
-             show.legend = F) +
-  scale_fill_manual(values = c("gray25", "gray75")) +
-  scale_y_continuous(limits = c(1.4,5.65), breaks = c(1.4,2.8, 4.2, 5.6))  +
-  ylab("Shannon's Diversity Index") + labs(fill = "Sample Type") +
-    theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_blank(),
-        strip.text = element_text(face="bold", size=6),
-        strip.text.x = element_text(face ="bold", size=6),
-        legend.title = element_text(face="bold", size=6),
-        axis.title.x = element_text(face="bold", size=6),
-        axis.title.y = element_text(face="bold", size=6),
-        axis.text.x = element_text(size=6),
-        axis.text.y = element_text(size=6),
-        legend.text = element_text(size=6),
-        legend.key.height = unit(3, 'mm'),
-        legend.key.width = unit(3, "mm"),
-        legend.box.margin=margin(-10,-7,-10,-10),
-        plot.margin = margin(t=1, r=1, b=1.5, l=0, unit = "mm")) +
-  annotate("text", x = 1.5, y = 5.6, label = "ns", size = 2)
+hist(adiv.wild$shannon, breaks=10)
+qqnorm(adiv.wild$shannon)
+qqline(adiv.wild$shannon)
+shapiro.test(adiv.wild$shannon)
+  # p-value = 0.4148
+  # Normal
+t.test(shannon ~ Sample_Type, data = adiv.wild, paired = T)
+  # p-value = 0.2124
 
 
 
 
-########## Number of Unique OTUs ##########
-otus <- data.frame(otu_table(physeq.pair))
-sampNames <- colnames(otus)
-uniq.otus <- data.frame(matrix(nrow = nsamples(physeq.pair), ncol = 2))
-colnames(uniq.otus) <- c("Sample", "Unique_OTUs")
-for(n in 1:nsamples(physeq.pair)) {
-  COL <- otus[,n]
-  numUniq <- length(which(COL > 0))
-  uniq.otus$Sample[n] <- sampNames[n]
-  uniq.otus$Unique_OTUs[n] <- numUniq
+########## NUMBER OF UNIQUE OTUS ##########
+otus.wild <- data.frame(otu_table(physeq.wild))
+sampNames.wild <- colnames(otus.wild)
+uniq.otus.wild <- data.frame(matrix(nrow = nsamples(physeq.wild), ncol = 2))
+colnames(uniq.otus.wild) <- c("Sample", "Unique_OTUs")
+for(n in 1:nsamples(physeq.wild)) {
+  COL.wild <- otus.wild[,n]
+  numUniq.wild <- length(which(COL.wild > 0))
+  uniq.otus.wild$Sample[n] <- sampNames.wild[n]
+  uniq.otus.wild$Unique_OTUs[n] <- numUniq.wild
 }
-uniq.otus$Sample_Type <- sample_data(physeq.pair)$Sample_Type
-rownames(uniq.otus) <- uniq.otus$Sample
-
-uniq.otus.sum <- uniq.otus %>%
-  group_by(Sample_Type) %>%
-  summarize(Mean = mean(Unique_OTUs),
-            SE = se(Unique_OTUs),
-            SD = sd(Unique_OTUs),
-            Median = median(Unique_OTUs))
-uniq.otus.sum$YMAX <- uniq.otus.sum$Mean + uniq.otus.sum$SE
-uniq.otus.sum$YMIN <- uniq.otus.sum$Mean - uniq.otus.sum$SE
+uniq.otus.wild$Sample_Type <- sample_data(physeq.wild)$Sample_Type
+rownames(uniq.otus.wild) <- uniq.otus.wild$Sample
 
 
-
-otu.plot <- ggplot(uniq.otus, aes(x = Sample_Type, y = Unique_OTUs, fill = Sample_Type)) +
-  geom_violin() +
-  geom_segment(aes(x = 1, y = uniq.otus.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = uniq.otus.sum$YMAX[1]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = uniq.otus.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = uniq.otus.sum$YMAX[2]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 1, y = uniq.otus.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = uniq.otus.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = uniq.otus.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = uniq.otus.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_point(data = uniq.otus.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
-  geom_point(data = uniq.otus.sum, aes(y= Mean), colour="white", size = 0.5, 
-             show.legend = F) +
-  scale_fill_manual(values = c("gray25", "gray75")) +
-  scale_y_continuous(limits = c(200,800), breaks = c(200,320,440,560,680,800))  +
-  ylab("Number of Unique OTUs") + labs(fill = "Sample Type") +
-    theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_blank(),
-        strip.text = element_text(face="bold", size=6),
-        strip.text.x = element_text(face ="bold", size=6),
-        legend.title = element_text(face="bold", size=6),
-        axis.title.x = element_text(face="bold", size=6),
-        axis.title.y = element_text(face="bold", size=6),
-        axis.text.x = element_text(size=6),
-        axis.text.y = element_text(size=6),
-        legend.position = "none",
-        plot.margin = margin(t=1, r=1, b=1.5, l=1, unit = "mm")
-        ) +
-  annotate("text", x = 1.5, y = 800, label = "ns", size = 2)
-
-
-
-### Testing ###
-hist(adiv$shannon, breaks=10)
-qqnorm(adiv$shannon)
-qqline(adiv$shannon)
-shapiro.test(adiv$shannon)
-  # p-value = 0.4637
+hist(uniq.otus.wild$Unique_OTUs, breaks=10)
+qqnorm(uniq.otus.wild$Unique_OTUs)
+qqline(uniq.otus.wild$Unique_OTUs)
+shapiro.test(uniq.otus.wild$Unique_OTUs)
+  # p-value =  0.6322
   # Normal
-t.test(shannon ~ Sample_Type, data = adiv, paired = T)
-  # p-value = 0.8903
+t.test(Unique_OTUs ~ Sample_Type, data = uniq.otus.wild, paired = T)
+  # p-value = 0.4487
+```
+
+### Alpha Div - Summer Captive
+```{r}
+########## FAITH'S PHYLOGENETIC DIVERSITY AND PHYLOGENETIC EVENNESS (MPD) ##########
+
+# Calculate Faith's phylogenetic diversity
+pd.sum.res <- pd(t(data.frame(otu_table(physeq.sum))), phy_tree(physeq.sum), 
+             include.root = T)
+pd.sum.df <- data.frame(pd.sum.res)
+
+# Calculate MPD (Mean Pairwise Distance)
+pd.sum.dist <- cophenetic(phy_tree(physeq.sum))
+  # Calculate cophenetic distance
+
+ses.mpd.sum.res <- ses.mpd(t(data.frame(otu_table(physeq.sum))), pd.sum.dist, 
+                       null.model = "taxa.labels", abundance.weighted = F, runs = 999)
+  # Calculate Mpd.sum
+  # This'll take a while to run-- be patient
+
+mpd.sum <- data.frame(ses.mpd.sum.res)
+  # Pull out MDP results
+
+### Prepare data for plotting ###
+mpd.sum$SampleID <- row.names(mpd.sum)
+pd.sum.res$SampleID <- row.names(pd.sum.res)
+  # Make sure all SampleID's match!
 
 
-hist(uniq.otus$Unique_OTUs, breaks=10)
-qqnorm(uniq.otus$Unique_OTUs)
-qqline(uniq.otus$Unique_OTUs)
-shapiro.test(uniq.otus$Unique_OTUs)
-  # p-value =  5.043e-06
-  # Not Normal
-wilcox.test(Unique_OTUs ~ Sample_Type, data = uniq.otus, paired = T)
-  # 0.9036
+# Pull out first Stat of each test
+# PD test = PD
+# MPD test = SES (Standardized Effect Size)
+pd.sum.stats <- data.frame(pd.sum.res$SampleID, pd.sum.res$PD)
+pd.sum.stats$Measure <- rep("PD", nrow(pd.sum.df))
+colnames(pd.sum.stats) <- c("Sample", "Stat", "Measure")
+mpd.sum.stats <- data.frame(mpd.sum$SampleID, mpd.sum$mpd.obs.z)
+mpd.sum.stats$Measure <- rep("MPD SES", nrow(pd.sum.df))
+colnames(mpd.sum.stats) <- c("Sample", "Stat", "Measure")
+
+
+### Prepare PD ###
+pd.sum.ready <- merge(pd.sum.stats, meta, by = "Sample")
+pd.sum.sum <- pd.sum.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.sum.sum$YMAX <- pd.sum.sum$Mean + pd.sum.sum$SE
+pd.sum.sum$YMIN <- pd.sum.sum$Mean - pd.sum.sum$SE
+
+
+### Prepare MPD ###
+mpd.sum.ready <- merge(mpd.sum.stats, meta, by = "Sample")
+mpd.sum.sum <- mpd.sum.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.sum.sum$YMAX <- mpd.sum.sum$Mean + mpd.sum.sum$SE
+mpd.sum.sum$YMIN <- mpd.sum.sum$Mean - mpd.sum.sum$SE
+
+
+####### TESTING PD & MPD #######
+# For the paired tests, the tests assume that your samples are in the same order (same order of ID for both content and mucosa)
+# Make sure you check ID orders!!!
+
+### Test PD ###
+hist(pd.sum.ready$Stat, breaks=10)
+qqnorm(pd.sum.ready$Stat)
+qqline(pd.sum.ready$Stat)
+shapiro.test(pd.sum.ready$Stat)
+  # p-value = 0.06382
+  # Normal
+t.test(Stat ~ Sample_Type, data = pd.sum.ready, paired = T)
+  # p-value = 0.9252
+
+### Test MPD ###
+hist(mpd.sum.ready$Stat, breaks=10)
+qqnorm(mpd.sum.ready$Stat)
+qqline(mpd.sum.ready$Stat)
+shapiro.test(mpd.sum.ready$Stat)
+  # p-value = 0.2046
+  # Normal
+t.test(Stat ~ Sample_Type, data = mpd.sum.ready, paired = T)
+  # p-value = 0.3174
+
+
+
+
+########## SHANNON ##########
+adiv.sum <- data.frame(sample_data(physeq.sum))
+
+hist(adiv.sum$shannon, breaks=10)
+qqnorm(adiv.sum$shannon)
+qqline(adiv.sum$shannon)
+shapiro.test(adiv.sum$shannon)
+  # p-value = 0.1935
+  # Normal
+t.test(shannon ~ Sample_Type, data = adiv.sum, paired = T)
+  # p-value = 0.7101
+
+
+
+
+########## NUMBER OF UNIQUE OTUS ##########
+otus.sum <- data.frame(otu_table(physeq.sum))
+sampNames.sum <- colnames(otus.sum)
+uniq.otus.sum <- data.frame(matrix(nrow = nsamples(physeq.sum), ncol = 2))
+colnames(uniq.otus.sum) <- c("Sample", "Unique_OTUs")
+for(n in 1:nsamples(physeq.sum)) {
+  COL.sum <- otus.sum[,n]
+  numUniq.sum <- length(which(COL.sum > 0))
+  uniq.otus.sum$Sample[n] <- sampNames.sum[n]
+  uniq.otus.sum$Unique_OTUs[n] <- numUniq.sum
+}
+uniq.otus.sum$Sample_Type <- sample_data(physeq.sum)$Sample_Type
+rownames(uniq.otus.sum) <- uniq.otus.sum$Sample
+
+
+hist(uniq.otus.sum$Unique_OTUs, breaks=10)
+qqnorm(uniq.otus.sum$Unique_OTUs)
+qqline(uniq.otus.sum$Unique_OTUs)
+shapiro.test(uniq.otus.sum$Unique_OTUs)
+  # p-value =  0.287
+  # Normal
+t.test(Unique_OTUs ~ Sample_Type, data = uniq.otus.sum, paired = T)
+  # p-value = 0.7555
+```
+
+
+
+### Alpha Div - Torpor
+```{r}
+########## FAITH'S PHYLOGENETIC DIVERSITY AND PHYLOGENETIC EVENNESS (MPD) ##########
+
+# Calculate Faith's phylogenetic diversity
+pd.tor.res <- pd(t(data.frame(otu_table(physeq.tor))), phy_tree(physeq.tor), 
+             include.root = T)
+pd.tor.df <- data.frame(pd.tor.res)
+
+# Calculate MPD (Mean Pairwise Distance)
+pd.tor.dist <- cophenetic(phy_tree(physeq.tor))
+  # Calculate cophenetic distance
+
+ses.mpd.tor.res <- ses.mpd(t(data.frame(otu_table(physeq.tor))), pd.tor.dist, 
+                       null.model = "taxa.labels", abundance.weighted = F, runs = 999)
+  # Calculate Mpd.tor
+  # This'll take a while to run-- be patient
+
+mpd.tor <- data.frame(ses.mpd.tor.res)
+  # Pull out MDP results
+
+### Prepare data for plotting ###
+mpd.tor$SampleID <- row.names(mpd.tor)
+pd.tor.res$SampleID <- row.names(pd.tor.res)
+  # Make sure all SampleID's match!
+
+
+# Pull out first Stat of each test
+# PD test = PD
+# MPD test = SES (Standardized Effect Size)
+pd.tor.stats <- data.frame(pd.tor.res$SampleID, pd.tor.res$PD)
+pd.tor.stats$Measure <- rep("PD", nrow(pd.tor.df))
+colnames(pd.tor.stats) <- c("Sample", "Stat", "Measure")
+mpd.tor.stats <- data.frame(mpd.tor$SampleID, mpd.tor$mpd.obs.z)
+mpd.tor.stats$Measure <- rep("MPD SES", nrow(pd.tor.df))
+colnames(mpd.tor.stats) <- c("Sample", "Stat", "Measure")
+
+
+### Prepare PD ###
+pd.tor.ready <- merge(pd.tor.stats, meta, by = "Sample")
+pd.tor.sum <- pd.tor.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.tor.sum$YMAX <- pd.tor.sum$Mean + pd.tor.sum$SE
+pd.tor.sum$YMIN <- pd.tor.sum$Mean - pd.tor.sum$SE
+
+
+### Prepare MPD ###
+mpd.tor.ready <- merge(mpd.tor.stats, meta, by = "Sample")
+mpd.tor.sum <- mpd.tor.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.tor.sum$YMAX <- mpd.tor.sum$Mean + mpd.tor.sum$SE
+mpd.tor.sum$YMIN <- mpd.tor.sum$Mean - mpd.tor.sum$SE
+
+
+####### TESTING PD & MPD #######
+# For the paired tests, the tests assume that your samples are in the same order (same order of ID for both content and mucosa)
+# Make sure you check ID orders!!!
+
+### Test PD ###
+hist(pd.tor.ready$Stat, breaks=10)
+qqnorm(pd.tor.ready$Stat)
+qqline(pd.tor.ready$Stat)
+shapiro.test(pd.tor.ready$Stat)
+  # p-value = 0.6967
+  # Normal
+t.test(Stat ~ Sample_Type, data = pd.tor.ready, paired = T)
+  # p-value = 0.5243
+
+### Test MPD ###
+hist(mpd.tor.ready$Stat, breaks=10)
+qqnorm(mpd.tor.ready$Stat)
+qqline(mpd.tor.ready$Stat)
+shapiro.test(mpd.tor.ready$Stat)
+  # p-value = 0.3399
+  # Normal
+t.test(Stat ~ Sample_Type, data = mpd.tor.ready, paired = T)
+  # p-value = 0.4248
+
+
+
+
+########## SHANNON ##########
+adiv.tor <- data.frame(sample_data(physeq.tor))
+
+hist(adiv.tor$shannon, breaks=10)
+qqnorm(adiv.tor$shannon)
+qqline(adiv.tor$shannon)
+shapiro.test(adiv.tor$shannon)
+  # p-value = 0.3101
+  # Normal
+t.test(shannon ~ Sample_Type, data = adiv.tor, paired = T)
+  # p-value = 0.8631
+
+
+
+
+########## NUMBER OF UNIQUE OTUS ##########
+otus.tor <- data.frame(otu_table(physeq.tor))
+sampNames.tor <- colnames(otus.tor)
+uniq.otus.tor <- data.frame(matrix(nrow = nsamples(physeq.tor), ncol = 2))
+colnames(uniq.otus.tor) <- c("Sample", "Unique_OTUs")
+for(n in 1:nsamples(physeq.tor)) {
+  COL.tor <- otus.tor[,n]
+  numUniq.tor <- length(which(COL.tor > 0))
+  uniq.otus.tor$Sample[n] <- sampNames.tor[n]
+  uniq.otus.tor$Unique_OTUs[n] <- numUniq.tor
+}
+uniq.otus.tor$Sample_Type <- sample_data(physeq.tor)$Sample_Type
+rownames(uniq.otus.tor) <- uniq.otus.tor$Sample
+
+
+hist(uniq.otus.tor$Unique_OTUs, breaks=10)
+qqnorm(uniq.otus.tor$Unique_OTUs)
+qqline(uniq.otus.tor$Unique_OTUs)
+shapiro.test(uniq.otus.tor$Unique_OTUs)
+  # p-value =  0.9582
+  # Normal
+t.test(Unique_OTUs ~ Sample_Type, data = uniq.otus.tor, paired = T)
+  # p-value = 0.6421
+```
+
+
+### Alpha Div - IBA
+```{r}
+########## FAITH'S PHYLOGENETIC DIVERSITY AND PHYLOGENETIC EVENNESS (MPD) ##########
+
+# Calculate Faith's phylogenetic diversity
+pd.iba.res <- pd(t(data.frame(otu_table(physeq.iba))), phy_tree(physeq.iba), 
+             include.root = T)
+pd.iba.df <- data.frame(pd.iba.res)
+
+# Calculate MPD (Mean Pairwise Distance)
+pd.iba.dist <- cophenetic(phy_tree(physeq.iba))
+  # Calculate cophenetic distance
+
+ses.mpd.iba.res <- ses.mpd(t(data.frame(otu_table(physeq.iba))), pd.iba.dist, 
+                       null.model = "taxa.labels", abundance.weighted = F, runs = 999)
+  # Calculate Mpd.iba
+  # This'll take a while to run-- be patient
+
+mpd.iba <- data.frame(ses.mpd.iba.res)
+  # Pull out MDP results
+
+### Prepare data for plotting ###
+mpd.iba$SampleID <- row.names(mpd.iba)
+pd.iba.res$SampleID <- row.names(pd.iba.res)
+  # Make sure all SampleID's match!
+
+
+# Pull out first Stat of each test
+# PD test = PD
+# MPD test = SES (Standardized Effect Size)
+pd.iba.stats <- data.frame(pd.iba.res$SampleID, pd.iba.res$PD)
+pd.iba.stats$Measure <- rep("PD", nrow(pd.iba.df))
+colnames(pd.iba.stats) <- c("Sample", "Stat", "Measure")
+mpd.iba.stats <- data.frame(mpd.iba$SampleID, mpd.iba$mpd.obs.z)
+mpd.iba.stats$Measure <- rep("MPD SES", nrow(pd.iba.df))
+colnames(mpd.iba.stats) <- c("Sample", "Stat", "Measure")
+
+
+### Prepare PD ###
+pd.iba.ready <- merge(pd.iba.stats, meta, by = "Sample")
+pd.iba.sum <- pd.iba.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.iba.sum$YMAX <- pd.iba.sum$Mean + pd.iba.sum$SE
+pd.iba.sum$YMIN <- pd.iba.sum$Mean - pd.iba.sum$SE
+
+
+### Prepare MPD ###
+mpd.iba.ready <- merge(mpd.iba.stats, meta, by = "Sample")
+mpd.iba.sum <- mpd.iba.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.iba.sum$YMAX <- mpd.iba.sum$Mean + mpd.iba.sum$SE
+mpd.iba.sum$YMIN <- mpd.iba.sum$Mean - mpd.iba.sum$SE
+
+
+####### TESTING PD & MPD #######
+# For the paired tests, the tests assume that your samples are in the same order (same order of ID for both content and mucosa)
+# Make sure you check ID orders!!!
+
+### Test PD ###
+hist(pd.iba.ready$Stat, breaks=10)
+qqnorm(pd.iba.ready$Stat)
+qqline(pd.iba.ready$Stat)
+shapiro.test(pd.iba.ready$Stat)
+  # p-value = 0.9476
+  # Normal
+t.test(Stat ~ Sample_Type, data = pd.iba.ready, paired = T)
+  # p-value = 0.9544
+
+### Test MPD ###
+hist(mpd.iba.ready$Stat, breaks=10)
+qqnorm(mpd.iba.ready$Stat)
+qqline(mpd.iba.ready$Stat)
+shapiro.test(mpd.iba.ready$Stat)
+  # p-value = 0.05583
+  # Normal
+t.test(Stat ~ Sample_Type, data = mpd.iba.ready, paired = T)
+  # p-value = 0.4008
+
+
+
+
+########## SHANNON ##########
+adiv.iba <- data.frame(sample_data(physeq.iba))
+
+hist(adiv.iba$shannon, breaks=10)
+qqnorm(adiv.iba$shannon)
+qqline(adiv.iba$shannon)
+shapiro.test(adiv.iba$shannon)
+  # p-value = 0.2504
+  # Normal
+t.test(shannon ~ Sample_Type, data = adiv.iba, paired = T)
+  # p-value = 0.5366
+
+
+
+
+########## NUMBER OF UNIQUE OTUS ##########
+otus.iba <- data.frame(otu_table(physeq.iba))
+sampNames.iba <- colnames(otus.iba)
+uniq.otus.iba <- data.frame(matrix(nrow = nsamples(physeq.iba), ncol = 2))
+colnames(uniq.otus.iba) <- c("Sample", "Unique_OTUs")
+for(n in 1:nsamples(physeq.iba)) {
+  COL.iba <- otus.iba[,n]
+  numUniq.iba <- length(which(COL.iba > 0))
+  uniq.otus.iba$Sample[n] <- sampNames.iba[n]
+  uniq.otus.iba$Unique_OTUs[n] <- numUniq.iba
+}
+uniq.otus.iba$Sample_Type <- sample_data(physeq.iba)$Sample_Type
+rownames(uniq.otus.iba) <- uniq.otus.iba$Sample
+
+
+hist(uniq.otus.iba$Unique_OTUs, breaks=10)
+qqnorm(uniq.otus.iba$Unique_OTUs)
+qqline(uniq.otus.iba$Unique_OTUs)
+shapiro.test(uniq.otus.iba$Unique_OTUs)
+  # p-value =  0.4646
+  # Normal
+t.test(Unique_OTUs ~ Sample_Type, data = uniq.otus.iba, paired = T)
+  # p-value = 0.5877
+```
+
+
+### Alpha Div - Spring
+```{r}
+########## FAITH'S PHYLOGENETIC DIVERSITY AND PHYLOGENETIC EVENNESS (MPD) ##########
+
+# Calculate Faith's phylogenetic diversity
+pd.spr.res <- pd(t(data.frame(otu_table(physeq.spr))), phy_tree(physeq.spr), 
+             include.root = T)
+pd.spr.df <- data.frame(pd.spr.res)
+
+# Calculate MPD (Mean Pairwise Distance)
+pd.spr.dist <- cophenetic(phy_tree(physeq.spr))
+  # Calculate cophenetic distance
+
+ses.mpd.spr.res <- ses.mpd(t(data.frame(otu_table(physeq.spr))), pd.spr.dist, 
+                       null.model = "taxa.labels", abundance.weighted = F, runs = 999)
+  # Calculate Mpd.spr
+  # This'll take a while to run-- be patient
+
+mpd.spr <- data.frame(ses.mpd.spr.res)
+  # Pull out MDP results
+
+### Prepare data for plotting ###
+mpd.spr$SampleID <- row.names(mpd.spr)
+pd.spr.res$SampleID <- row.names(pd.spr.res)
+  # Make sure all SampleID's match!
+
+
+# Pull out first Stat of each test
+# PD test = PD
+# MPD test = SES (Standardized Effect Size)
+pd.spr.stats <- data.frame(pd.spr.res$SampleID, pd.spr.res$PD)
+pd.spr.stats$Measure <- rep("PD", nrow(pd.spr.df))
+colnames(pd.spr.stats) <- c("Sample", "Stat", "Measure")
+mpd.spr.stats <- data.frame(mpd.spr$SampleID, mpd.spr$mpd.obs.z)
+mpd.spr.stats$Measure <- rep("MPD SES", nrow(pd.spr.df))
+colnames(mpd.spr.stats) <- c("Sample", "Stat", "Measure")
+
+
+### Prepare PD ###
+pd.spr.ready <- merge(pd.spr.stats, meta, by = "Sample")
+pd.spr.sum <- pd.spr.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.spr.sum$YMAX <- pd.spr.sum$Mean + pd.spr.sum$SE
+pd.spr.sum$YMIN <- pd.spr.sum$Mean - pd.spr.sum$SE
+
+
+### Prepare MPD ###
+mpd.spr.ready <- merge(mpd.spr.stats, meta, by = "Sample")
+mpd.spr.sum <- mpd.spr.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.spr.sum$YMAX <- mpd.spr.sum$Mean + mpd.spr.sum$SE
+mpd.spr.sum$YMIN <- mpd.spr.sum$Mean - mpd.spr.sum$SE
+
+
+####### TESTING PD & MPD #######
+# For the paired tests, the tests assume that your samples are in the same order (same order of ID for both content and mucosa)
+# Make sure you check ID orders!!!
+
+### Test PD ###
+hist(pd.spr.ready$Stat, breaks=10)
+qqnorm(pd.spr.ready$Stat)
+qqline(pd.spr.ready$Stat)
+shapiro.test(pd.spr.ready$Stat)
+  # p-value = 0.3587
+  # Normal
+t.test(Stat ~ Sample_Type, data = pd.spr.ready, paired = T)
+  # p-value = 0.5265
+
+
+### Test MPD ###
+hist(mpd.spr.ready$Stat, breaks=10)
+qqnorm(mpd.spr.ready$Stat)
+qqline(mpd.spr.ready$Stat)
+shapiro.test(mpd.spr.ready$Stat)
+  # p-value = 0.3311
+  # Normal
+t.test(Stat ~ Sample_Type, data = mpd.spr.ready, paired = T)
+  # p-value = 0.3549
+
+
+
+
+########## SHANNON ##########
+adiv.spr <- data.frame(sample_data(physeq.spr))
+
+hist(adiv.spr$shannon, breaks=10)
+qqnorm(adiv.spr$shannon)
+qqline(adiv.spr$shannon)
+shapiro.test(adiv.spr$shannon)
+  # p-value = 0.3758
+  # Normal
+t.test(shannon ~ Sample_Type, data = adiv.spr, paired = T)
+  # p-value = 0.3927
+
+
+
+
+########## NUMBER OF UNIQUE OTUS ##########
+otus.spr <- data.frame(otu_table(physeq.spr))
+sampNames.spr <- colnames(otus.spr)
+uniq.otus.spr <- data.frame(matrix(nrow = nsamples(physeq.spr), ncol = 2))
+colnames(uniq.otus.spr) <- c("Sample", "Unique_OTUs")
+for(n in 1:nsamples(physeq.spr)) {
+  COL.spr <- otus.spr[,n]
+  numUniq.spr <- length(which(COL.spr > 0))
+  uniq.otus.spr$Sample[n] <- sampNames.spr[n]
+  uniq.otus.spr$Unique_OTUs[n] <- numUniq.spr
+}
+uniq.otus.spr$Sample_Type <- sample_data(physeq.spr)$Sample_Type
+rownames(uniq.otus.spr) <- uniq.otus.spr$Sample
+
+
+hist(uniq.otus.spr$Unique_OTUs, breaks=10)
+qqnorm(uniq.otus.spr$Unique_OTUs)
+qqline(uniq.otus.spr$Unique_OTUs)
+shapiro.test(uniq.otus.spr$Unique_OTUs)
+  # p-value =  0.2606
+  # Normal
+t.test(Unique_OTUs ~ Sample_Type, data = uniq.otus.spr, paired = T)
+  # p-value = 0.7409
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Alpha Div - Adjust P
+```{r}
+p.adjust(c(0.449,0.456,0.075,0.212, # Summer Wild
+           0.756,0.925,0.317,0.710, # Summer Captive
+           0.642,0.524,0.425,0.863, # Torpor
+           0.588,0.954,0.401,0.5366, # IBA
+           0.741,0.5265,0.3549,0.3927), # Spring
+         method = "fdr")
+
+# Summer Wild - 0.8894118 0.8894118 0.8894118 0.8894118
+# Summer Captive - 0.8894118 0.9540000 0.8894118 0.8894118
+# Torpor - 0.8894118 0.8894118 0.8894118 0.9540000
+# IBA - 0.8894118 0.9540000 0.8894118 0.8894118
+# Spring - 0.8894118 0.8894118 0.8894118 0.8894118
 
 ```
 
 
-### Plot - Alpha-Diversity
+
+### Beta Div - Summer Wild
 ```{r}
-tiff("adiv.samptype.tiff", width = 170, height = 60, units = "mm", res = 600)
-grid.newpage()
-pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
-grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
-          gp=gpar(fontsize=8,fontface="bold"))
-print(otu.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
-grid.text("B", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),
-          gp=gpar(fontsize=8,fontface="bold"))
-print(pd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=2))
-grid.text("C", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=3),
-          gp=gpar(fontsize=8,fontface="bold"))
-print(mpd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
-grid.text("D", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
-          gp=gpar(fontsize=8,fontface="bold"))
-print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
-dev.off()
-```
-
-
-### Beta Div
-```{r}
-########## Unweighted UniFrac ##########
-UF.u <- phyloseq::distance(physeq = physeq.pair, method = "unifrac")
-UF.u.pcoa <- ordinate(physeq = physeq.pair, method = "PCoA", distance = "unifrac")
-  # Variation explained = 27.7%
-
-
-u2.plot <- plot_ordination(physeq = physeq.pair, ordination = UF.u.pcoa, axes = c(1,2),
-                title = "Unweighted UniFrac", color = "Sample_Type", shape = "Group") +
-  geom_point(size = 2) +
-  #stat_ellipse(aes(colour = Sample_Type), size = 1, level = 0.95) +
-  scale_color_manual(values = c("gray75", "gray25"), labels = c("Content", "Mucosa")) +
-  scale_shape_manual(values = c(1,16,2,17,4), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) + 
-  labs(color = "Sample Type") +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_blank(),
-        axis.title.x = element_text(size = 6),
-        axis.title.y = element_text(size = 6),
-        axis.text.x = element_text(size = 6, colour = "black", vjust = 0.5),
-        axis.text.y = element_text(size = 6, colour = "black"),
-        plot.title = element_text(hjust = 0.5, size = 8),
-        legend.title = element_text(size = 6, face = "bold"),
-        legend.text = element_text(size = 6),
-        legend.key.height = unit(3.5, 'mm'),
-        legend.box.margin=margin(-15,-10,-10,-10)
-        )
-
-
-### Test
-pair.sampdf <- data.frame(sample_data(physeq.pair))
-beta.tax <- betadisper(d=UF.u, group=pair.sampdf$Sample_Type)
-p <- permutest(beta.tax)
-p$tab
-  # p-value = 0.236
-adonis(UF.u ~ ID + Sample_Type, data = pair.sampdf, permutations = 9999)
-  # ID P = 0.0001; R2 = 0.12705
-  # Sample Type P = 0.9980; R2 - 0.00790
-
-
-
-
-
 ########## Weighted UniFrac ##########
-UF.w <- phyloseq::distance(physeq = physeq.pair, method = "wunifrac")
-UF.w.pcoa <- ordinate(physeq = physeq.pair, method = "PCoA", distance = "wunifrac")
-  # Variation explained = 35.7%
+UF.w.wild <- phyloseq::distance(physeq = physeq.wild, method = "wunifrac")
+UF.w.wild.pcoa <- ordinate(physeq = physeq.wild, method = "PCoA", distance = "wunifrac")
 
-w2.plot <- plot_ordination(physeq = physeq.pair, ordination = UF.w.pcoa, axes = c(1,2),
-                title = "Weighted UniFrac", color = "Sample_Type", shape = "Group") +
-  geom_point(size = 2) +
-  #stat_ellipse(aes(colour = Sample_Type), size = 1, level = 0.95) +
-  scale_color_manual(values = c("gray75", "gray25"), labels = c("Content", "Mucosa")) +
-  scale_shape_manual(values = c(1,16,2,17,4), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) + 
-  labs(color = "Sample Type") +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_blank(),
-        axis.title.x = element_text(size = 6),
-        axis.title.y = element_text(size = 6),
-        axis.text.x = element_text(size = 6, colour = "black"),
-        axis.text.y = element_text(size = 6, colour = "black"),
-        plot.title = element_text(hjust = 0.5, size = 8),
-        legend.position = "none",
-        plot.margin = margin(t=2, r=5, b=2, l=3, unit = "mm")
-        )
-
-
-### PERMANOVA ###
-pair.sampdf <- data.frame(sample_data(physeq.pair))
-beta.tax <- betadisper(d=UF.w, group=pair.sampdf$Sample_Type)
+sampdf <- data.frame(sample_data(physeq.wild))
+beta.tax <- betadisper(d=UF.w.wild, group=sampdf$Sample_Type)
 p <- permutest(beta.tax)
 p$tab
-  # p-value = 0.088
-adonis(UF.w ~ ID + Sample_Type, data = pair.sampdf, permutations = 9999)
-  # ID P = 0.0001; R2 = 0.08040
-  # Sample Type P = 0.9937 ; R2= 0.00675
+  # p-value = 0.9013889
+adonis(UF.w.wild ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID P = 0.01667, R2 = 0.53348
+  # Sample_Type P = 0.60556, R2 = 0.07401
+
+
+
+
+
+########## Unweighted UniFrac ##########
+UF.u.wild <- phyloseq::distance(physeq = physeq.wild, method = "unifrac")
+UF.u.wild.pcoa <- ordinate(physeq = physeq.wild, method = "PCoA", distance = "unifrac")
+
+sampdf <- data.frame(sample_data(physeq.wild))
+beta.tax <- betadisper(d=UF.u.wild, group=sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.1013889
+adonis(UF.u.wild ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID: P = 0.05, R2 = 0.40122
+  # Sample_Type: P = 0.6056, R2 = 0.08301
+
+
+
+
+########## Bray-Curtis ##########
+bray.wild.pcoa <- ordinate(physeq=physeq.wild, method="PCoA", distance="bray")
+
+sampdf <- data.frame(sample_data(physeq.wild))
+bray.wild <- phyloseq::distance(physeq = physeq.wild, method = "bray")
+beta.tax <- betadisper(d = bray.wild, group = sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.9013889
+adonis(bray.wild ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID: P = 0.05556, R2 = 0.50378
+  # Sample_Type: P = 0.60556, R2 = 0.03878
 ```
-### PLOT
+
+### Beta Div - Summer Captive
 ```{r}
-tiff("ContentMucosaComp.tiff", width = 170, height = 120, units = "mm", res = 600)
-grid.newpage()
-pushViewport(viewport(layout=grid.layout(4,4, widths = c(1, 1, 1, 1.3), heights = c(0.07, 1.5, 0.07, 1.5))))
+########## Weighted UniFrac ##########
+UF.w.sum <- phyloseq::distance(physeq = physeq.sum, method = "wunifrac")
+UF.w.sum.pcoa <- ordinate(physeq = physeq.sum, method = "PCoA", distance = "wunifrac")
 
-grid.text("A", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
-          gp=gpar(fontsize=10,fontface="bold"))
-print(otu.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
-grid.text("B", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),
-          gp=gpar(fontsize=10,fontface="bold"))
-print(pd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=2))
-grid.text("C", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=3),
-          gp=gpar(fontsize=10,fontface="bold"))
-print(mpd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
-grid.text("D", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
-          gp=gpar(fontsize=10,fontface="bold"))
-print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
+sampdf <- data.frame(sample_data(physeq.sum))
+beta.tax <- betadisper(d=UF.w.sum, group=sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.124
+adonis(UF.w.sum ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID P = 0.0001, R2 = 0.24467
+  # Sample_Type P = 0.5519, R2 = 0.05572
 
 
 
-print(w2.plot, vp=viewport(layout.pos.row=4, layout.pos.col=1:2))
-grid.text("E", x=unit(0.1, "npc"), y=unit(-1, "npc"), 
-          vp=viewport(layout.pos.row=3, layout.pos.col=1), gp=gpar(fontsize=10,fontface="bold"))
-print(u2.plot, vp=viewport(layout.pos.row=4, layout.pos.col=3:4))
-grid.text("F", x=unit(0.1, "npc"), y=unit(-1, "npc"),
-          vp=viewport(layout.pos.row=3,layout.pos.col=3), gp=gpar(fontsize=10,fontface="bold"))
 
-dev.off()
+
+########## Unweighted UniFrac ##########
+UF.u.sum <- phyloseq::distance(physeq = physeq.sum, method = "unifrac")
+UF.u.sum.pcoa <- ordinate(physeq = physeq.sum, method = "PCoA", distance = "unifrac")
+
+sampdf <- data.frame(sample_data(physeq.sum))
+beta.tax <- betadisper(d=UF.u.sum, group=sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.791
+adonis(UF.u.sum ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID: P = 0.0002, R2 = 0.23953
+  # Sample_Type: P = 0.9521, R2 = 0.02428
+
+
+
+
+########## Bray-Curtis ##########
+bray.sum.pcoa <- ordinate(physeq=physeq.sum, method="PCoA", distance="bray")
+
+sampdf <- data.frame(sample_data(physeq.sum))
+bray.sum <- phyloseq::distance(physeq = physeq.sum, method = "bray")
+beta.tax <- betadisper(d = bray.sum, group = sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.389
+adonis(bray.sum ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID: P = 0.0001, R2 = 0.22428
+  # Sample_Type: P = 0.9028, R2 = 0.03305
 ```
+
+
+
+### Beta Div - Torpor
+```{r}
+########## Weighted UniFrac ##########
+UF.w.tor <- phyloseq::distance(physeq = physeq.tor, method = "wunifrac")
+UF.w.tor.pcoa <- ordinate(physeq = physeq.tor, method = "PCoA", distance = "wunifrac")
+
+sampdf <- data.frame(sample_data(physeq.tor))
+beta.tax <- betadisper(d=UF.w.tor, group=sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.323
+adonis(UF.w.tor ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID P = 0.2592, R2 = 0.16036
+  # Sample_Type P = 0.8740, R2 = 0.01962
+
+
+
+
+
+########## Unweighted UniFrac ##########
+UF.u.tor <- phyloseq::distance(physeq = physeq.tor, method = "unifrac")
+UF.u.tor.pcoa <- ordinate(physeq = physeq.tor, method = "PCoA", distance = "unifrac")
+
+sampdf <- data.frame(sample_data(physeq.tor))
+beta.tax <- betadisper(d=UF.u.tor, group=sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.027
+  # Not significant after fdr, so I'll go with PERMANOVA
+adonis(UF.u.tor ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID: P = 0.0133, R2 = 0.26324
+  # Sample Type: P = 0.8757, R2 = 0.03934
+
+anosim(UF.u.tor, sampdf$Sample_Type, permutations = 9999)
+  # P-value = 0.7806
+anosim(UF.u.tor, sampdf$ID, permutations = 9999)
+  # P-value = 0.001
+###(UF.u.tor ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID: P = 0.0121, R2 = 0.26324
+  # Sample_Type: P = 0.8711, R2 = 0.03934
+
+
+
+
+########## Bray-Curtis ##########
+bray.tor.pcoa <- ordinate(physeq=physeq.tor, method="PCoA", distance="bray")
+
+sampdf <- data.frame(sample_data(physeq.tor))
+bray.tor <- phyloseq::distance(physeq = physeq.tor, method = "bray")
+beta.tax <- betadisper(d = bray.tor, group = sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.406
+adonis(bray.tor ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID: P = 0.0845, R2 = 0.23260
+  # Sample_Type: P = 0.8687, R2 = 0.01358
+```
+
+
+
+### Beta Div - IBA
+```{r}
+########## Weighted UniFrac ##########
+UF.w.iba <- phyloseq::distance(physeq = physeq.iba, method = "wunifrac")
+UF.w.iba.pcoa <- ordinate(physeq = physeq.iba, method = "PCoA", distance = "wunifrac")
+
+sampdf <- data.frame(sample_data(physeq.iba))
+beta.tax <- betadisper(d=UF.w.iba, group=sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.832
+adonis(UF.w.iba ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID P = 0.0108, R2 = 0.23228
+  # Sample_Type P = 0.9322, R2 = 0.01868
+
+
+
+
+
+########## Unweighted UniFrac ##########
+UF.u.iba <- phyloseq::distance(physeq = physeq.iba, method = "unifrac")
+UF.u.iba.pcoa <- ordinate(physeq = physeq.iba, method = "PCoA", distance = "unifrac")
+
+sampdf <- data.frame(sample_data(physeq.iba))
+beta.tax <- betadisper(d=UF.u.iba, group=sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.644
+adonis(UF.u.iba ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID P = 0.0167, R2 = 0.15848
+  # Sample_Type P = 0.9638, R2 = 0.02947
+
+
+
+########## Bray-Curtis ##########
+bray.iba.pcoa <- ordinate(physeq=physeq.iba, method="PCoA", distance="bray")
+
+sampdf <- data.frame(sample_data(physeq.iba))
+bray.iba <- phyloseq::distance(physeq = physeq.iba, method = "bray")
+beta.tax <- betadisper(d = bray.iba, group = sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.936
+adonis(bray.iba ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID: P = 0.0011, R2 = 0.26414
+  # Sample_Type: P = 0.9554, R2 = 0.01095
+```
+
+
+
+### Beta Div - Spring
+```{r}
+########## Weighted UniFrac ##########
+UF.w.spr <- phyloseq::distance(physeq = physeq.spr, method = "wunifrac")
+
+sampdf <- data.frame(sample_data(physeq.spr))
+beta.tax <- betadisper(d=UF.w.spr, group=sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.5013889
+adonis(UF.w.spr ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID P = 0.2028, R2 = 0.38553
+  # Sample_Type P = 0.6444, R2 = 0.03608
+
+
+
+########## Unweighted UniFrac ##########
+UF.u.spr <- phyloseq::distance(physeq = physeq.spr, method = "unifrac")
+
+sampdf <- data.frame(sample_data(physeq.spr))
+beta.tax <- betadisper(d=UF.u.spr, group=sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.8013889
+adonis(UF.u.spr ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID P = 0.04167, R2 = 0.47220
+  # Sample_Type P = 0.60833, R2 = 0.06016
+
+
+
+########## Bray-Curtis ##########
+bray.spr.pcoa <- ordinate(physeq=physeq.spr, method="PCoA", distance="bray")
+
+sampdf <- data.frame(sample_data(physeq.spr))
+bray.spr <- phyloseq::distance(physeq = physeq.spr, method = "bray")
+beta.tax <- betadisper(d = bray.spr, group = sampdf$Sample_Type)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.5013889
+adonis(bray.spr ~ ID + Sample_Type, data = sampdf, permutations = 9999)
+  # ID: P = 0.2139, R2 = 0.39772
+  # Sample_Type: P = 0.6889, R2 = 0.02878
+```
+
+
+### Beta Div - Adjust P
+```{r}
+# Betadisper
+p.adjust(c(0.901,0.101,0.901, # Summer Wild
+           0.124,0.791,0.039, # Summer Captive
+           0.300,0.027,0.406, # Torpor
+           0.832,0.644,0.936, # IBA
+           0.5013889,0.8013889,0.5013889), # Spring
+         method = "fdr")
+  # Summer Wild = 0.9360 0.4650 0.9360
+  # Summer Captive = 0.4650 0.9360 0.2925
+  # Torpor = 0.9000 0.2925 0.9360
+  # IBA = 0.9360 0.9360 0.9360
+  # Spring = 0.9360 0.9360 0.9360
+
+# PERMANOVA/ANOSIM
+p.adjust(c(0.01667,0.60556,0.05,0.6056,0.05556,0.60556, # Summer Wild
+           0.0001,0.5519,0.0002,0.9521,0.0001,0.9028, # Summer Captive
+           0.2592,0.874,0.0133,0.8757,0.0845,0.8687, # Torpor
+           0.0108,0.9332,0.0167,0.9638,0.001,0.9554, # IBA
+           0.2028,0.6444,0.04167,0.60833,0.2139,0.6889), # Spring
+         method = "fdr")
+  # Summer Wild = 0.0626250 0.9124950 0.1500000 0.9124950 0.1515273 0.9124950
+  # Summer Captive = 0.0015000 0.9124950 0.0020000 0.9638000 0.0015000 0.9638000
+  # Torpor = 0.5184000 0.9638000 0.0626250 0.9638000 0.2112500 0.9638000
+  # IBA = 0.0540000 0.9638000 0.0626250 0.9638000 0.0060000 0.9638000
+  # Spring = 0.4583571 0.9205714 0.1389000 0.9124950 0.4583571 0.9394091
+
 ```
