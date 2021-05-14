@@ -795,6 +795,936 @@ p.adjust(c(0.449,0.456,0.075,0.212, # Summer Wild
 
 
 
+
+### Alpha Div - Summer Wild - Prepare Plots
+```{r}
+###### Unique # of OTUs ######
+
+# Prepare data for plot
+uniq.otus.wild.sum <- uniq.otus.wild %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Unique_OTUs),
+            SE = se(Unique_OTUs),
+            SD = sd(Unique_OTUs),
+            Median = median(Unique_OTUs))
+uniq.otus.wild.sum$YMAX <- uniq.otus.wild.sum$Mean + uniq.otus.wild.sum$SE
+uniq.otus.wild.sum$YMIN <- uniq.otus.wild.sum$Mean - uniq.otus.wild.sum$SE
+
+otu.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
+
+wild.otu.plot <- ggplot(uniq.otus.wild, aes(x = Sample_Type, y = Unique_OTUs, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(640,780), breaks = c(640, 675, 710, 745, 780)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Number of Unique OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Summer Wild") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = otu.ann, aes(label=lab), x=c(1.5,0),
+            y=c(780,0), size=2.5, color="black")
+
+
+
+
+
+
+###### Faith's Phylogenetic Diversity ######
+
+# Prepare PD ###
+pd.wild.sum <- pd.wild.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.wild.sum$YMAX <- pd.wild.sum$Mean + pd.wild.sum$SE
+pd.wild.sum$YMIN <- pd.wild.sum$Mean - pd.wild.sum$SE
+
+
+pd.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
+
+wild.pd.plot <- ggplot(pd.wild.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
+  geom_violin() + 
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(34,38), breaks = c(34,35,36,37,38)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Faith's Phylogenetic Diversity") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Summer Wild") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = pd.ann, aes(label=lab), x=c(1.5,0),
+            y=c(38,0), size=2.5, color="black")
+  
+  
+
+        
+###### Phylogenetic Evenness (MPD) ######
+
+# Prepare MPD
+mpd.wild.sum <- mpd.wild.ready %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.wild.sum$YMAX <- mpd.wild.sum$Mean + mpd.wild.sum$SE
+mpd.wild.sum$YMIN <- mpd.wild.sum$Mean - mpd.wild.sum$SE
+
+mpd.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
+
+wild.mpd.plot <- ggplot(mpd.wild.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(-2.8,4.4), breaks = c(-2.8, -0.5, 1.8, 4.1)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Phylogenetic Evenness (MPD)") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Summer Wild") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = mpd.ann, aes(label=lab), x=c(1.5,0),
+            y=c(4.4,0), size=2.5, color="black")
+  
+
+        
+
+###### Shannon's Diversity #####      
+
+# Prepare data for plot
+shannon.wild.sum <- adiv.wild %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(shannon),
+            SE = se(shannon),
+            SD = sd(shannon),
+            Median = median(shannon))
+shannon.wild.sum$YMAX <- shannon.wild.sum$Mean + shannon.wild.sum$SE
+shannon.wild.sum$YMIN <- shannon.wild.sum$Mean - shannon.wild.sum$SE
+
+shannon.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
+
+
+wild.shannon.plot <- ggplot(adiv.wild, aes(x = Sample_Type, y = shannon, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(2.0,5.25), breaks = c(2.0,2.8,3.6,4.4,5.2)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Shannon's Diversity") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Summer Wild") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        legend.title = element_text(face="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.text = element_text(size=6),
+        legend.key.height = unit(3, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10)) +
+  geom_text(data = shannon.ann, aes(label=lab), x=c(1.5,0),
+            y=c(5.25,0), size=2.5, color="black")
+
+```
+
+### Alpha Div - Summer Captive - Prepare Plots
+```{r}
+###### Unique # of OTUs ######
+
+# Prepare data for plot
+uniq.otus.sum.sum <- uniq.otus.sum %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Unique_OTUs),
+            SE = se(Unique_OTUs),
+            SD = sd(Unique_OTUs),
+            Median = median(Unique_OTUs))
+uniq.otus.sum.sum$YMAX <- uniq.otus.sum.sum$Mean + uniq.otus.sum.sum$SE
+uniq.otus.sum.sum$YMIN <- uniq.otus.sum.sum$Mean - uniq.otus.sum.sum$SE
+
+otu.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
+
+sum.otu.plot <- ggplot(uniq.otus.sum, aes(x = Sample_Type, y = Unique_OTUs, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(290,590), breaks = c(290,390,490,590)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Number of Unique OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Summer Captive") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = otu.ann, aes(label=lab), x=c(1.5,0),
+            y=c(590,0), size=2.5, color="black")
+
+
+
+
+
+
+###### Faith's Phylogenetic Diversity ######
+
+# Prepare PD ###
+pd.sum.sum <- pd.sum.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.sum.sum$YMAX <- pd.sum.sum$Mean + pd.sum.sum$SE
+pd.sum.sum$YMIN <- pd.sum.sum$Mean - pd.sum.sum$SE
+
+
+pd.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
+
+sum.pd.plot <- ggplot(pd.sum.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
+  geom_violin() + 
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(17,31), breaks = c(17,24,31)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Faith's Phylogenetic Diversity") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Summer Captive") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = pd.ann, aes(label=lab), x=c(1.5,0),
+            y=c(31,0), size=2.5, color="black")
+  
+  
+
+        
+###### Phylogenetic Evenness (MPD) ######
+
+# Prepare MPD
+mpd.sum.sum <- mpd.sum.ready %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.sum.sum$YMAX <- mpd.sum.sum$Mean + mpd.sum.sum$SE
+mpd.sum.sum$YMIN <- mpd.sum.sum$Mean - mpd.sum.sum$SE
+
+mpd.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
+
+sum.mpd.plot <- ggplot(mpd.sum.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(-6.8,1.8), breaks = c(-6.8,-2.5,1.8)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Phylogenetic Evenness (MPD)") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Summer Captive") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = mpd.ann, aes(label=lab), x=c(1.5,0),
+            y=c(1.8,0), size=2.5, color="black")
+  
+
+        
+
+###### Shannon's Diversity #####      
+
+# Prepare data for plot
+shannon.sum.sum <- adiv.sum %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(shannon),
+            SE = se(shannon),
+            SD = sd(shannon),
+            Median = median(shannon))
+shannon.sum.sum$YMAX <- shannon.sum.sum$Mean + shannon.sum.sum$SE
+shannon.sum.sum$YMIN <- shannon.sum.sum$Mean - shannon.sum.sum$SE
+
+shannon.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
+
+
+sum.shannon.plot <- ggplot(adiv.sum, aes(x = Sample_Type, y = shannon, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(1.4,5.75), breaks = c(1.40,2.83,4.26,5.70)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Shannon's Diversity") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Summer Captive") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        legend.title = element_text(face="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.text = element_text(size=6),
+        legend.key.height = unit(3, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10)) +
+  geom_text(data = shannon.ann, aes(label=lab), x=c(1.5,0),
+            y=c(5.75,0), size=2.5, color="black")
+
+```
+
+
+### Alpha Div - Torpor - Prepare Plots
+```{r}
+###### Unique # of OTUs ######
+
+# Prepare data for plot
+uniq.otus.tor.sum <- uniq.otus.tor %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Unique_OTUs),
+            SE = se(Unique_OTUs),
+            SD = sd(Unique_OTUs),
+            Median = median(Unique_OTUs))
+uniq.otus.tor.sum$YMAX <- uniq.otus.tor.sum$Mean + uniq.otus.tor.sum$SE
+uniq.otus.tor.sum$YMIN <- uniq.otus.tor.sum$Mean - uniq.otus.tor.sum$SE
+
+otu.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
+
+tor.otu.plot <- ggplot(uniq.otus.tor, aes(x = Sample_Type, y = Unique_OTUs, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(210,345), breaks = c(210,255,300,345)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Number of Unique OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Torpor") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = otu.ann, aes(label=lab), x=c(1.5,0),
+            y=c(345,0), size=2.5, color="black")
+
+
+
+
+
+
+###### Faith's Phylogenetic Diversity ######
+
+# Prepare PD ###
+pd.tor.sum <- pd.tor.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.tor.sum$YMAX <- pd.tor.sum$Mean + pd.tor.sum$SE
+pd.tor.sum$YMIN <- pd.tor.sum$Mean - pd.tor.sum$SE
+
+
+pd.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
+
+tor.pd.plot <- ggplot(pd.tor.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
+  geom_violin() + 
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(15.8,20.2), breaks = c(15.8,16.9,18,19.1,20.2)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Faith's Phylogenetic Diversity") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Torpor") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = pd.ann, aes(label=lab), x=c(1.5,0),
+            y=c(20.2,0), size=2.5, color="black")
+  
+  
+
+        
+###### Phylogenetic Evenness (MPD) ######
+
+# Prepare MPD
+mpd.tor.sum <- mpd.tor.ready %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.tor.sum$YMAX <- mpd.tor.sum$Mean + mpd.tor.sum$SE
+mpd.tor.sum$YMIN <- mpd.tor.sum$Mean - mpd.tor.sum$SE
+
+mpd.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
+
+tor.mpd.plot <- ggplot(mpd.tor.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(-0.42,5.40), breaks = c(-0.42,1.52,3.46,5.40)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Phylogenetic Evenness (MPD)") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Torpor") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = mpd.ann, aes(label=lab), x=c(1.5,0),
+            y=c(5.4,0), size=2.5, color="black")
+  
+
+        
+
+###### Shannon's Diversity #####      
+
+# Prepare data for plot
+shannon.tor.sum <- adiv.tor %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(shannon),
+            SE = se(shannon),
+            SD = sd(shannon),
+            Median = median(shannon))
+shannon.tor.sum$YMAX <- shannon.tor.sum$Mean + shannon.tor.sum$SE
+shannon.tor.sum$YMIN <- shannon.tor.sum$Mean - shannon.tor.sum$SE
+
+shannon.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
+
+
+tor.shannon.plot <- ggplot(adiv.tor, aes(x = Sample_Type, y = shannon, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(3.0,5.1), breaks = c(3.0,3.7,4.4,5.1)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Shannon's Diversity") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Torpor") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        legend.title = element_text(face="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.text = element_text(size=6),
+        legend.key.height = unit(3, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10)) +
+  geom_text(data = shannon.ann, aes(label=lab), x=c(1.5,0),
+            y=c(5.1,0), size=2.5, color="black")
+
+```
+
+
+### Alpha Div - IBA - Prepare Plots
+```{r}
+###### Unique # of OTUs ######
+
+# Prepare data for plot
+uniq.otus.iba.sum <- uniq.otus.iba %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Unique_OTUs),
+            SE = se(Unique_OTUs),
+            SD = sd(Unique_OTUs),
+            Median = median(Unique_OTUs))
+uniq.otus.iba.sum$YMAX <- uniq.otus.iba.sum$Mean + uniq.otus.iba.sum$SE
+uniq.otus.iba.sum$YMIN <- uniq.otus.iba.sum$Mean - uniq.otus.iba.sum$SE
+
+otu.ann <- data.frame(lab = c("ns", " "), Sample_Type = faciba(c("Content", "Mucosa")))
+
+iba.otu.plot <- ggplot(uniq.otus.iba, aes(x = Sample_Type, y = Unique_OTUs, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(220,390), breaks = c(220,254,288,322,356,390)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Number of Unique OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("IBA") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = otu.ann, aes(label=lab), x=c(1.5,0),
+            y=c(390,0), size=2.5, color="black")
+
+
+
+
+
+
+###### Faith's Phylogenetic Diversity ######
+
+# Prepare PD ###
+pd.iba.sum <- pd.iba.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.iba.sum$YMAX <- pd.iba.sum$Mean + pd.iba.sum$SE
+pd.iba.sum$YMIN <- pd.iba.sum$Mean - pd.iba.sum$SE
+
+
+pd.ann <- data.frame(lab = c("ns", " "), Sample_Type = faciba(c("Content", "Mucosa")))
+
+iba.pd.plot <- ggplot(pd.iba.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
+  geom_violin() + 
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(13.3,22.6), breaks = c(13.3,16.4,19.5,22.6)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Faith's Phylogenetic Diversity") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("IBA") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = pd.ann, aes(label=lab), x=c(1.5,0),
+            y=c(22.6,0), size=2.5, color="black")
+  
+  
+
+        
+###### Phylogenetic Evenness (MPD) ######
+
+# Prepare MPD
+mpd.iba.sum <- mpd.iba.ready %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.iba.sum$YMAX <- mpd.iba.sum$Mean + mpd.iba.sum$SE
+mpd.iba.sum$YMIN <- mpd.iba.sum$Mean - mpd.iba.sum$SE
+
+mpd.ann <- data.frame(lab = c("ns", " "), Sample_Type = faciba(c("Content", "Mucosa")))
+
+iba.mpd.plot <- ggplot(mpd.iba.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(-4.5,4.2), breaks = c(-4.50,-2.35,-0.2,1.95,4.1)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Phylogenetic Evenness (MPD)") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("IBA") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = mpd.ann, aes(label=lab), x=c(1.5,0),
+            y=c(4.15,0), size=2.5, color="black")
+  
+
+        
+
+###### Shannon's Diversity #####      
+
+# Prepare data for plot
+shannon.iba.sum <- adiv.iba %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(shannon),
+            SE = se(shannon),
+            SD = sd(shannon),
+            Median = median(shannon))
+shannon.iba.sum$YMAX <- shannon.iba.sum$Mean + shannon.iba.sum$SE
+shannon.iba.sum$YMIN <- shannon.iba.sum$Mean - shannon.iba.sum$SE
+
+shannon.ann <- data.frame(lab = c("ns", " "), Sample_Type = faciba(c("Content", "Mucosa")))
+
+
+iba.shannon.plot <- ggplot(adiv.iba, aes(x = Sample_Type, y = shannon, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(2.4,4.8), breaks = c(2.4,3.0,3.6,4.2,4.8)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Shannon's Diversity") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("IBA") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        legend.title = element_text(face="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.text = element_text(size=6),
+        legend.key.height = unit(3, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10)) +
+  geom_text(data = shannon.ann, aes(label=lab), x=c(1.5,0),
+            y=c(4.8,0), size=2.5, color="black")
+
+```
+
+
+### Alpha Div - Spring - Prepare Plots
+```{r}
+###### Unique # of OTUs ######
+
+# Prepare data for plot
+uniq.otus.spr.sum <- uniq.otus.spr %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Unique_OTUs),
+            SE = se(Unique_OTUs),
+            SD = sd(Unique_OTUs),
+            Median = median(Unique_OTUs))
+uniq.otus.spr.sum$YMAX <- uniq.otus.spr.sum$Mean + uniq.otus.spr.sum$SE
+uniq.otus.spr.sum$YMIN <- uniq.otus.spr.sum$Mean - uniq.otus.spr.sum$SE
+
+otu.ann <- data.frame(lab = c("ns", " "), Sample_Type = facspr(c("Content", "Mucosa")))
+
+spr.otu.plot <- ggplot(uniq.otus.spr, aes(x = Sample_Type, y = Unique_OTUs, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(310,410), breaks = c(310,335,360,385,410)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Number of Unique OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Spring") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = otu.ann, aes(label=lab), x=c(1.5,0),
+            y=c(410,0), size=2.5, color="black")
+
+
+
+
+
+
+###### Faith's Phylogenetic Diversity ######
+
+# Prepare PD ###
+pd.spr.sum <- pd.spr.ready %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.spr.sum$YMAX <- pd.spr.sum$Mean + pd.spr.sum$SE
+pd.spr.sum$YMIN <- pd.spr.sum$Mean - pd.spr.sum$SE
+
+
+pd.ann <- data.frame(lab = c("ns", " "), Sample_Type = facspr(c("Content", "Mucosa")))
+
+spr.pd.plot <- ggplot(pd.spr.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
+  geom_violin() + 
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(18.6,23.7), breaks = c(18.6,20.3,22,23.7)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Faith's Phylogenetic Diversity") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Spring") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = pd.ann, aes(label=lab), x=c(1.5,0),
+            y=c(23.7,0), size=2.5, color="black")
+  
+  
+
+        
+###### Phylogenetic Evenness (MPD) ######
+
+# Prepare MPD
+mpd.spr.sum <- mpd.spr.ready %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.spr.sum$YMAX <- mpd.spr.sum$Mean + mpd.spr.sum$SE
+mpd.spr.sum$YMIN <- mpd.spr.sum$Mean - mpd.spr.sum$SE
+
+mpd.ann <- data.frame(lab = c("ns", " "), Sample_Type = facspr(c("Content", "Mucosa")))
+
+spr.mpd.plot <- ggplot(mpd.spr.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(-2.5,2.6), breaks = c(-2.5,-0.8,0.9,2.6)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Phylogenetic Evenness (MPD)") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Spring") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.position = "none") +
+  geom_text(data = mpd.ann, aes(label=lab), x=c(1.5,0),
+            y=c(2.6,0), size=2.5, color="black")
+  
+
+        
+
+###### Shannon's Diversity #######      
+
+# Prepare data for plot
+shannon.spr.sum <- adiv.spr %>%
+  group_by(Sample_Type) %>%
+  summarize(Mean = mean(shannon),
+            SE = se(shannon),
+            SD = sd(shannon),
+            Median = median(shannon))
+shannon.spr.sum$YMAX <- shannon.spr.sum$Mean + shannon.spr.sum$SE
+shannon.spr.sum$YMIN <- shannon.spr.sum$Mean - shannon.spr.sum$SE
+
+shannon.ann <- data.frame(lab = c("ns", " "), Sample_Type = facspr(c("Content", "Mucosa")))
+
+
+spr.shannon.plot <- ggplot(adiv.spr, aes(x = Sample_Type, y = shannon, fill = Sample_Type)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  scale_y_continuous(limits = c(3.3,4.5), breaks = c(3.3,3.7,4.1,4.5)) +
+  scale_x_discrete(labels = c("Content", "Mucosa")) +
+  ylab("Shannon's Diversity") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ggtitle("Spring") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        legend.title = element_text(face="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        plot.title = element_text(face = "bold", size = 6, hjust = 0.5, margin=margin(-5,0,0,0)),
+        legend.text = element_text(size=6),
+        legend.key.height = unit(3, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10)) +
+  geom_text(data = shannon.ann, aes(label=lab), x=c(1.5,0),
+            y=c(4.5,0), size=2.5, color="black")
+
+```
+
+### Plot - Alpha-Diversity
+```{r}
+tiff("ConMuc.adiv.tiff", width = 170, height = 300, units = "mm", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=grid.layout(10,4, widths = c(1, 1, 1, 1.4),
+                                         heights = c(0.07,1.5,0.07,1.5,0.07,1.5,0.07,1.5,0.07,1.5))))
+grid.text("A", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(wild.otu.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+grid.text("B", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(wild.pd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=2))
+grid.text("C", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=3),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(wild.mpd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
+grid.text("D", x=unit(0.045, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(wild.shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
+
+
+grid.text("E", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=3, layout.pos.col=1),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(sum.otu.plot, vp=viewport(layout.pos.row=4, layout.pos.col=1))
+grid.text("F", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=3, layout.pos.col=2),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(sum.pd.plot, vp=viewport(layout.pos.row=4, layout.pos.col=2))
+grid.text("G", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=3, layout.pos.col=3),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(sum.mpd.plot, vp=viewport(layout.pos.row=4, layout.pos.col=3))
+grid.text("H", x=unit(0.045, "npc"), vp=viewport(layout.pos.row=3, layout.pos.col=4),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(sum.shannon.plot, vp=viewport(layout.pos.row=4, layout.pos.col=4))
+
+
+grid.text("I", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=5, layout.pos.col=1),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(tor.otu.plot, vp=viewport(layout.pos.row=6, layout.pos.col=1))
+grid.text("J", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=5, layout.pos.col=2),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(tor.pd.plot, vp=viewport(layout.pos.row=6, layout.pos.col=2))
+grid.text("K", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=5, layout.pos.col=3),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(tor.mpd.plot, vp=viewport(layout.pos.row=6, layout.pos.col=3))
+grid.text("L", x=unit(0.045, "npc"), vp=viewport(layout.pos.row=5, layout.pos.col=4),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(tor.shannon.plot, vp=viewport(layout.pos.row=6, layout.pos.col=4))
+
+
+
+grid.text("M", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=7, layout.pos.col=1),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(iba.otu.plot, vp=viewport(layout.pos.row=8, layout.pos.col=1))
+grid.text("N", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=7, layout.pos.col=2),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(iba.pd.plot, vp=viewport(layout.pos.row=8, layout.pos.col=2))
+grid.text("O", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=7, layout.pos.col=3),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(iba.mpd.plot, vp=viewport(layout.pos.row=8, layout.pos.col=3))
+grid.text("P", x=unit(0.045, "npc"), vp=viewport(layout.pos.row=7, layout.pos.col=4),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(iba.shannon.plot, vp=viewport(layout.pos.row=8, layout.pos.col=4))
+
+
+grid.text("Q", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=9, layout.pos.col=1),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(spr.otu.plot, vp=viewport(layout.pos.row=10, layout.pos.col=1))
+grid.text("R", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=9, layout.pos.col=2),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(spr.pd.plot, vp=viewport(layout.pos.row=10, layout.pos.col=2))
+grid.text("S", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=9, layout.pos.col=3),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(spr.mpd.plot, vp=viewport(layout.pos.row=10, layout.pos.col=3))
+grid.text("T", x=unit(0.045, "npc"), vp=viewport(layout.pos.row=9, layout.pos.col=4),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(spr.shannon.plot, vp=viewport(layout.pos.row=10, layout.pos.col=4))
+dev.off()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Beta Div - Summer Wild
 ```{r}
 ########## Weighted UniFrac ##########
