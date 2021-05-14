@@ -1,0 +1,13 @@
+Comparison,SIMPER,OTU,krusk_p.val,fdr_krusk_p.val,Taxonomy,Left.mean.abund,Left.stdev,Right.mean.abund,Right.stdev
+Wild_Captive,0.035836038,Otu00019,0.035908282,0.086179876,Bacteroidetes - Bacteroidia - Bacteroidales - Bacteroidales_unclassified - Bacteroidales_unclassified,0.001023662,0.001984977,0.059739097,0.043063356
+Wild_Captive,0.018807167,Otu00035,0.008150972,0.032603886,Firmicutes - Bacilli - Lactobacillales - Lactobacillaceae - Lactobacillus,0.000736585,0.000997948,0.031704617,0.027997115
+Wild_Captive,0.018681396,Otu00027,0.702870783,0.766768127,Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_NK4A136_group,0.002898016,0.003370275,0.030373128,0.072924305
+Wild_Captive,0.017005909,Otu00003,0.849768971,0.849768971,Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified,0.003252975,0.003585442,0.028213393,0.0382157
+Wild_Captive,0.016483945,Otu00017,0.181853988,0.242471984,Firmicutes - Clostridia - Clostridiales - Ruminococcaceae - Ruminococcus_1,0.000800952,0.000736208,0.027485862,0.030233608
+Wild_Captive,0.015470801,Otu00119,0.002181432,0.026177182,Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified,0.025474345,0.020966132,0,0
+Wild_Captive,0.014902044,Otu00111,0.028609796,0.085829389,Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified,0.024544374,0.031760571,1.31E-05,3.47E-05
+Wild_Captive,0.014013414,Otu00055,0.257017896,0.308421476,Bacteroidetes - Bacteroidia - Bacteroidales - Prevotellaceae - Prevotellaceae_UCG-003,0.023496438,0.021735769,0.012111529,0.020756593
+Wild_Captive,0.012877626,Otu00096,0.006768741,0.032603886,Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified,0.021494617,0.021993799,0.000290214,0.000471308
+Wild_Captive,0.0114524,Otu00134,0.14925661,0.223884914,Bacteroidetes - Bacteroidia - Bacteroidales - Muribaculaceae - Muribaculaceae_ge,0,0,0.018857615,0.027582889
+Wild_Captive,0.010474383,Otu00060,0.07993602,0.147544402,Firmicutes - Clostridia - Clostridiales - Lachnospiraceae - Lachnospiraceae_unclassified,0,0,0.017247204,0.025289438
+Wild_Captive,0.01030489,Otu00140,0.086067568,0.147544402,Firmicutes - Clostridia - Clostridiales - Ruminococcaceae - Ruminiclostridium_6,0.01721628,0.029656496,0.001361687,0.002568135
