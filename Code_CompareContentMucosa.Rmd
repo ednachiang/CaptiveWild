@@ -1307,7 +1307,7 @@ uniq.otus.iba.sum <- uniq.otus.iba %>%
 uniq.otus.iba.sum$YMAX <- uniq.otus.iba.sum$Mean + uniq.otus.iba.sum$SE
 uniq.otus.iba.sum$YMIN <- uniq.otus.iba.sum$Mean - uniq.otus.iba.sum$SE
 
-otu.ann <- data.frame(lab = c("ns", " "), Sample_Type = faciba(c("Content", "Mucosa")))
+otu.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
 
 iba.otu.plot <- ggplot(uniq.otus.iba, aes(x = Sample_Type, y = Unique_OTUs, fill = Sample_Type)) +
   geom_violin() +
@@ -1349,7 +1349,7 @@ pd.iba.sum$YMAX <- pd.iba.sum$Mean + pd.iba.sum$SE
 pd.iba.sum$YMIN <- pd.iba.sum$Mean - pd.iba.sum$SE
 
 
-pd.ann <- data.frame(lab = c("ns", " "), Sample_Type = faciba(c("Content", "Mucosa")))
+pd.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
 
 iba.pd.plot <- ggplot(pd.iba.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
   geom_violin() + 
@@ -1388,7 +1388,7 @@ mpd.iba.sum <- mpd.iba.ready %>%
 mpd.iba.sum$YMAX <- mpd.iba.sum$Mean + mpd.iba.sum$SE
 mpd.iba.sum$YMIN <- mpd.iba.sum$Mean - mpd.iba.sum$SE
 
-mpd.ann <- data.frame(lab = c("ns", " "), Sample_Type = faciba(c("Content", "Mucosa")))
+mpd.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
 
 iba.mpd.plot <- ggplot(mpd.iba.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
   geom_violin() +
@@ -1427,7 +1427,7 @@ shannon.iba.sum <- adiv.iba %>%
 shannon.iba.sum$YMAX <- shannon.iba.sum$Mean + shannon.iba.sum$SE
 shannon.iba.sum$YMIN <- shannon.iba.sum$Mean - shannon.iba.sum$SE
 
-shannon.ann <- data.frame(lab = c("ns", " "), Sample_Type = faciba(c("Content", "Mucosa")))
+shannon.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
 
 
 iba.shannon.plot <- ggplot(adiv.iba, aes(x = Sample_Type, y = shannon, fill = Sample_Type)) +
@@ -1473,7 +1473,7 @@ uniq.otus.spr.sum <- uniq.otus.spr %>%
 uniq.otus.spr.sum$YMAX <- uniq.otus.spr.sum$Mean + uniq.otus.spr.sum$SE
 uniq.otus.spr.sum$YMIN <- uniq.otus.spr.sum$Mean - uniq.otus.spr.sum$SE
 
-otu.ann <- data.frame(lab = c("ns", " "), Sample_Type = facspr(c("Content", "Mucosa")))
+otu.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
 
 spr.otu.plot <- ggplot(uniq.otus.spr, aes(x = Sample_Type, y = Unique_OTUs, fill = Sample_Type)) +
   geom_violin() +
@@ -1515,7 +1515,7 @@ pd.spr.sum$YMAX <- pd.spr.sum$Mean + pd.spr.sum$SE
 pd.spr.sum$YMIN <- pd.spr.sum$Mean - pd.spr.sum$SE
 
 
-pd.ann <- data.frame(lab = c("ns", " "), Sample_Type = facspr(c("Content", "Mucosa")))
+pd.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
 
 spr.pd.plot <- ggplot(pd.spr.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
   geom_violin() + 
@@ -1554,7 +1554,7 @@ mpd.spr.sum <- mpd.spr.ready %>%
 mpd.spr.sum$YMAX <- mpd.spr.sum$Mean + mpd.spr.sum$SE
 mpd.spr.sum$YMIN <- mpd.spr.sum$Mean - mpd.spr.sum$SE
 
-mpd.ann <- data.frame(lab = c("ns", " "), Sample_Type = facspr(c("Content", "Mucosa")))
+mpd.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
 
 spr.mpd.plot <- ggplot(mpd.spr.ready, aes(x = Sample_Type, y = Stat, fill = Sample_Type)) +
   geom_violin() +
@@ -1593,7 +1593,7 @@ shannon.spr.sum <- adiv.spr %>%
 shannon.spr.sum$YMAX <- shannon.spr.sum$Mean + shannon.spr.sum$SE
 shannon.spr.sum$YMIN <- shannon.spr.sum$Mean - shannon.spr.sum$SE
 
-shannon.ann <- data.frame(lab = c("ns", " "), Sample_Type = facspr(c("Content", "Mucosa")))
+shannon.ann <- data.frame(lab = c("ns", " "), Sample_Type = factor(c("Content", "Mucosa")))
 
 
 spr.shannon.plot <- ggplot(adiv.spr, aes(x = Sample_Type, y = shannon, fill = Sample_Type)) +
@@ -1626,7 +1626,7 @@ spr.shannon.plot <- ggplot(adiv.spr, aes(x = Sample_Type, y = shannon, fill = Sa
 
 ### Plot - Alpha-Diversity
 ```{r}
-tiff("ConMuc.adiv.tiff", width = 170, height = 300, units = "mm", res = 600)
+tiff("ConMuc.adiv.tiff", width = 170, height = 225, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(10,4, widths = c(1, 1, 1, 1.4),
                                          heights = c(0.07,1.5,0.07,1.5,0.07,1.5,0.07,1.5,0.07,1.5))))
