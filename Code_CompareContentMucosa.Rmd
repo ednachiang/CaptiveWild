@@ -1729,7 +1729,6 @@ dev.off()
 ```{r}
 ########## Weighted UniFrac ##########
 UF.w.wild <- phyloseq::distance(physeq = physeq.wild, method = "wunifrac")
-UF.w.wild.pcoa <- ordinate(physeq = physeq.wild, method = "PCoA", distance = "wunifrac")
 
 sampdf <- data.frame(sample_data(physeq.wild))
 beta.tax <- betadisper(d=UF.w.wild, group=sampdf$Sample_Type)
@@ -1746,7 +1745,6 @@ adonis(UF.w.wild ~ ID + Sample_Type, data = sampdf, permutations = 9999)
 
 ########## Unweighted UniFrac ##########
 UF.u.wild <- phyloseq::distance(physeq = physeq.wild, method = "unifrac")
-UF.u.wild.pcoa <- ordinate(physeq = physeq.wild, method = "PCoA", distance = "unifrac")
 
 sampdf <- data.frame(sample_data(physeq.wild))
 beta.tax <- betadisper(d=UF.u.wild, group=sampdf$Sample_Type)
@@ -1761,8 +1759,6 @@ adonis(UF.u.wild ~ ID + Sample_Type, data = sampdf, permutations = 9999)
 
 
 ########## Bray-Curtis ##########
-bray.wild.pcoa <- ordinate(physeq=physeq.wild, method="PCoA", distance="bray")
-
 sampdf <- data.frame(sample_data(physeq.wild))
 bray.wild <- phyloseq::distance(physeq = physeq.wild, method = "bray")
 beta.tax <- betadisper(d = bray.wild, group = sampdf$Sample_Type)
@@ -2008,4 +2004,470 @@ p.adjust(c(0.01667,0.60556,0.05,0.6056,0.05556,0.60556, # Summer Wild
   # IBA = 0.0540000 0.9638000 0.0626250 0.9638000 0.0060000 0.9638000
   # Spring = 0.4583571 0.9205714 0.1389000 0.9124950 0.4583571 0.9394091
 
+```
+### Beta Div - Summer Wild - Prepare Plots
+```{r}
+### Weighted UniFrac ###
+UF.w.wild <- phyloseq::distance(physeq = physeq.wild, method = "wunifrac")
+UF.w.wild.pcoa <- ordinate(physeq = physeq.wild, method = "PCoA", distance = "wunifrac")
+  # Variation explained = 89.7%
+
+wild.wUF.plot <- plot_ordination(physeq = physeq.wild, ordination = UF.w.wild.pcoa, axes = c(1,2),
+                                 color = "Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("Summer Wild\nWeighted UniFrac") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.title = element_text(face = "bold", size = 8),
+        legend.position = "none"
+        )
+
+
+
+### Unweighted UniFrac ###
+UF.u.wild <- phyloseq::distance(physeq = physeq.wild, method = "unifrac")
+UF.u.wild.pcoa <- ordinate(physeq = physeq.wild, method = "PCoA", distance = "unifrac")
+  # Variation explained = 78.1%
+
+wild.uUF.plot <- plot_ordination(physeq = physeq.wild, ordination = UF.u.wild.pcoa, axes = c(1,2),
+                                 color = "Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("Summer Wild\nUnweighted UniFrac") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.title = element_text(face = "bold", size = 8),
+        legend.position = "none"
+        )
+
+
+
+### Bray-Curtis ###
+bray.wild.pcoa <- ordinate(physeq=physeq.wild, method="PCoA", distance="bray")
+  # Variation explained = 92.6%
+wild.bc.plot <- plot_ordination(physeq=physeq.wild, ordination=bray.wild.pcoa, color="Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("Summer Wild\nBray-Curtis Dissimilarity") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.position = "none"
+        #legend.title = element_text(size = 8, face = "bold"),
+        #legend.text = element_text(size = 8),
+        #legend.key.height = unit(4, 'mm'),
+        #legend.box.margin=margin(-10,-10,-10,-10)
+        )
+```
+
+### Beta Div - Summer Captive - Prepare Plots
+```{r}
+### Weighted UniFrac ###
+UF.w.sum <- phyloseq::distance(physeq = physeq.sum, method = "wunifrac")
+UF.w.sum.pcoa <- ordinate(physeq = physeq.sum, method = "PCoA", distance = "wunifrac")
+  # Variation explained = 50.9%
+
+sum.wUF.plot <- plot_ordination(physeq = physeq.sum, ordination = UF.w.sum.pcoa, axes = c(1,2),
+                                color = "Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("Summer Captive\nWeighted UniFrac") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.title = element_text(face = "bold", size = 8),
+        legend.position = "none"
+        )
+
+
+
+### Unweighted UniFrac ###
+UF.u.sum <- phyloseq::distance(physeq = physeq.sum, method = "unifrac")
+UF.u.sum.pcoa <- ordinate(physeq = physeq.sum, method = "PCoA", distance = "unifrac")
+  # Variation explained = 47%
+
+sum.uUF.plot <- plot_ordination(physeq = physeq.sum, ordination = UF.u.sum.pcoa, axes = c(1,2),
+                                color = "Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("Summer Captive\nUnweighted UniFrac") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.title = element_text(face = "bold", size = 8),
+        legend.position = "none"
+        )
+
+
+
+### Bray-Curtis ###
+bray.sum.pcoa <- ordinate(physeq=physeq.sum, method="PCoA", distance="bray")
+  # Variation explained = 48.9%
+
+sum.bc.plot <- plot_ordination(physeq=physeq.sum, ordination=bray.sum.pcoa, color="Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("Summer Captive\nBray-Curtis Dissimilarity") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.position = "none"
+        #legend.title = element_text(size = 8, face = "bold"),
+        #legend.text = element_text(size = 8),
+        #legend.key.height = unit(4, 'mm'),
+        #legend.box.margin=margin(-10,-10,-10,-10)
+        )
+
+```
+
+### Beta Div - Torpor - Prepare Plots
+```{r}
+### Weighted UniFrac ###
+UF.w.tor <- phyloseq::distance(physeq = physeq.tor, method = "wunifrac")
+UF.w.tor.pcoa <- ordinate(physeq = physeq.tor, method = "PCoA", distance = "wunifrac")
+  # Variation explained = 75.8%
+
+tor.wUF.plot <- plot_ordination(physeq = physeq.tor, ordination = UF.w.tor.pcoa, axes = c(1,2),
+                                color = "Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("Torpor\nWeighted UniFrac") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.title = element_text(face = "bold", size = 8),
+        legend.position = "none"
+        )
+
+
+
+### Unweighted UniFrac ###
+UF.u.tor <- phyloseq::distance(physeq = physeq.tor, method = "unifrac")
+UF.u.tor.pcoa <- ordinate(physeq = physeq.tor, method = "PCoA", distance = "unifrac")
+  # Variation explained = 56.1%
+
+tor.uUF.plot <- plot_ordination(physeq = physeq.tor, ordination = UF.u.tor.pcoa, axes = c(1,2),
+                                color = "Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("Torpor\nUnweighted UniFrac") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.title = element_text(face = "bold", size = 8),
+        legend.position = "none"
+        )
+
+
+
+### Bray-Curtis ###
+bray.tor.pcoa <- ordinate(physeq=physeq.tor, method="PCoA", distance="bray")
+  # Variation explained = 69.7%
+
+tor.bc.plot <- plot_ordination(physeq=physeq.tor, ordination=bray.tor.pcoa, color="Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("Torpor\nBray-Curtis Dissimilarity") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.position = "none"
+        #legend.title = element_text(size = 8, face = "bold"),
+        #legend.text = element_text(size = 8),
+        #legend.key.height = unit(4, 'mm'),
+        #legend.box.margin=margin(-10,-10,-10,-10)
+        )
+
+```
+
+
+### Beta Div - IBA - Prepare Plots
+```{r}
+### Weighted UniFrac ###
+UF.w.iba <- phyloseq::distance(physeq = physeq.iba, method = "wunifrac")
+UF.w.iba.pcoa <- ordinate(physeq = physeq.iba, method = "PCoA", distance = "wunifrac")
+  # Variation explained = 64.2%
+
+iba.wUF.plot <- plot_ordination(physeq = physeq.iba, ordination = UF.w.iba.pcoa, axes = c(1,2),
+                                color = "Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("IBA\nWeighted UniFrac") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.title = element_text(face = "bold", size = 8),
+        legend.position = "none"
+        )
+
+
+
+### Unweighted UniFrac ###
+UF.u.iba <- phyloseq::distance(physeq = physeq.iba, method = "unifrac")
+UF.u.iba.pcoa <- ordinate(physeq = physeq.iba, method = "PCoA", distance = "unifrac")
+  # Variation explained = 41.2%
+
+iba.uUF.plot <- plot_ordination(physeq = physeq.iba, ordination = UF.u.iba.pcoa, axes = c(1,2),
+                                color = "Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("IBA\nUnweighted UniFrac") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.title = element_text(face = "bold", size = 8),
+        legend.position = "none"
+        )
+
+
+
+### Bray-Curtis ###
+bray.iba.pcoa <- ordinate(physeq=physeq.iba, method="PCoA", distance="bray")
+  # Variation explained = 61.6%
+iba.bc.plot <- plot_ordination(physeq=physeq.iba, ordination=bray.iba.pcoa, color="Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("IBA\nBray-Curtis Dissimilarity") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.position = "none"
+        #legend.title = element_text(size = 8, face = "bold"),
+        #legend.text = element_text(size = 8),
+        #legend.key.height = unit(4, 'mm'),
+        #legend.box.margin=margin(-10,-10,-10,-10)
+        )
+
+```
+
+
+
+### Beta Div - Spring - Prepare Plots
+```{r}
+### Weighted UniFrac ###
+UF.w.spr <- phyloseq::distance(physeq = physeq.spr, method = "wunifrac")
+UF.w.spr.pcoa <- ordinate(physeq = physeq.spr, method = "PCoA", distance = "wunifrac")
+  # Variation explained = 91.5%
+
+spr.wUF.plot <- plot_ordination(physeq = physeq.spr, ordination = UF.w.spr.pcoa, axes = c(1,2),
+                                color = "Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("Spring\nWeighted UniFrac") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.title = element_text(face = "bold", size = 8),
+        legend.position = "none"
+        )
+
+
+
+### Unweighted UniFrac ###
+UF.u.spr <- phyloseq::distance(physeq = physeq.spr, method = "unifrac")
+UF.u.spr.pcoa <- ordinate(physeq = physeq.spr, method = "PCoA", distance = "unifrac")
+  # Variation explained = 86%
+
+spr.uUF.plot <- plot_ordination(physeq = physeq.spr, ordination = UF.u.spr.pcoa, axes = c(1,2),
+                color = "Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("Spring\nUnweighted UniFrac") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.title = element_text(face = "bold", size = 8),
+        legend.position = "none"
+        )
+
+
+
+### Bray-Curtis ###
+bray.spr.pcoa <- ordinate(physeq=physeq.spr, method="PCoA", distance="bray")
+  # Variation explained = 91.7%
+
+spr.bc.plot <- plot_ordination(physeq=physeq.spr, ordination=bray.spr.pcoa, color="Sample_Type") +
+  scale_colour_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
+  labs(color = "Sample Type") + ggtitle("Spring\nBray-Curtis Dissimilarity") +
+  geom_point(size = 3) + geom_point(size=3, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 6),
+        axis.title.y = element_text(size = 6),
+        axis.text.x = element_text(size = 6, colour = "black"),
+        axis.text.y = element_text(size = 6, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 8, face = "bold"),
+        legend.position = "none"
+        #legend.title = element_text(size = 8, face = "bold"),
+        #legend.text = element_text(size = 8),
+        #legend.key.height = unit(4, 'mm'),
+        #legend.box.margin=margin(-10,-10,-10,-10)
+        )
+
+```
+
+
+
+### Plot - Beta-Diversity
+```{r}
+tiff("ConMuc.bdiv.tiff", width = 170, height = 225, units = "mm", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=grid.layout(10,4, widths = c(1, 1, 1, 0.4), heights = c(0.04, 1,0.03,1,0.03,1,0.03,1,0.03,1))))
+
+print(wild.wUF.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+print(wild.uUF.plot, vp=viewport(layout.pos.row=2, layout.pos.col=2))
+print(wild.bc.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
+
+print(sum.wUF.plot, vp=viewport(layout.pos.row=4, layout.pos.col=1))
+print(sum.uUF.plot, vp=viewport(layout.pos.row=4, layout.pos.col=2))
+print(sum.bc.plot, vp=viewport(layout.pos.row=4, layout.pos.col=3))
+
+print(tor.wUF.plot, vp=viewport(layout.pos.row=6, layout.pos.col=1))
+print(tor.uUF.plot, vp=viewport(layout.pos.row=6, layout.pos.col=2))
+print(tor.bc.plot, vp=viewport(layout.pos.row=6, layout.pos.col=3))
+
+print(iba.wUF.plot, vp=viewport(layout.pos.row=8, layout.pos.col=1))
+print(iba.uUF.plot, vp=viewport(layout.pos.row=8, layout.pos.col=2))
+print(iba.bc.plot, vp=viewport(layout.pos.row=8, layout.pos.col=3))
+
+print(spr.wUF.plot, vp=viewport(layout.pos.row=10, layout.pos.col=1))
+print(spr.uUF.plot, vp=viewport(layout.pos.row=10, layout.pos.col=2))
+print(spr.bc.plot, vp=viewport(layout.pos.row=10, layout.pos.col=3))
+
+
+
+ord.legend$vp <- viewport(layout.pos.row = 2, layout.pos.col = 4)
+grid.draw(ord.legend)
+ord.legend$vp <- viewport(layout.pos.row = 4, layout.pos.col = 4)
+grid.draw(ord.legend)
+ord.legend$vp <- viewport(layout.pos.row = 6, layout.pos.col = 4)
+grid.draw(ord.legend)
+ord.legend$vp <- viewport(layout.pos.row = 8, layout.pos.col = 4)
+grid.draw(ord.legend)
+ord.legend$vp <- viewport(layout.pos.row = 10, layout.pos.col = 4)
+grid.draw(ord.legend)
+
+
+
+grid.text("A", x=unit(0.05, "npc"), y=unit(0.2, "npc"), vp=viewport(layout.pos.row=1,
+                                                                  layout.pos.col=1),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("B", x=unit(0.05, "npc"),  y=unit(0.2, "npc"), vp=viewport(layout.pos.row=1,
+                                                                   layout.pos.col=2),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("C", x=unit(0.05, "npc"),  y=unit(0.2, "npc"), vp=viewport(layout.pos.row=1,
+                                                                   layout.pos.col=3),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("D", x=unit(0.05, "npc"), y=unit(0.2, "npc"), vp=viewport(layout.pos.row=3,
+                                                                  layout.pos.col=1),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("E", x=unit(0.05, "npc"),  y=unit(0.2, "npc"), vp=viewport(layout.pos.row=3,
+                                                                   layout.pos.col=2),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("F", x=unit(0.05, "npc"),  y=unit(0.2, "npc"), vp=viewport(layout.pos.row=3,
+                                                                   layout.pos.col=3),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("G", x=unit(0.05, "npc"), y=unit(0.2, "npc"), vp=viewport(layout.pos.row=5,
+                                                                  layout.pos.col=1),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("H", x=unit(0.05, "npc"),  y=unit(0.2, "npc"), vp=viewport(layout.pos.row=5,
+                                                                   layout.pos.col=2),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("I", x=unit(0.05, "npc"),  y=unit(0.2, "npc"), vp=viewport(layout.pos.row=5,
+                                                                   layout.pos.col=3),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("J", x=unit(0.05, "npc"), y=unit(0.2, "npc"), vp=viewport(layout.pos.row=7,
+                                                                  layout.pos.col=1),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("K", x=unit(0.05, "npc"),  y=unit(0.2, "npc"), vp=viewport(layout.pos.row=7,
+                                                                   layout.pos.col=2),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("L", x=unit(0.05, "npc"),  y=unit(0.2, "npc"), vp=viewport(layout.pos.row=7,
+                                                                   layout.pos.col=3),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("M", x=unit(0.05, "npc"), y=unit(0.2, "npc"), vp=viewport(layout.pos.row=9,
+                                                                  layout.pos.col=1),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("N", x=unit(0.05, "npc"),  y=unit(0.2, "npc"), vp=viewport(layout.pos.row=9,
+                                                                   layout.pos.col=2),
+          gp=gpar(fontsize=10,fontface="bold"))
+grid.text("O", x=unit(0.05, "npc"),  y=unit(0.2, "npc"), vp=viewport(layout.pos.row=9,
+                                                                   layout.pos.col=3),
+          gp=gpar(fontsize=10,fontface="bold"))
+
+dev.off()
 ```
