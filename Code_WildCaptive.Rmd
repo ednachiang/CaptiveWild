@@ -1269,6 +1269,189 @@ p.adjust(c(0.00003348,0.00011150,0.30270000,0.61380000), method = "fdr")
 ```
 
 
+### Content - Alpha-Diversity Prepare Plots
+```{r}
+###### Unique # of OTUs ######
+
+# Prepare data for plot
+uniq.otus.muc.sum <- uniq.otus.muc %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Unique_OTUs),
+            SE = se(Unique_OTUs),
+            SD = sd(Unique_OTUs),
+            Median = median(Unique_OTUs))
+uniq.otus.muc.sum$YMAX <- uniq.otus.muc.sum$Mean + uniq.otus.muc.sum$SE
+uniq.otus.muc.sum$YMIN <- uniq.otus.muc.sum$Mean - uniq.otus.muc.sum$SE
+
+otu.muc.ann <- data.frame(lab = c("*", " "), Group = factor(c("Summer_Captive", "Summer_Wild")))
+
+muc.otu.plot <- ggplot(uniq.otus.muc, aes(x = Group, y = Unique_OTUs, fill = Group)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("#e60000", "#ec9393"), labels = c("Captive", "Wild")) +
+  scale_y_continuous(limits = c(280,760), breaks = c(280,400,520,640,760)) +
+  scale_x_discrete(labels = c("Captive", "Wild")) +
+  ylab("Number of Unique OTUs") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        legend.position = "none") +
+  geom_text(data = otu.muc.ann, aes(label=lab), x=c(1.5,0),
+            y=c(760,0), size=5, color="black")
+
+
+
+
+
+
+###### Faith's Phylogenetic Diversity ######
+
+# Prepare PD ###
+pd.muc.sum <- pd.muc.ready %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.muc.sum$YMAX <- pd.muc.sum$Mean + pd.muc.sum$SE
+pd.muc.sum$YMIN <- pd.muc.sum$Mean - pd.muc.sum$SE
+
+
+pd.muc.ann <- data.frame(lab = c("*", " "), Diet = factor(c("Captive", "Wild")))
+
+muc.pd.plot <- ggplot(pd.muc.ready, aes(x = Diet, y = Stat, fill = Diet)) +
+  geom_violin() + 
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("#e60000", "#ec9393"), labels = c("Captive", "Wild")) +
+  scale_y_continuous(limits = c(17,38), breaks = c(17,24,31,38)) +
+  ylab("Faith's Phylogenetic Diversity") + xlab("Group") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        legend.position = "none") +
+  geom_text(data = pd.muc.ann, aes(label=lab), x=c(1.5,0),
+            y=c(38,0), size=5, color="black")
+  
+  
+
+        
+###### Phylogenetic Evenness (MPD) ######
+
+# Prepare MPD
+mpd.muc.sum <- mpd.muc.ready %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.muc.sum$YMAX <- mpd.muc.sum$Mean + mpd.muc.sum$SE
+mpd.muc.sum$YMIN <- mpd.muc.sum$Mean - mpd.muc.sum$SE
+
+mpd.muc.ann <- data.frame(lab = c("ns", " "), Diet = factor(c("Captive", "Wild")))
+
+muc.mpd.plot <- ggplot(mpd.muc.ready, aes(x = Diet, y = Stat, fill = Diet)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("#e60000", "#ec9393"), labels = c("Captive", "Wild")) +
+  scale_y_continuous(limits = c(-4.6,3.8), breaks = c(-4.6,-2.5,-0.4,1.7,3.8)) +
+  scale_x_discrete(labels = c("Captive", "Wild")) +
+  ylab("Phylogenetic Evenness (MPD)") + xlab("Group") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        legend.position = "none") +
+  geom_text(data = mpd.muc.ann, aes(label=lab), x=c(1.5,0),
+            y=c(3.8,0), size=2.5, color="black")
+  
+
+        
+
+###### Shannon's Diversity #####      
+
+# Prepare data for plot
+shannon.muc.sum <- adiv.muc %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(shannon),
+            SE = se(shannon),
+            SD = sd(shannon),
+            Median = median(shannon))
+shannon.muc.sum$YMAX <- shannon.muc.sum$Mean + shannon.muc.sum$SE
+shannon.muc.sum$YMIN <- shannon.muc.sum$Mean - shannon.muc.sum$SE
+
+shannon.muc.ann <- data.frame(lab = c("ns", " "), Group = factor(c("Summer_Captive", "Summer_Wild")))
+
+
+muc.shannon.plot <- ggplot(adiv.muc, aes(x = Group, y = shannon, fill = Group)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("#e60000", "#ec9393"), labels = c("Captive", "Wild")) +
+  scale_y_continuous(limits = c(1.4,5.8), breaks = c(1.4,2.5,3.6,4.7,5.8)) +
+  scale_x_discrete(labels = c("Captive", "Wild")) +
+  ylab("Shannon's Diversity") +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        legend.title = element_text(face="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6),
+        axis.text.y = element_text(size=6),
+        legend.text = element_text(size=6),
+        legend.key.height = unit(3, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10)) +
+  geom_text(data = shannon.muc.ann, aes(label=lab), x=c(1.5,0),
+            y=c(5.8,0), size=2.5, color="black")
+
+
+
+
+```
+
+
+### Content - Plot - Alpha-Diversity
+```{r}
+tiff("wild.captive.muc.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
+grid.text("A", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(muc.otu.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+grid.text("B", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(muc.pd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=2))
+grid.text("C", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=3),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(muc.mpd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
+grid.text("D", x=unit(0.045, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(muc.shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
+dev.off()
+```
+
+
+
+
 ### Mucosa - Beta Diversity
 ```{r}
 
