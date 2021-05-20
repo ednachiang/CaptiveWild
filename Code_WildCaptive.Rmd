@@ -784,18 +784,6 @@ grid.text("ANOSIM adj P = 0.020", x=unit(0.44, "npc"),  y=unit(0.19, "npc"), vp=
 ```
 ### Content - Simper
 ```{r}
-# Change Group names to be compatible (no "_")
-#rename <- data.frame(sample_data(phy.con))
-#rename$GroupRename <- rep(NA, nrow(rename))
-#sum.rename$GroupRename[which(sum.rename$Group == "Summer_Wild")] <- "SummerWild"
-#sum.rename$GroupRename[which(sum.rename$Group == "Summer_Lab")] <- "SummerLab"
-#sum.rename$GroupRename[which(sum.rename$Group == "Torpor")] <- "Torpor"
-#sum.rename$GroupRename[which(sum.rename$Group == "IBA")] <- "IBA"
-#sum.rename$GroupRename[which(sum.rename$Group == "Spring")] <- "Spring"
-#sum.rename$GroupRename <- ordered(sum.rename$GroupRename, levels = c("SummerWild", "SummerLab", "Torpor", "IBA", "Spring"))
-#physeq.simp <- merge_phyloseq(otu_table(physeq), sample_data(sum.rename), tax_table(physeq))
-
-
 # Group
 #simper.pretty(data.frame(otu_table(phy.con)),
               data.frame(sample_data(phy.con)),
@@ -823,7 +811,7 @@ kruskal.pretty(data.frame(otu_table(phy.con)),
 #group.simper.kw <- read.csv("wild.captive.con_clean_simper.csv", row.names = 1)
 ```
 
-### Content - Core OTUs
+### Content & Mucosa - Core OTUs
 ```{r}
 ### Subset out group + sample type
 phy.wild.con <- subset_samples(phy.con, Diet == "Wild")
@@ -898,8 +886,10 @@ intersect(rownames(wild.core), rownames(sum.core))
 
 
 ### Physeq object with only core OTUs
-#phy.core <- merge_phyloseq(phy.wild.core, phy.sum.core, phy.tor.core, phy.iba.core, phy.spr.core)
-#write.csv(data.frame(tax_table(phy.core)), "coreOTUs.csv")
+phy.con.core <- merge_phyloseq(phy.wild.con.core, phy.sum.con.core)
+#write.csv(data.frame(tax_table(phy.con.core)), "WildCaptive.con.coreOTUs.csv")
+phy.muc.core <- merge_phyloseq(phy.wild.muc.core, phy.sum.muc.core)
+#write.csv(data.frame(tax_table(phy.muc.core)), "WildCaptive.muc.coreOTUs.csv")
 ```
 
 
@@ -1631,41 +1621,29 @@ grid.text("ANOSIM adj P = 0.005", x=unit(0.44, "npc"),  y=unit(0.19, "npc"), vp=
 
 ### Mucosa - Simper
 ```{r}
-# Change Group names to be compatible (no "_")
-#rename <- data.frame(sample_data(phy.muc))
-#rename$GroupRename <- rep(NA, nrow(rename))
-#sum.rename$GroupRename[which(sum.rename$Group == "Summer_Wild")] <- "SummerWild"
-#sum.rename$GroupRename[which(sum.rename$Group == "Summer_Lab")] <- "SummerLab"
-#sum.rename$GroupRename[which(sum.rename$Group == "Torpor")] <- "Torpor"
-#sum.rename$GroupRename[which(sum.rename$Group == "IBA")] <- "IBA"
-#sum.rename$GroupRename[which(sum.rename$Group == "Spring")] <- "Spring"
-#sum.rename$GroupRename <- ordered(sum.rename$GroupRename, levels = c("SummerWild", "SummerLab", "Torpor", "IBA", "Spring"))
-#physeq.simp <- merge_phyloseq(otu_table(physeq), sample_data(sum.rename), tax_table(physeq))
-
-
 # Group
-#simper.pretty(data.frame(otu_table(phy.muc)),
+simper.pretty(data.frame(otu_table(phy.muc)),
               data.frame(sample_data(phy.muc)),
               c("Diet"),
               perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
               output_name='wild.captive.muc')
-group.simper <- read.csv("wild.captive.muc_clean_simper.csv")
-#kruskal.pretty(data.frame(otu_table(phy.muc)),
+group.muc.simper <- read.csv("wild.captive.muc_clean_simper.csv")
+kruskal.pretty(data.frame(otu_table(phy.muc)),
                data.frame(sample_data(phy.muc)),
-               csv = group.simper,
+               csv = group.muc.simper,
                c("Diet"),
                output_name = 'wild.captive.muc',
                taxonomy = data.frame(tax_table(phy.muc)))
-group.simper.kw <- read.csv("wild.captive.muc_krusk_simper.csv")
-#for(i in 1:nrow(group.simper.kw)){
-  save <- which(rownames(data.frame(tax_table(phy.muc))) == group.simper.kw$OTU[i])
-  group.simper.kw$Taxonomy[i] <-
+group.muc.simper.kw <- read.csv("wild.captive.muc_krusk_simper.csv")
+for(i in 1:nrow(group.muc.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(phy.muc))) == group.muc.simper.kw$OTU[i])
+  group.muc.simper.kw$Taxonomy[i] <-
     paste(data.frame(tax_table(phy.muc))[save,2], "-",
           data.frame(tax_table(phy.muc))[save,3], "-",
           data.frame(tax_table(phy.muc))[save,4], "-",
           data.frame(tax_table(phy.muc))[save,5], "-",
           data.frame(tax_table(phy.muc))[save,6])
 }
-#write.table(group.simper.kw, "wild.captive.muc_krusk_simper.csv", sep=",")
-#group.simper.kw <- read.csv("wild.captive.muc_clean_simper.csv", row.names = 1)
+#write.table(group.muc.simper.kw, "wild.captive.muc_krusk_simper.csv", sep=",")
+#group.muc.simper.kw <- read.csv("wild.captive.muc_clean_simper.csv", row.names = 1)
 ```
