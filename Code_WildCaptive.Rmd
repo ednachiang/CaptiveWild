@@ -770,6 +770,16 @@ grid.text("C", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos
                                                                    layout.pos.col=1),
           gp=gpar(fontsize=12,fontface="bold"))
 
+
+grid.text("betadisper adj P = 0.006", x=unit(0.47, "npc"),  y=unit(0.24, "npc"), vp=viewport(layout.pos.row=1,layout.pos.col=2),gp=gpar(fontsize=7))
+grid.text("ANOSIM adj P = 0.186", x=unit(0.44, "npc"),  y=unit(0.19, "npc"), vp=viewport(layout.pos.row=1,layout.pos.col=2),gp=gpar(fontsize=7))
+
+grid.text("betadisper adj P = 0.006", x=unit(0.47, "npc"),  y=unit(0.24, "npc"), vp=viewport(layout.pos.row=2,layout.pos.col=2),gp=gpar(fontsize=7))
+grid.text("ANOSIM adj P = 0.019", x=unit(0.44, "npc"),  y=unit(0.19, "npc"), vp=viewport(layout.pos.row=2,layout.pos.col=2),gp=gpar(fontsize=7))
+
+grid.text("betadisper adj P = 0.006", x=unit(0.47, "npc"),  y=unit(0.24, "npc"), vp=viewport(layout.pos.row=3,layout.pos.col=2),gp=gpar(fontsize=7))
+grid.text("ANOSIM adj P = 0.020", x=unit(0.44, "npc"),  y=unit(0.19, "npc"), vp=viewport(layout.pos.row=3,layout.pos.col=2),gp=gpar(fontsize=7))
+
 #dev.off()
 ```
 ### Content - Simper
