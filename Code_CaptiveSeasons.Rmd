@@ -94,8 +94,8 @@ phy.cap <- subset_samples(phy.cap, ID != 3916)
 phy.cap <- transform_sample_counts(phy.cap, function(x){(x/sum(x))*100})
 
 # Separate by Sample Type
-phy.con <- subset_samples(phy.cap, Sample_Type = "Content")
-phy.muc <- subset_samples(phy.cap, Sample_Type = "Mucosa")
+phy.con <- subset_samples(phy.cap, Sample_Type == "Content")
+phy.muc <- subset_samples(phy.cap, Sample_Type == "Mucosa")
 
 ```
 
@@ -113,7 +113,7 @@ phy99 <- prune_taxa(taxa_sums(phy99) > 1, phy99)
 
 # View ordered phyla - most abundant --> least abundant
 # barplot(sort(taxa_sums(phy99),TRUE)[1:20]/nsamples(phy99),las=2,cex.axis=.7)
-# 11 phyla: "Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Kiritimatiellaeota", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia", "Epsilonbacteraeota"
+# 10 phyla: "Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Bacteria_unclassified", "Kiritimatiellaeota", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia"
      
 
 
@@ -127,20 +127,21 @@ hist(fir.df$RelAbund, breaks=10)
 qqnorm(fir.df$RelAbund)
 qqline(fir.df$RelAbund)
 shapiro.test(fir.df$RelAbund)
-  # p-value = 0.03218
+  # p-value = 0.02154
+  # adj P = 2.393333e-02
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=fir.df)
-  # p-value = 1.669e-07
-  # adj P = 0.0000018359
+  # p-value = 0.0004946
+  # adj P = 0.00494600 
 dunn.test(x = as.numeric(fir.df$RelAbund), g = as.factor(fir.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.000*
-  # Summer-IBA = 0.000*
-  # Summer-Spring = 0.1038
-  # Torpor-IBA = 0.4971
-  # Torpor-Spring = 0.0125*
-  # IBA-Spring = 0.0125*
+  # Summer-Torpor = 0.0012*
+  # Summer-IBA = 0.0010*
+  # Summer-Spring = 0.2662
+  # Torpor-IBA = 0.4686
+  # Torpor-Spring = 0.0501
+  # IBA-Spring = 0.0521
 
 
 
@@ -158,21 +159,23 @@ hist(bac.df$RelAbund, breaks=10)
 qqnorm(bac.df$RelAbund)
 qqline(bac.df$RelAbund)
 shapiro.test(bac.df$RelAbund)
-  # p-value = 0.4209
+  # p-value = 0.437
+  # adj P = 4.370000e-01
   # Normal
   # Sticking with Kruskal-Wallis for consistency among phyla-level comparisons
 
 # Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=bac.df)
-  # p-value = 0.001312
-  # adj P = 0.0057786667
-dunn.test(x = as.numeric(bac.df$RelAbund), g = as.factor(bac.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.0034*
-  # Summer-IBA = 0.0032*
-  # Summer-Spring = 0.0049*
-  # Torpor-IBA = 0.4981
-  # Torpor-Spring = 0.4645
-  # IBA-Spring = 0.5763
+summary(aov(formula = RelAbund ~ Group, data=bac.df))
+  # p-value = 0.0044
+  # adj P = 0.02200000
+TukeyHSD(aov(formula = RelAbund ~ Group, data=bac.df))
+  # Summer-Torpor = 0.0062170*
+  # Summer-IBA = 0.0165052*
+  # Summer-Spring = 0.1274590
+  # Torpor-IBA = 0.9425026
+  # Torpor-Spring = 0.9131470
+  # IBA-Spring = 0.9962508
+
 
 
 
@@ -187,20 +190,22 @@ hist(ver.df$RelAbund, breaks=10)
 qqnorm(ver.df$RelAbund)
 qqline(ver.df$RelAbund)
 shapiro.test(ver.df$RelAbund)
-  # p-value = 1.085e-06
+  # p-value = 0.0003558
+  # adj P = 6.095000e-04
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ver.df)
-  # p-value = 0.001576
-  # adj P = 0.0057786667
-dunn.test(x = as.numeric(ver.df$RelAbund), g = as.factor(ver.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.0520
-  # Summer-IBA = 0.0004*
-  # Summer-Spring = 0.0559
-  # Torpor-IBA = 0.0771
-  # Torpor-Spring = 0.2397
-  # IBA-Spring = 0.0559
+  # p-value = 0.04741
+  # adj P = 0.11852500
+  # NOT SIG
+#dunn.test(x = as.numeric(ver.df$RelAbund), g = as.factor(ver.df$Group), method = "bh", label = T)
+  # Summer-Torpor = 0.1625
+  # Summer-IBA = 0.0189*
+  # Summer-Spring = 0.3381
+  # Torpor-IBA = 0.1766
+  # Torpor-Spring = 0.3030
+  # IBA-Spring = 0.1517
 
 
 
@@ -216,13 +221,14 @@ hist(pro.df$RelAbund, breaks=10)
 qqnorm(pro.df$RelAbund)
 qqline(pro.df$RelAbund)
 shapiro.test(pro.df$RelAbund)
-  # p-value = 0.003095
+  # p-value = 0.003036
+  # adj P = 3.795000e-03
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=pro.df)
-  # p-value = 0.05366
-  # adj P = 0.0737825000
+  # p-value = 0.35
+  # adj P = 0.43750000
 
 
 
@@ -243,21 +249,22 @@ hist(kir.df$RelAbund, breaks=10)
 qqnorm(kir.df$RelAbund)
 qqline(kir.df$RelAbund)
 shapiro.test(kir.df$RelAbund)
-  # p-value = 1.835e-11
+  # p-value = 2.72e-08
+  # adj P = 1.370500e-07
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=kir.df)
-  # p-value = 0.03247
-  # adj P = 0.0695016667
+  # p-value = 0.01657
+  # adj P = 0.05523333
   # NOT SIG
-# dunn.test(x = as.numeric(kir.df$RelAbund), g = as.factor(kir.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.0329
-  # Summer-IBA = 0.3177
-  # Summer-Spring =0.0662
-  # Torpor-IBA = 0.0540
-  # Torpor-Spring = 0.4704
-  # IBA-Spring = 0.0976
+#dunn.test(x = as.numeric(kir.df$RelAbund), g = as.factor(kir.df$Group), method = "bh", label = T)
+  # Summer-Torpor = 0.0146*
+  # Summer-IBA = 0.2433
+  # Summer-Spring =0.0448
+  # Torpor-IBA = 0.0500
+  # Torpor-Spring = 0.4716
+  # IBA-Spring = 0.0989
 
 
 
@@ -275,24 +282,14 @@ hist(cya.df$RelAbund, breaks=10)
 qqnorm(cya.df$RelAbund)
 qqline(cya.df$RelAbund)
 shapiro.test(cya.df$RelAbund)
-  # p-value = 0.0001734
+  # p-value = 0.001164
+  # adj P = 1.662857e-03
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=cya.df)
-  # p-value = 0.03781
-  # adj P = 0.0695016667
-  # NOT SIG
-# dunn.test(x = as.numeric(cya.df$RelAbund), g = as.factor(cya.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.0841
-  # Summer-IBA = 0.2479
-  # Summer-Spring = 0.1450
-  # Torpor-IBA = 0.0297
-  # Torpor-Spring = 0.0289
-  # IBA-Spring = 0.2652
-
-
-
+  # p-value = 0.1391
+  # adj P = 0.27820000
 
 
 
@@ -308,22 +305,14 @@ hist(ten.df$RelAbund, breaks=10)
 qqnorm(ten.df$RelAbund)
 qqline(ten.df$RelAbund)
 shapiro.test(ten.df$RelAbund)
-  # p-value = 4.427e-08
+  # p-value = 1.929e-05
+  # adj P = 4.822500e-05
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ten.df)
-  # p-value = 0.04964
-  # adj P = 0.0737825000
-  # NOT SIG
-#dunn.test(x = as.numeric(ten.df$RelAbund), g = as.factor(ten.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.3766
-  # Summer-IBA = 0.0748
-  # Summer-Spring = 0.0570
-  # Torpor-IBA = 0.3766
-  # Torpor-Spring = 0.0548
-  # IBA-Spring = 0.0570
-
+  # p-value = 0.3289
+  # adj P = 0.43750000
 
 
 
@@ -339,13 +328,14 @@ hist(act.df$RelAbund, breaks=10)
 qqnorm(act.df$RelAbund)
 qqline(act.df$RelAbund)
 shapiro.test(act.df$RelAbund)
-  # p-value = 6.002e-05
+  # p-value = 0.0003657
+  # adj P = 6.095000e-04
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=act.df)
-  # p-value = 0.4614
-  # adj P = 0.4614000000
+  # p-value = 0.5082
+  # adj P = 0.56466667
 
 
 
@@ -363,44 +353,16 @@ hist(elu.df$RelAbund, breaks=10)
 qqnorm(elu.df$RelAbund)
 qqline(elu.df$RelAbund)
 shapiro.test(elu.df$RelAbund)
-  # p-value = 1.437e-11
+  # p-value = 2.741e-08
+  # adj P = 1.370500e-07 
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=elu.df)
-  # p-value = 0.03791
-  # adj P = 0.0695016667
-  # NOT SIG
-dunn.test(x = as.numeric(elu.df$RelAbund), g = as.factor(elu.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.4942
-  # Summer-IBA = 0.0841
-  # Summer-Spring = 0.0841
-  # Torpor-IBA = 0.0757
-  # Torpor-Spring = 0.1413
-  # IBA-Spring = 0.0208
+  # p-value = 0.2008
+  # adj P = 0.33466667
 
 
-
-
-
-
-##### EPSILONBACTERAEOTA #####
-eps.phy <- subset_taxa(phy99, Phylum == "Epsilonbacteraeota")
-eps.df <- data.frame(sample_data(eps.phy))
-eps.df$RelAbund <- t(data.frame(otu_table(eps.phy)))
-
-# Test normality
-hist(eps.df$RelAbund, breaks=10)
-qqnorm(eps.df$RelAbund)
-qqline(eps.df$RelAbund)
-shapiro.test(eps.df$RelAbund)
-  # p-value = 6.462e-13
-  # Not Normal
-
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=eps.df)
-  # p-value = 0.2277
-  # adj P = 0.2504700000
 
 
 
@@ -414,25 +376,31 @@ hist(unc.df$RelAbund, breaks=10)
 qqnorm(unc.df$RelAbund)
 qqline(unc.df$RelAbund)
 shapiro.test(unc.df$RelAbund)
-  # p-value = 5.443e-11
+  # p-value = 6.53e-08
+  # adj P = 2.176667e-07
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=unc.df)
-  # p-value = 0.1807
-  # adj P = 0.2208555556
+  # p-value = 0.64
+  # adj P = 0.64000000
 
 
+### P-adjust for Shapiro
+p.adjust(c(0.02154,0.437,0.0003558,0.003036,2.72e-08,0.001164,1.929e-05,0.0003657,2.741e-08,6.53e-08), method = "fdr")
+  # 2.393333e-02 4.370000e-01 6.095000e-04 3.795000e-03 1.370500e-07 1.662857e-03 4.822500e-05 6.095000e-04 1.370500e-07 2.176667e-07
 
 ### P-adjust for Kruskal-Wallis
-p.adjust(c(1.669e-07,0.001312,0.001576,0.05366,0.03247,0.03781,0.04964,0.4614,0.03791,0.2277,0.1807), method = "fdr")
-  # 0.0000018359 0.0057786667 0.0057786667 0.0737825000 0.0695016667 0.0695016667 0.0737825000 0.4614000000 0.0695016667 0.2504700000 0.2208555556
-```
+p.adjust(c(0.0004946,0.0044,0.04741,0.35,0.01657,0.1391,0.3289,0.5082,0.2008,0.64), method = "fdr")
+  # 0.00494600 0.02200000 0.11852500 0.43750000 0.05523333 0.27820000 0.43750000 0.56466667 0.33466667 0.64000000
 
 
 
-### Plot - Phyla Rel Abund Barplots
-```{r}
+
+
+
+
+
 ### Format data
 phy99.df <- psmelt(phy99)
 phy99.df$Phylum <- ordered(phy99.df$Phylum, levels = c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Kiritimatiellaeota", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia", "Epsilonbacteraeota"))
@@ -444,36 +412,12 @@ phy.sum <- phy99.df %>%
             SD = sd(Abundance),
             SE = se(Abundance),
             iqr = IQR(Abundance))
-group.renamed <- as_labeller(c(`Summer_Captive` = "Summer", `Torpor` = "Torpor", `IBA` = "IBA", `Spring` = "Spring"))
-
-### Plot
-#tiff("phyla.tiff", width=170, height=200, units="mm", res=600)
-#ggplot(phy.sum, aes(x = Phylum, y = Mean, fill = Phylum)) +
-#  facet_wrap(Group ~ ., strip.position = "top", nrow = 5, scale = "free_y",
-#             labeller = group.renamed) +
-#  geom_bar(stat = "identity", color = "black") +
-#  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), width = 0.2) +
-#  xlab("Phylum") + ylab("Relative Abundance (%)") +
-#  scale_fill_manual(values=c("#ed5e61", "#629fd0", "#ffff33", "#bd87c5", "gray60", "orange", #"lawngreen", "rosybrown1", "#cd6b32", "gold", "lightyellow")) +
-#  scale_y_continuous(breaks=equal_breaks(n = 4)) +
-#  theme(panel.grid.major = element_blank(),
-#        panel.grid.minor = element_blank(),
-#        strip.background = element_blank(),
-#        axis.text.x = element_blank(),
-#        axis.text.y = element_text(size = 10),
-#        axis.ticks.x = element_blank(),
-#        axis.title.x = element_text(size = 12),
-#        axis.title.y = element_text(size = 12),
-#        strip.text = element_text(size = 10, face = "bold"),
-#        legend.title = element_text(size = 10, face = "bold"),
-#        legend.text = element_text(size = 10),
-#        legend.key.height = unit(5, 'mm'),
-#        legend.key.width = unit(5, 'mm'),
-#        legend.box.margin = margin(-10,-10,-10,-10)
-  )
-#dev.off()
 ```
-### Alpha-Diversity - Phylogenetic Diversity and SES MPD
+
+
+
+
+### Content - Alpha-Diversity - Phylogenetic Diversity and SES MPD
 ```{r}
 ### Unweighted - Calculate phylogenetic diversity and MPD ###
 
@@ -513,156 +457,12 @@ colnames(mpd.stats) <- c("Sample", "Stat", "Measure")
 ### Prepare PD ###
 pd.ready <- merge(pd.stats, meta, by = "Sample")
 pd.ready$Group <- ordered(pd.ready$Group, levels = c("Summer_Captive", "Torpor", "IBA", "Spring"))
-pd.sum <- pd.ready %>%
-  group_by(Group) %>%
-  summarize(Mean = mean(Stat),
-            SE = se(Stat),
-            SD = sd(Stat),
-            Median = median(Stat))
-pd.sum$YMAX <- pd.sum$Mean + pd.sum$SE
-pd.sum$YMIN <- pd.sum$Mean - pd.sum$SE
-
-
 
 ### Prepare MPD ###
 mpd.ready <- merge(mpd.stats, meta, by = "Sample")
 mpd.ready$Group <- ordered(mpd.ready$Group, levels = c("Summer_Captive", "Torpor", "IBA", "Spring"))
-mpd.sum <- mpd.ready %>%
-  group_by(Group) %>%
-  summarize(Mean = mean(Stat),
-            SE = se(Stat),
-            SD = sd(Stat),
-            Median = median(Stat))
-mpd.sum$YMAX <- mpd.sum$Mean + mpd.sum$SE
-mpd.sum$YMIN <- mpd.sum$Mean - mpd.sum$SE
 
 
-
-
-
-########## PLOT PD & MPD ##########
-
-### Plot PD ###
-pd.ann <- data.frame(lab = c("a", "b", "c", "bc", "b"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
-
-pd.plot <- ggplot(pd.ready, aes(x = Group, y = Stat, fill = Group)) +
-  geom_violin() +
-  geom_segment(aes(x = 1, y = pd.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = pd.sum$YMAX[1]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = pd.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = pd.sum$YMAX[2]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 3, y = pd.sum$YMIN[3]-0.1, xend = 3, 
-                   yend = pd.sum$YMAX[3]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 4, y = pd.sum$YMIN[4]-0.1, xend = 4, 
-                   yend = pd.sum$YMAX[4]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 5, y = pd.sum$YMIN[5]-0.1, xend = 5, 
-                   yend = pd.sum$YMAX[5]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 1, y = pd.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = pd.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = pd.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = pd.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 3, y = pd.sum$YMIN[3]-0.1, xend = 3, 
-                   yend = pd.sum$YMAX[3]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 4, y = pd.sum$YMIN[4]-0.1, xend = 4, 
-                   yend = pd.sum$YMAX[4]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 5, y = pd.sum$YMIN[5]-0.1, xend = 5, 
-                   yend = pd.sum$YMAX[5]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_point(data = pd.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
-  geom_point(data = pd.sum, aes(y= Mean), colour="white", size = 0.5, 
-             show.legend = F) +
-  scale_fill_manual(values = c("#e60000", "#ec9393", "#1c41b0", "deepskyblue", "#74b300"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  scale_y_continuous(limits = c(13,40), breaks = c(13,19.5,26,32.5,39)) +
-  scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  ylab("Faith's Phylogenetic Diversity") +
-    theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_blank(),
-        strip.text = element_text(face="bold", size=6),
-        strip.text.x = element_text(face ="bold", size=6),
-        axis.title.x = element_text(face="bold", size=6, vjust = 10,
-                                    margin = margin(t = 1, r = 10, b = -15, l = 1)),
-        axis.title.y = element_text(face="bold", size=6),
-        axis.text.x = element_text(size=6, angle = 50, hjust = 1, vjust = 1.05),
-        axis.text.y = element_text(size=6),
-        legend.position = "none") +
-  geom_text(data = pd.ann, aes(label=lab), x=c(1,2,3,4,5),
-            y=c(40,40,40,40,40), size=2, color="black")
-
-
-
-
-        
-### Plot MPD ###
-mpd.ann <- data.frame(lab = c("ab", "a", "b", "b", "ab"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
-
-mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
-  geom_violin() +
-  geom_segment(aes(x = 1, y = mpd.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = mpd.sum$YMAX[1]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = mpd.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = mpd.sum$YMAX[2]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 3, y = mpd.sum$YMIN[3]-0.1, xend = 3, 
-                   yend = mpd.sum$YMAX[3]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 4, y = mpd.sum$YMIN[4]-0.1, xend = 4, 
-                   yend = mpd.sum$YMAX[4]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 5, y = mpd.sum$YMIN[5]-0.1, xend = 5, 
-                   yend = mpd.sum$YMAX[5]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 1, y = mpd.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = mpd.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = mpd.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = mpd.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 3, y = mpd.sum$YMIN[3]-0.1, xend = 3, 
-                   yend = mpd.sum$YMAX[3]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 4, y = mpd.sum$YMIN[4]-0.1, xend = 4, 
-                   yend = mpd.sum$YMAX[4]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 5, y = mpd.sum$YMIN[5]-0.1, xend = 5, 
-                   yend = mpd.sum$YMAX[5]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_point(data = mpd.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
-  geom_point(data = mpd.sum, aes(y= Mean), colour="white", size = 0.5, 
-             show.legend = F) +
-  scale_fill_manual(values = c("#e60000", "#ec9393", "#1c41b0", "deepskyblue", "#74b300"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  scale_y_continuous(limits = c(-7,5.7), breaks = c(-7,-4.5,-2,0.5,3.0,5.5)) +
-  scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  ylab("Phylogenetic Evenness (MPD)") +
-    theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_blank(),
-        strip.text = element_text(face="bold", size=6),
-        strip.text.x = element_text(face ="bold", size=6),
-        axis.title.x = element_text(face="bold", size=6, vjust = 10,
-                                    margin = margin(t = 1, r = 10, b = -15, l = 1)),
-        axis.title.y = element_text(face="bold", size=6),
-        axis.text.x = element_text(size=6, angle = 50, hjust = 1, vjust = 1.05),
-        axis.text.y = element_text(size=6),
-        legend.position = "none") +
-  geom_text(data = mpd.ann, aes(label=lab), x=c(1,2,3,4,5),
-            y=c(5.7,5.7,5.7,5.7,5.7), size=2, color="black")
-
-        
-
-        
-        
-        
         
         
 ########## TESTING PD & MPD ##########
@@ -672,19 +472,12 @@ hist(pd.ready$Stat, breaks=10)
 qqnorm(pd.ready$Stat)
 qqline(pd.ready$Stat)
 shapiro.test(pd.ready$Stat)
-  # p-value = 0.1414
+  # p-value = 0.9905
   # Normal
 
 # Run Kruskal-Wallis
 summary(aov(Stat ~ Group, data = pd.ready))
-  # p-value = 0.000299
-TukeyHSD(aov(Stat ~ Group, data = pd.ready))
-  # Summer-Torpor = 0.0011196*
-  # Summer-IBA = 0.0010730*
-  # Summer-Spring = 0.5133391
-  # Torpor-IBA = 0.9948681
-  # Torpor-Spring = 0.2593828
-  # IBA-Spring = 0.3179979
+  # p-value = 0.0519
 
  
 
@@ -693,30 +486,27 @@ hist(mpd.ready$Stat, breaks=10)
 qqnorm(mpd.ready$Stat)
 qqline(mpd.ready$Stat)
 shapiro.test(mpd.ready$Stat)
-  # p-value = 0.1652
-  # Normal
+  # p-value = 0.048
+  # Not Normal
 
-# Run ANOVA
-summary(aov(Stat ~ Group, data = mpd.ready))
-  # p-value = 0.000829
-TukeyHSD(aov(Stat ~ Group, data = mpd.ready))
-  # Summer_Lab-Summer_Wild = 0.1031086
-  # Torpor-Summer_Wild = 0.7170097
-  # IBA-Summer_Wild = 0.9988490
-  # Spring-Summer_Wild = 0.9906331
-  # Torpor-Summer_Lab = 0.0004883*
-  # IBA-Summer_Lab = 0.0103018*
-  # Spring-Summer_Lab = 0.3525159
-  # IBA-Torpor = 0.7487473
-  # Spring-Torpor = 0.4425591
-  # Spring-IBA = 0.9364683
+# Run Kruskal-Wallis
+kruskal.test(formula = Stat ~ Group, data=mpd.ready)
+  # p-value = 0.001112
+dunn.test(x = as.numeric(mpd.ready$Stat), g = as.factor(mpd.ready$Group), method = "bh", label = T)
+  # Summer-Torpor = 0.0012*
+  # Summer-IBA = 0.0018*
+  # Summer-Spring = 0.1204
+  # Torpor-IBA = 0.4759
+  # Torpor-Spring = 0.1824
+  # IBA-Spring = 0.1408
+
 
 
 ```
 
-### Alpha Diversity - Shannon & # OTUs
+### Content - Alpha Diversity - Shannon & # OTUs
 ```{r}
-adiv <- data.frame(sample_data(physeq))
+adiv <- data.frame(sample_data(phy.con))
 
 
 ########## Shannon ##########
@@ -724,11 +514,172 @@ hist(adiv$shannon, breaks=10)
 qqnorm(adiv$shannon)
 qqline(adiv$shannon)
 shapiro.test(adiv$shannon)
-  # p-value = 0.2932
+  # p-value = 0.6322
   # Normal
 
 summary(aov(shannon ~ Group, data = adiv))
-  # p-value = 0.847
+  # p-value = 0.793
+
+
+
+
+
+########## Number of Unique OTUs ##########
+otus <- data.frame(otu_table(phy.con))
+sampNames <- colnames(otus)
+uniq.otus <- data.frame(matrix(nrow = nsamples(phy.con), ncol = 2))
+colnames(uniq.otus) <- c("Sample", "Unique_OTUs")
+for(n in 1:nsamples(phy.con)) {
+  COL <- otus[,n]
+  numUniq <- length(which(COL > 0))
+  uniq.otus$Sample[n] <- sampNames[n]
+  uniq.otus$Unique_OTUs[n] <- numUniq
+}
+uniq.otus$Group <- sample_data(phy.con)$Group
+rownames(uniq.otus) <- uniq.otus$Sample
+
+
+hist(uniq.otus$Unique_OTUs, breaks=10)
+qqnorm(uniq.otus$Unique_OTUs)
+qqline(uniq.otus$Unique_OTUs)
+shapiro.test(uniq.otus$Unique_OTUs)
+  # p-value =  0.775
+  # Normal
+
+summary(aov(Unique_OTUs ~ Group, data = uniq.otus))
+  # p-value = 0.00847
+TukeyHSD(aov(Unique_OTUs ~ Group, data = uniq.otus))
+  # Summer-Torpor = 0.0104213*
+  # Summer-IBA = 0.0255349*
+  # Summer-Spring = 0.4195955
+  # Torpor-IBA = 0.9522292
+  # Torpor-Spring = 0.6357198
+  # IBA-Spring = 0.8518157
+
+
+```
+
+### Content - Alpha-Diversity Prepare Plots
+```{r}
+###### Unique # of OTUs ######
+
+### Prepare data for plot
+uniq.otus.sum <- uniq.otus %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Unique_OTUs),
+            SE = se(Unique_OTUs),
+            SD = sd(Unique_OTUs),
+            Median = median(Unique_OTUs))
+uniq.otus.sum$YMAX <- uniq.otus.sum$Mean + uniq.otus.sum$SE
+uniq.otus.sum$YMIN <- uniq.otus.sum$Mean - uniq.otus.sum$SE
+
+otu.ann <- data.frame(lab = c("a", "b", "b", "ab"), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
+
+otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_y_continuous(limits = c(240,830), breaks = c(240,354,468,582,696,810)) +
+  scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  ylab("Number of Unique OTUs") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6, vjust = 10,
+                                    margin = margin(t = 8, r = 10, b = -15, l = 1)),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6, angle = 20, hjust = 0.5, vjust = 1.1),
+        axis.text.y = element_text(size=6),
+        legend.position = "none") +
+  geom_text(data = otu.ann, aes(label=lab), x=c(1,2,3,4),
+            y=c(835,835,835,835), size=2.5, color="black")
+
+
+
+
+###### Faith's Phylogenetic Diversity ######
+
+### Prepare PD ###
+pd.sum <- pd.ready %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.sum$YMAX <- pd.sum$Mean + pd.sum$SE
+pd.sum$YMIN <- pd.sum$Mean - pd.sum$SE
+
+pd.ann <- data.frame(lab = c("ns", " ", " ", " "), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
+
+pd.plot <- ggplot(pd.ready, aes(x = Group, y = Stat, fill = Group)) +
+  geom_violin() + 
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_y_continuous(limits = c(14,39), breaks = c(14,19,24,29,34,39)) +
+  scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  ylab("Faith's Phylogenetic Diversity") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6, vjust = 10,
+                                    margin = margin(t = 8, r = 10, b = -15, l = 1)),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6, angle = 20, hjust = 0.5, vjust = 1.1),
+        axis.text.y = element_text(size=6),
+        legend.position = "none") +
+  geom_text(data = pd.ann, aes(label=lab), x=c(2.5,0,0,0),
+            y=c(39.5,0,0,0), size=2.5, color="black")
+
+
+
+
+
+###### Phylogenetic Diversity (MPD) ######
+
+### Prepare MPD ###
+mpd.sum <- mpd.ready %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.sum$YMAX <- mpd.sum$Mean + mpd.sum$SE
+mpd.sum$YMIN <- mpd.sum$Mean - mpd.sum$SE
+
+mpd.ann <- data.frame(lab = c("a", "b", "b", "ab"), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
+
+mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_y_continuous(limits = c(-8.6,6.1), breaks = c(-8.6,-1.6,5.4)) +
+  scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  ylab("Phylogenetic Evenness (MPD)") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6, vjust = 10,
+                                    margin = margin(t = 8, r = 10, b = -15, l = 1)),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6, angle = 20, hjust = 0.5, vjust = 1.1),
+        axis.text.y = element_text(size=6),
+        legend.position = "none") +
+  geom_text(data = mpd.ann, aes(label=lab), x=c(1,2,3,4),
+            y=c(6.2,6.2,6.2,6.2), size=2.5, color="black")
+  
+
+
+        
+        
+        
+
+
 
 ### Prepare data for plot
 shannon.sum <- adiv %>%
@@ -741,45 +692,15 @@ shannon.sum$YMAX <- shannon.sum$Mean + shannon.sum$SE
 shannon.sum$YMIN <- shannon.sum$Mean - shannon.sum$SE
 
 
-### Plot
+
+shannon.ann <- data.frame(lab = c("ns", " ", " ", " "), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
+
 shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
   geom_violin() +
-  geom_segment(aes(x = 1, y = shannon.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = shannon.sum$YMAX[1]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = shannon.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = shannon.sum$YMAX[2]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 3, y = shannon.sum$YMIN[3]-0.1, xend = 3, 
-                   yend = shannon.sum$YMAX[3]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 4, y = shannon.sum$YMIN[4]-0.1, xend = 4, 
-                   yend = shannon.sum$YMAX[4]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 5, y = shannon.sum$YMIN[5]-0.1, xend = 5, 
-                   yend = shannon.sum$YMAX[5]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 1, y = shannon.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = shannon.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = shannon.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = shannon.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 3, y = shannon.sum$YMIN[3]-0.1, xend = 3, 
-                   yend = shannon.sum$YMAX[3]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 4, y = shannon.sum$YMIN[4]-0.1, xend = 4, 
-                   yend = shannon.sum$YMAX[4]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 5, y = shannon.sum$YMIN[5]-0.1, xend = 5, 
-                   yend = shannon.sum$YMAX[5]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_point(data = shannon.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
-  geom_point(data = shannon.sum, aes(y= Mean), colour="white", size = 0.5, 
-             show.legend = F) +
-  scale_fill_manual(values = c("#e60000", "#ec9393", "#1c41b0", "deepskyblue", "#74b300"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  scale_y_continuous(limits = c(1.4, 5.75), breaks = c(1.4,2.26,3.12,3.98,4.84,5.7)) +
-  scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_y_continuous(limits = c(2.3,5.5), breaks = c(2.3,3.1,3.9,4.7,5.5)) +
+  scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
   ylab("Shannon's Diversity Index") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -788,127 +709,22 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
         strip.text.x = element_text(face ="bold", size=6),
         legend.title = element_text(face="bold", size=6),
         axis.title.x = element_text(face="bold", size=6, vjust = 10,
-                                    margin = margin(t = 1, r = 10, b = -15, l = 1)),
+                                    margin = margin(t = 8, r = 10, b = -15, l = 1)),
         axis.title.y = element_text(face="bold", size=6),
-        axis.text.x = element_text(size=6, angle = 50, hjust = 1, vjust = 1.05),
+        axis.text.x = element_text(size=6, angle = 20, hjust = 0.5, vjust = 1.1),
         axis.text.y = element_text(size=6),
         legend.text = element_text(size=6),
         legend.key.height = unit(3, 'mm'),
         legend.key.width = unit(3, "mm"),
         legend.box.margin=margin(-10,-10,-10,-10)) +
-  annotate("text", x = 3, y = 5.75, label = "ns", size = 2)
-
-
-
-
-########## Number of Unique OTUs ##########
-otus <- data.frame(otu_table(physeq))
-sampNames <- colnames(otus)
-uniq.otus <- data.frame(matrix(nrow = nsamples(physeq), ncol = 2))
-colnames(uniq.otus) <- c("Sample", "Unique_OTUs")
-for(n in 1:nsamples(physeq)) {
-  COL <- otus[,n]
-  numUniq <- length(which(COL > 0))
-  uniq.otus$Sample[n] <- sampNames[n]
-  uniq.otus$Unique_OTUs[n] <- numUniq
-}
-uniq.otus$Group <- sample_data(physeq)$Group
-rownames(uniq.otus) <- uniq.otus$Sample
-
-
-hist(uniq.otus$Unique_OTUs, breaks=10)
-qqnorm(uniq.otus$Unique_OTUs)
-qqline(uniq.otus$Unique_OTUs)
-shapiro.test(uniq.otus$Unique_OTUs)
-  # p-value =  2.065e-06
-  # Not Normal
-kruskal.test(formula = Unique_OTUs ~ Group, data = uniq.otus)
-  # p-value = 4.092e-07
-dunn.test(x = as.numeric(uniq.otus$Unique_OTUs), g = as.factor(uniq.otus$Group), method = "bh", label = T)
-# Wild-Lab = 0.0228*
-# Wild-Torpor = 0.0000*
-# Wild-IBA = 0.0000*
-# Wild-Spring = 0.0235*
-# Lab-Torpor = 0.0005*
-# Lab-IBA = 0.0034*
-# Lab-Spring = 0.3570
-# Torpor-IBA = 0.2326
-# Torpor-Spring = 0.0129*
-# IBA-Spring = 0.0345
-
-
-
-
-### Prepare data for plot
-uniq.otus.sum <- uniq.otus %>%
-  group_by(Group) %>%
-  summarize(Mean = mean(Unique_OTUs),
-            SE = se(Unique_OTUs),
-            SD = sd(Unique_OTUs),
-            Median = median(Unique_OTUs))
-uniq.otus.sum$YMAX <- uniq.otus.sum$Mean + uniq.otus.sum$SE
-uniq.otus.sum$YMIN <- uniq.otus.sum$Mean - uniq.otus.sum$SE
-
-otu.ann <- data.frame(lab = c("a", "b", "c", "cd", "bd"), Group = factor(c("Summer_Wild", "Summer_Lab", "Torpor", "IBA", "Spring")))
-
-otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
-  geom_violin() +
-  geom_segment(aes(x = 1, y = uniq.otus.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = uniq.otus.sum$YMAX[1]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = uniq.otus.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = uniq.otus.sum$YMAX[2]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 3, y = uniq.otus.sum$YMIN[3]-0.1, xend = 3, 
-                   yend = uniq.otus.sum$YMAX[3]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 4, y = uniq.otus.sum$YMIN[4]-0.1, xend = 4, 
-                   yend = uniq.otus.sum$YMAX[4]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 5, y = uniq.otus.sum$YMIN[5]-0.1, xend = 5, 
-                   yend = uniq.otus.sum$YMAX[5]+0.1), color = "black", size = 1, 
-               show.legend = F) +
-  geom_segment(aes(x = 1, y = uniq.otus.sum$YMIN[1]-0.1, xend = 1, 
-                   yend = uniq.otus.sum$YMAX[1]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 2, y = uniq.otus.sum$YMIN[2]-0.1, xend = 2, 
-                   yend = uniq.otus.sum$YMAX[2]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 3, y = uniq.otus.sum$YMIN[3]-0.1, xend = 3, 
-                   yend = uniq.otus.sum$YMAX[3]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 4, y = uniq.otus.sum$YMIN[4]-0.1, xend = 4, 
-                   yend = uniq.otus.sum$YMAX[4]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_segment(aes(x = 5, y = uniq.otus.sum$YMIN[5]-0.1, xend = 5, 
-                   yend = uniq.otus.sum$YMAX[5]+0.1), color = "white", size = 0.5, 
-               show.legend = F) +
-  geom_point(data = uniq.otus.sum, aes(y= Mean), colour="black", size = 1, show.legend = F) +
-  geom_point(data = uniq.otus.sum, aes(y= Mean), colour="white", size = 0.5, 
-             show.legend = F) +
-  scale_fill_manual(values = c("#e60000", "#ec9393", "#1c41b0", "deepskyblue", "#74b300"), labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  scale_y_continuous(limits = c(200,800), breaks = c(200, 400, 600, 800)) +
-  scale_x_discrete(labels = c("Summer Wild", "Summer Lab", "Torpor", "IBA", "Spring")) +
-  ylab("Number of Unique OTUs") +
-    theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        strip.background = element_blank(),
-        strip.text = element_text(face="bold", size=6),
-        strip.text.x = element_text(face ="bold", size=6),
-        axis.title.x = element_text(face="bold", size=6, vjust = 10, 
-                                    margin = margin(t = 1, r = 10, b = -15, l = 1)),
-        axis.title.y = element_text(face="bold", size=6),
-        axis.text.x = element_text(size=6, angle = 50, hjust = 1, vjust = 1.05),
-        axis.text.y = element_text(size=6),
-        legend.position = "none") +
-  geom_text(data = otu.ann, aes(label=lab), x=c(1,2,3,4,5),
-            y=c(810,810,810,810,810), size=2, color="black")
+  geom_text(data = shannon.ann, aes(label=lab), x=c(2.5,0,0,0),
+            y=c(5.55,0,0,0), size=2.5, color="black")
 
 ```
 
 ### Plot - Alpha-Diversity
 ```{r}
-tiff("adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+tiff("CaptiveSeasons.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -1951,4 +1767,338 @@ core4 <- intersect(core3, rownames(spr.core))
 ### Physeq object with only core OTUs
 phy.core <- merge_phyloseq(phy.wild.core, phy.sum.core, phy.tor.core, phy.iba.core, phy.spr.core)
 #write.csv(data.frame(tax_table(phy.core)), "coreOTUs.csv")
+```
+
+
+# EVERYTHING BELOW IS MUCOSAAAAA
+
+
+
+### Mucosa - Test Phyla Rel Abund
+```{r}
+# Merge samples with the same taxonomic rank
+goodphy.muc <- tax_glom(phy.muc, taxrank="Phylum")
+
+# Transform each merged phylum count to rel abund
+phy99.muc <- transform_sample_counts(goodphy.muc, function(x){(x/sum(x))*100})
+
+# Remove any phyla with <1% rel abund
+phy99.muc <- prune_taxa(taxa_sums(phy99.muc) > 1, phy99.muc)
+
+# View ordered phyla - most abundant --> least abundant
+# barplot(sort(taxa_sums(phy99.muc),TRUE)[1:20]/nsamples(phy99.muc),las=2,cex.axis=.7)
+# 11 phyla: "Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Kiritimatiellaeota", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia", "Epsilonbacteraeota"
+     
+
+
+##### FIRMICUTES #####
+fir.muc.phy <- subset_taxa(phy99.muc, Phylum == "Firmicutes")
+fir.muc.df <- data.frame(sample_data(fir.muc.phy))
+fir.muc.df$RelAbund <- t(data.frame(otu_table(fir.muc.phy)))
+
+# Test normality
+hist(fir.muc.df$RelAbund, breaks=10)
+qqnorm(fir.muc.df$RelAbund)
+qqline(fir.muc.df$RelAbund)
+shapiro.test(fir.muc.df$RelAbund)
+  # p-value = 0.03218
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=fir.muc.df)
+  # p-value = 1.669e-07
+  # adj P = 0.0000018359
+dunn.test(x = as.numeric(fir.muc.df$RelAbund), g = as.factor(fir.muc.df$Group), method = "bh", label = T)
+  # Summer-Torpor = 0.000*
+  # Summer-IBA = 0.000*
+  # Summer-Spring = 0.1038
+  # Torpor-IBA = 0.4971
+  # Torpor-Spring = 0.0125*
+  # IBA-Spring = 0.0125*
+
+
+
+
+
+
+
+##### BACTEROIDETES #####
+bac.muc.phy <- subset_taxa(phy99.muc, Phylum == "Bacteroidetes")
+bac.muc.df <- data.frame(sample_data(bac.muc.phy))
+bac.muc.df$RelAbund <- t(data.frame(otu_table(bac.muc.phy)))
+
+# Test normality
+hist(bac.muc.df$RelAbund, breaks=10)
+qqnorm(bac.muc.df$RelAbund)
+qqline(bac.muc.df$RelAbund)
+shapiro.test(bac.muc.df$RelAbund)
+  # p-value = 0.4209
+  # Normal
+  # Sticking with Kruskal-Wallis for consistency among phyla-level comparisons
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=bac.muc.df)
+  # p-value = 0.001312
+  # adj P = 0.0057786667
+dunn.test(x = as.numeric(bac.muc.df$RelAbund), g = as.factor(bac.muc.df$Group), method = "bh", label = T)
+  # Summer-Torpor = 0.0034*
+  # Summer-IBA = 0.0032*
+  # Summer-Spring = 0.0049*
+  # Torpor-IBA = 0.4981
+  # Torpor-Spring = 0.4645
+  # IBA-Spring = 0.5763
+
+
+
+
+##### Verrucomicrobia #####
+ver.muc.phy <- subset_taxa(phy99.muc, Phylum == "Verrucomicrobia")
+ver.muc.df <- data.frame(sample_data(ver.muc.phy))
+ver.muc.df$RelAbund <- t(data.frame(otu_table(ver.muc.phy)))
+
+# Test normality
+hist(ver.muc.df$RelAbund, breaks=10)
+qqnorm(ver.muc.df$RelAbund)
+qqline(ver.muc.df$RelAbund)
+shapiro.test(ver.muc.df$RelAbund)
+  # p-value = 1.085e-06
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=ver.muc.df)
+  # p-value = 0.001576
+  # adj P = 0.0057786667
+dunn.test(x = as.numeric(ver.muc.df$RelAbund), g = as.factor(ver.muc.df$Group), method = "bh", label = T)
+  # Summer-Torpor = 0.0520
+  # Summer-IBA = 0.0004*
+  # Summer-Spring = 0.0559
+  # Torpor-IBA = 0.0771
+  # Torpor-Spring = 0.2397
+  # IBA-Spring = 0.0559
+
+
+
+
+
+##### PROTEOBACTERIA #####
+pro.muc.phy <- subset_taxa(phy99.muc, Phylum == "Proteobacteria")
+pro.muc.df <- data.frame(sample_data(pro.muc.phy))
+pro.muc.df$RelAbund <- t(data.frame(otu_table(pro.muc.phy)))
+
+# Test normality
+hist(pro.muc.df$RelAbund, breaks=10)
+qqnorm(pro.muc.df$RelAbund)
+qqline(pro.muc.df$RelAbund)
+shapiro.test(pro.muc.df$RelAbund)
+  # p-value = 0.003095
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=pro.muc.df)
+  # p-value = 0.05366
+  # adj P = 0.0737825000
+
+
+
+
+
+##### KIRITIMATIELLAEOTA #####
+# Ar/ma/ti/mon/a/de/tes
+# ^        ^      ^
+# Ki/ri/ti/ma/ti/e/llae/o/ta
+#                       ^
+# Pull out kiris
+kir.muc.phy <- subset_taxa(phy99.muc, Phylum == "Kiritimatiellaeota")
+kir.muc.df <- data.frame(sample_data(kir.muc.phy))
+kir.muc.df$RelAbund <- t(data.frame(otu_table(kir.muc.phy)))
+
+# Test normality
+hist(kir.muc.df$RelAbund, breaks=10)
+qqnorm(kir.muc.df$RelAbund)
+qqline(kir.muc.df$RelAbund)
+shapiro.test(kir.muc.df$RelAbund)
+  # p-value = 1.835e-11
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=kir.muc.df)
+  # p-value = 0.03247
+  # adj P = 0.0695016667
+  # NOT SIG
+# dunn.test(x = as.numeric(kir.df$RelAbund), g = as.factor(kir.df$Group), method = "bh", label = T)
+  # Summer-Torpor = 0.0329
+  # Summer-IBA = 0.3177
+  # Summer-Spring =0.0662
+  # Torpor-IBA = 0.0540
+  # Torpor-Spring = 0.4704
+  # IBA-Spring = 0.0976
+
+
+
+
+
+
+##### CYANOBACTERIA #####
+# Pull out cyanos
+cya.muc.phy <- subset_taxa(phy99.muc, Phylum == "Cyanobacteria")
+cya.muc.df <- data.frame(sample_data(cya.muc.phy))
+cya.muc.df$RelAbund <- t(data.frame(otu_table(cya.muc.phy)))
+
+# Test normality
+hist(cya.muc.df$RelAbund, breaks=10)
+qqnorm(cya.muc.df$RelAbund)
+qqline(cya.muc.df$RelAbund)
+shapiro.test(cya.muc.df$RelAbund)
+  # p-value = 0.0001734
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=cya.muc.df)
+  # p-value = 0.03781
+  # adj P = 0.0695016667
+  # NOT SIG
+# dunn.test(x = as.numeric(cya.df$RelAbund), g = as.factor(cya.df$Group), method = "bh", label = T)
+  # Summer-Torpor = 0.0841
+  # Summer-IBA = 0.2479
+  # Summer-Spring = 0.1450
+  # Torpor-IBA = 0.0297
+  # Torpor-Spring = 0.0289
+  # IBA-Spring = 0.2652
+
+
+
+
+
+
+
+
+##### TENERICUTES #####
+ten.muc.phy <- subset_taxa(phy99.muc, Phylum == "Tenericutes")
+ten.muc.df <- data.frame(sample_data(ten.muc.phy))
+ten.muc.df$RelAbund <- t(data.frame(otu_table(ten.muc.phy)))
+
+# Test normality
+hist(ten.muc.df$RelAbund, breaks=10)
+qqnorm(ten.muc.df$RelAbund)
+qqline(ten.muc.df$RelAbund)
+shapiro.test(ten.muc.df$RelAbund)
+  # p-value = 4.427e-08
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=ten.muc.df)
+  # p-value = 0.04964
+  # adj P = 0.0737825000
+  # NOT SIG
+#dunn.test(x = as.numeric(ten.df$RelAbund), g = as.factor(ten.df$Group), method = "bh", label = T)
+  # Summer-Torpor = 0.3766
+  # Summer-IBA = 0.0748
+  # Summer-Spring = 0.0570
+  # Torpor-IBA = 0.3766
+  # Torpor-Spring = 0.0548
+  # IBA-Spring = 0.0570
+
+
+
+
+
+
+##### ACTINOBACTERIA #####
+act.muc.phy <- subset_taxa(phy99.muc, Phylum == "Actinobacteria")
+act.muc.df <- data.frame(sample_data(act.muc.phy))
+act.muc.df$RelAbund <- t(data.frame(otu_table(act.muc.phy)))
+
+# Test normality
+hist(act.muc.df$RelAbund, breaks=10)
+qqnorm(act.muc.df$RelAbund)
+qqline(act.muc.df$RelAbund)
+shapiro.test(act.muc.df$RelAbund)
+  # p-value = 6.002e-05
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=act.muc.df)
+  # p-value = 0.4614
+  # adj P = 0.4614000000
+
+
+
+
+
+
+
+##### ELUSIMICROBIA #####
+elu.muc.phy <- subset_taxa(phy99.muc, Phylum == "Elusimicrobia")
+elu.muc.df <- data.frame(sample_data(elu.muc.phy))
+elu.muc.df$RelAbund <- t(data.frame(otu_table(elu.muc.phy)))
+
+# Test normality
+hist(elu.muc.df$RelAbund, breaks=10)
+qqnorm(elu.muc.df$RelAbund)
+qqline(elu.muc.df$RelAbund)
+shapiro.test(elu.muc.df$RelAbund)
+  # p-value = 1.437e-11
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=elu.muc.df)
+  # p-value = 0.03791
+  # adj P = 0.0695016667
+  # NOT SIG
+dunn.test(x = as.numeric(elu.muc.df$RelAbund), g = as.factor(elu.muc.df$Group), method = "bh", label = T)
+  # Summer-Torpor = 0.4942
+  # Summer-IBA = 0.0841
+  # Summer-Spring = 0.0841
+  # Torpor-IBA = 0.0757
+  # Torpor-Spring = 0.1413
+  # IBA-Spring = 0.0208
+
+
+
+
+
+
+
+##### UNCLASSIFIED #####
+unc.muc.phy <- subset_taxa(phy99.muc, Phylum == "Bacteria_unclassified")
+unc.muc.df <- data.frame(sample_data(unc.muc.phy))
+unc.muc.df$RelAbund <- t(data.frame(otu_table(unc.muc.phy)))
+
+# Test normality
+hist(unc.muc.df$RelAbund, breaks=10)
+qqnorm(unc.muc.df$RelAbund)
+qqline(unc.muc.df$RelAbund)
+shapiro.test(unc.muc.df$RelAbund)
+  # p-value = 5.443e-11
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=unc.muc.df)
+  # p-value = 0.1807
+  # adj P = 0.2208555556
+
+
+
+### P-adjust for Kruskal-Wallis
+p.adjust(c(1.669e-07,0.001312,0.001576,0.05366,0.03247,0.03781,0.04964,0.4614,0.03791,0.2277,0.1807), method = "fdr")
+  # 0.0000018359 0.0057786667 0.0057786667 0.0737825000 0.0695016667 0.0695016667 0.0737825000 0.4614000000 0.0695016667 0.2504700000 0.2208555556
+
+
+
+
+
+
+
+
+### Format data
+phy99.muc.df <- psmelt(phy99.muc)
+phy99.muc.df$Phylum <- ordered(phy99.df$Phylum, levels = c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Kiritimatiellaeota", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia", "Epsilonbacteraeota"))
+phy99.df$Phylum[which(is.na(phy99.df$Phylum))] <- rep("Unclassified",length(which(is.na(phy99.df$Phylum))))
+phy.sum <- phy99.df %>%
+  group_by(Group, Phylum) %>%
+  summarize(Mean = mean(Abundance),
+            Median = median(Abundance),
+            SD = sd(Abundance),
+            SE = se(Abundance),
+            iqr = IQR(Abundance))
 ```
