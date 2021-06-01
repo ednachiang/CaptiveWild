@@ -733,7 +733,7 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
 
 ```
 
-### Plot - Alpha-Diversity
+### Content Plot - Alpha-Diversity
 ```{r}
 tiff("CaptiveSeasons.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
@@ -753,7 +753,7 @@ print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
 dev.off()
 ```
 
-### Beta Diversity
+### Content - Beta-Diversity
 ```{r}
 
 ########## Weighted UniFrac ##########
@@ -1178,7 +1178,7 @@ p.adjust(c(8e-04,4e-04,0.1099,0.7277,0.0122,0.0194), method = "fdr")
 ```
 
 
-### Plot - Beta-div Ordinations
+### Content Plot - Beta-diversity
 ```{r}
 tiff("CaptiveSeasons.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
 grid.newpage()
@@ -1206,7 +1206,7 @@ grid.text("C", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos
 dev.off()
 ```
 
-### Simper
+### Content - SIMPER
 ```{r}
 # Change Group names to be compatible (no "_")
 con.rename <- data.frame(sample_data(phy.con))
@@ -1246,7 +1246,7 @@ for(i in 1:nrow(group.simper.kw)){
 #group.simper.kw <- read.csv("group_clean_simper.csv", row.names = 1)
 ```
 
-### Core OTUs and Shared OTUs
+### Content - Core OTUs and Shared OTUs
 ```{r}
 ### Drop empty taxa
 phy.con.sum.trim <- prune_taxa(taxa_sums(phy.con.sum) > 0, phy.con.sum)
@@ -1332,7 +1332,7 @@ phy.con.core <- merge_phyloseq(phy.con.sum.core, phy.con.tor.core, phy.con.iba.c
 
 
 
-# EVERYTHING BELOW IS MUCOSAAAAA
+### EVERYTHING BELOW IS MUCOSAAAAA
 
 
 
