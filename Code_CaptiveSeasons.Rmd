@@ -735,7 +735,7 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
 
 ### Content Plot - Alpha-Diversity
 ```{r}
-tiff("CaptiveSeasons.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+#tiff("CaptiveSeasons.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -750,7 +750,7 @@ print(mpd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
 grid.text("D", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
           gp=gpar(fontsize=8,fontface="bold"))
 print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
-dev.off()
+#dev.off()
 ```
 
 ### Content - Beta-Diversity
@@ -1349,7 +1349,7 @@ phy99.muc <- prune_taxa(taxa_sums(phy99.muc) > 1, phy99.muc)
 
 # View ordered phyla - most abundant --> least abundant
 # barplot(sort(taxa_sums(phy99.muc),TRUE)[1:20]/nsamples(phy99.muc),las=2,cex.axis=.7)
-# 11 phyla: "Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Kiritimatiellaeota", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia", "Epsilonbacteraeota"
+# 11 phyla: "Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Kiritimatiellaeota", "Bacteria_unclassified", "Cyanobacteria", "Tenericutes", "Elusimicrobia", "Actinobacteria","Epsilonbacteraeota"
      
 
 
@@ -1363,23 +1363,19 @@ hist(fir.muc.df$RelAbund, breaks=10)
 qqnorm(fir.muc.df$RelAbund)
 qqline(fir.muc.df$RelAbund)
 shapiro.test(fir.muc.df$RelAbund)
-  # p-value = 0.03218
-  # Not Normal
+  # p-value = 0.3238
+  # Normal
 
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=fir.muc.df)
-  # p-value = 1.669e-07
-  # adj P = 0.0000018359
-dunn.test(x = as.numeric(fir.muc.df$RelAbund), g = as.factor(fir.muc.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.000*
-  # Summer-IBA = 0.000*
-  # Summer-Spring = 0.1038
-  # Torpor-IBA = 0.4971
-  # Torpor-Spring = 0.0125*
-  # IBA-Spring = 0.0125*
-
-
-
+# ANOVA
+summary(aov(formula = RelAbund ~ Group, data=fir.muc.df))
+  # p-value = 8.41e-06
+TukeyHSD(aov(formula = RelAbund ~ Group, data=fir.muc.df))
+  # Summer-Torpor = 0.0000488
+  # Summer-IBA = 0.0000175
+  # Summer-Spring = 0.1050824
+  # Torpor-IBA = 0.9999155
+  # Torpor-Spring = 0.0781171
+  # IBA-Spring = 0.0644690
 
 
 
@@ -1394,22 +1390,12 @@ hist(bac.muc.df$RelAbund, breaks=10)
 qqnorm(bac.muc.df$RelAbund)
 qqline(bac.muc.df$RelAbund)
 shapiro.test(bac.muc.df$RelAbund)
-  # p-value = 0.4209
+  # p-value = 0.2837
   # Normal
-  # Sticking with Kruskal-Wallis for consistency among phyla-level comparisons
 
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=bac.muc.df)
-  # p-value = 0.001312
-  # adj P = 0.0057786667
-dunn.test(x = as.numeric(bac.muc.df$RelAbund), g = as.factor(bac.muc.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.0034*
-  # Summer-IBA = 0.0032*
-  # Summer-Spring = 0.0049*
-  # Torpor-IBA = 0.4981
-  # Torpor-Spring = 0.4645
-  # IBA-Spring = 0.5763
-
+# ANOVA
+summary(aov(formula = RelAbund ~ Group, data=bac.muc.df))
+  # p-value = 0.162
 
 
 
@@ -1423,20 +1409,12 @@ hist(ver.muc.df$RelAbund, breaks=10)
 qqnorm(ver.muc.df$RelAbund)
 qqline(ver.muc.df$RelAbund)
 shapiro.test(ver.muc.df$RelAbund)
-  # p-value = 1.085e-06
+  # p-value = 0.0001722
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ver.muc.df)
-  # p-value = 0.001576
-  # adj P = 0.0057786667
-dunn.test(x = as.numeric(ver.muc.df$RelAbund), g = as.factor(ver.muc.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.0520
-  # Summer-IBA = 0.0004*
-  # Summer-Spring = 0.0559
-  # Torpor-IBA = 0.0771
-  # Torpor-Spring = 0.2397
-  # IBA-Spring = 0.0559
+  # p-value = 0.05591
 
 
 
@@ -1452,13 +1430,19 @@ hist(pro.muc.df$RelAbund, breaks=10)
 qqnorm(pro.muc.df$RelAbund)
 qqline(pro.muc.df$RelAbund)
 shapiro.test(pro.muc.df$RelAbund)
-  # p-value = 0.003095
-  # Not Normal
+  # p-value = 0.2079
+  # Normal
 
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=pro.muc.df)
-  # p-value = 0.05366
-  # adj P = 0.0737825000
+# ANOVA
+summary(aov(formula = RelAbund ~ Group, data=pro.muc.df))
+  # p-value = 0.0287
+TukeyHSD(aov(formula = RelAbund ~ Group, data=pro.muc.df))
+  # Summer-Torpor = 0.0929545
+  # Summer-IBA = 0.0346314
+  # Summer-Spring = 0.9098571
+  # Torpor-IBA = 0.9948679
+  # Torpor-Spring = 0.5253304
+  # IBA-Spring = 0.3680455
 
 
 
@@ -1479,22 +1463,12 @@ hist(kir.muc.df$RelAbund, breaks=10)
 qqnorm(kir.muc.df$RelAbund)
 qqline(kir.muc.df$RelAbund)
 shapiro.test(kir.muc.df$RelAbund)
-  # p-value = 1.835e-11
+  # p-value = 1.863e-07
   # Not Normal
 
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=kir.muc.df)
-  # p-value = 0.03247
-  # adj P = 0.0695016667
-  # NOT SIG
-# dunn.test(x = as.numeric(kir.df$RelAbund), g = as.factor(kir.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.0329
-  # Summer-IBA = 0.3177
-  # Summer-Spring =0.0662
-  # Torpor-IBA = 0.0540
-  # Torpor-Spring = 0.4704
-  # IBA-Spring = 0.0976
-
+# ANOVA
+summary(aov(formula = RelAbund ~ Group, data=kir.muc.df))
+  # p-value = 0.148
 
 
 
@@ -1511,21 +1485,12 @@ hist(cya.muc.df$RelAbund, breaks=10)
 qqnorm(cya.muc.df$RelAbund)
 qqline(cya.muc.df$RelAbund)
 shapiro.test(cya.muc.df$RelAbund)
-  # p-value = 0.0001734
-  # Not Normal
+  # p-value = 0.04871
+  # Normal
 
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=cya.muc.df)
-  # p-value = 0.03781
-  # adj P = 0.0695016667
-  # NOT SIG
-# dunn.test(x = as.numeric(cya.df$RelAbund), g = as.factor(cya.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.0841
-  # Summer-IBA = 0.2479
-  # Summer-Spring = 0.1450
-  # Torpor-IBA = 0.0297
-  # Torpor-Spring = 0.0289
-  # IBA-Spring = 0.2652
+# ANOVA
+summary(aov(formula = RelAbund ~ Group, data=kir.muc.df))
+  # p-value = 0.148
 
 
 
@@ -1544,21 +1509,12 @@ hist(ten.muc.df$RelAbund, breaks=10)
 qqnorm(ten.muc.df$RelAbund)
 qqline(ten.muc.df$RelAbund)
 shapiro.test(ten.muc.df$RelAbund)
-  # p-value = 4.427e-08
+  # p-value = 4.415e-05
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ten.muc.df)
-  # p-value = 0.04964
-  # adj P = 0.0737825000
-  # NOT SIG
-#dunn.test(x = as.numeric(ten.df$RelAbund), g = as.factor(ten.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.3766
-  # Summer-IBA = 0.0748
-  # Summer-Spring = 0.0570
-  # Torpor-IBA = 0.3766
-  # Torpor-Spring = 0.0548
-  # IBA-Spring = 0.0570
+  # p-value = 0.1474
 
 
 
@@ -1575,13 +1531,13 @@ hist(act.muc.df$RelAbund, breaks=10)
 qqnorm(act.muc.df$RelAbund)
 qqline(act.muc.df$RelAbund)
 shapiro.test(act.muc.df$RelAbund)
-  # p-value = 6.002e-05
-  # Not Normal
+  # p-value = 0.1113
+  # Normal
 
-# Kruskal-Wallis
-kruskal.test(formula = RelAbund ~ Group, data=act.muc.df)
-  # p-value = 0.4614
-  # adj P = 0.4614000000
+# ANOVA
+summary(aov(formula = RelAbund ~ Group, data=act.muc.df))
+  # p-value = 0.421
+
 
 
 
@@ -1599,21 +1555,12 @@ hist(elu.muc.df$RelAbund, breaks=10)
 qqnorm(elu.muc.df$RelAbund)
 qqline(elu.muc.df$RelAbund)
 shapiro.test(elu.muc.df$RelAbund)
-  # p-value = 1.437e-11
+  # p-value = 1.382e-07
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=elu.muc.df)
-  # p-value = 0.03791
-  # adj P = 0.0695016667
-  # NOT SIG
-dunn.test(x = as.numeric(elu.muc.df$RelAbund), g = as.factor(elu.muc.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.4942
-  # Summer-IBA = 0.0841
-  # Summer-Spring = 0.0841
-  # Torpor-IBA = 0.0757
-  # Torpor-Spring = 0.1413
-  # IBA-Spring = 0.0208
+  # p-value = 0.2135
 
 
 
@@ -1631,13 +1578,12 @@ hist(unc.muc.df$RelAbund, breaks=10)
 qqnorm(unc.muc.df$RelAbund)
 qqline(unc.muc.df$RelAbund)
 shapiro.test(unc.muc.df$RelAbund)
-  # p-value = 5.443e-11
+  # p-value = 3.292e-07
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=unc.muc.df)
-  # p-value = 0.1807
-  # adj P = 0.2208555556
+  # p-value = 0.2998
 
 
 
@@ -1663,4 +1609,353 @@ phy.sum <- phy99.df %>%
             SD = sd(Abundance),
             SE = se(Abundance),
             iqr = IQR(Abundance))
+```
+
+
+
+### Mucosa - Alpha-Diversity - Phylogenetic Diversity and SES MPD
+```{r}
+### Unweighted - Calculate phylogenetic diversity and MPD ###
+
+# Calculate Faith's phylogenetic diversity
+pd.muc.res <- pd(t(data.frame(otu_table(phy.muc))), phy_tree(phy.muc), include.root = T)
+pd.muc.df <- data.frame(pd.muc.res)
+
+# Calculate MPD (Mean Pairwise Distance)
+pd.muc.dist <- cophenetic(phy_tree(phy.muc))
+  # Calculate cophenetic distance
+ses.mpd.muc.res <- ses.mpd(t(data.frame(otu_table(phy.muc))), pd.muc.dist, null.model = "taxa.labels", abundance.weighted = F, runs = 999)
+  # Calculate MPD
+  # This'll take a while to run-- be patient
+#save(ses.mpd.muc.res, file = "mpd.muc.RData")
+#load("mpd.muc.RData")
+mpd.muc <- data.frame(ses.mpd.muc.res)
+  # Pull out MDP results
+
+
+### Prepare data for plotting ###
+mpd.muc$SampleID <- row.names(mpd.muc)
+pd.muc.res$SampleID <- row.names(pd.muc.res)
+  # Make sure all SampleID's match!
+
+# Pull out first Stat of each test
+# PD test = PD
+# MPD test = SES (Standardized Effect Size)
+pd.muc.stats <- data.frame(pd.muc.res$SampleID, pd.muc.res$PD)
+pd.muc.stats$Measure <- rep("PD", nrow(pd.muc.df))
+colnames(pd.muc.stats) <- c("Sample", "Stat", "Measure")
+mpd.muc.stats <- data.frame(mpd.muc$SampleID, mpd.muc$mpd.obs.z)
+mpd.muc.stats$Measure <- rep("MPD SES", nrow(pd.muc.df))
+colnames(mpd.muc.stats) <- c("Sample", "Stat", "Measure")
+
+
+
+### Prepare PD ###
+pd.muc.ready <- merge(pd.muc.stats, meta, by = "Sample")
+pd.muc.ready$Group <- ordered(pd.muc.ready$Group, levels = c("Summer_Captive", "Torpor", "IBA", "Spring"))
+
+### Prepare MPD ###
+mpd.muc.ready <- merge(mpd.muc.stats, meta, by = "Sample")
+mpd.muc.ready$Group <- ordered(mpd.muc.ready$Group, levels = c("Summer_Captive", "Torpor", "IBA", "Spring"))
+
+
+        
+        
+########## TESTING PD & MPD ##########
+
+### Test PD ###
+hist(pd.muc.ready$Stat, breaks=10)
+qqnorm(pd.muc.ready$Stat)
+qqline(pd.muc.ready$Stat)
+shapiro.test(pd.muc.ready$Stat)
+  # p-value = 0.01796
+  # adj p = 0.0359200
+  # Not Normal
+
+# Run Kruskal-Wallis
+kruskal.test(formula = Stat ~ Group, data=pd.muc.ready)
+  # p-value = 0.01219
+  # adj p = 0.02438000
+dunn.test(x = as.numeric(pd.muc.ready$Stat), g = as.factor(pd.muc.ready$Group), method = "bh", label = T)
+  # Summer-Torpor = 0.0316*
+  # Summer-IBA = 0.0175*
+  # Summer-Spring = 0.4788
+  # Torpor-IBA = 0.5000
+  # Torpor-Spring = 0.0540
+  # IBA-Spring = 0.0373*
+ 
+
+### Test MPD ###
+hist(mpd.muc.ready$Stat, breaks=10)
+qqnorm(mpd.muc.ready$Stat)
+qqline(mpd.muc.ready$Stat)
+shapiro.test(mpd.muc.ready$Stat)
+  # p-value = 0.4471
+  # adj p = 0.5961333
+  # Normal
+
+# ANOVA
+summary(aov(formula = Stat ~ Group, data=mpd.muc.ready))
+  # p-value = 0.0313
+  # adj p = 0.04173333 
+TukeyHSD(aov(formula = Stat ~ Group, data=mpd.muc.ready))
+  # Summer-Torpor = 0.0215479*
+  # Summer-IBA = 0.2171125
+  # Summer-Spring = 0.3451903
+  # Torpor-IBA = 0.5188648
+  # Torpor-Spring = 0.7642430
+  # IBA-Spring = 0.9987692
+
+
+
+```
+
+### Mucosa - Alpha Diversity - Shannon & # OTUs
+```{r}
+adiv.muc <- data.frame(sample_data(phy.muc))
+
+
+########## Shannon ##########
+hist(adiv.muc$shannon, breaks=10)
+qqnorm(adiv.muc$shannon)
+qqline(adiv.muc$shannon)
+shapiro.test(adiv.muc$shannon)
+  # p-value = 0.6468
+  # adj P = 0.6468000
+  # Normal
+
+summary(aov(shannon ~ Group, data = adiv.muc))
+  # p-value = 0.868
+  # adj P = 0.86800000
+
+
+
+
+
+########## Number of Unique OTUs ##########
+otus.muc <- data.frame(otu_table(phy.muc))
+sampNames.muc <- colnames(otus.muc)
+uniq.otus.muc <- data.frame(matrix(nrow = nsamples(phy.muc), ncol = 2))
+colnames(uniq.otus.muc) <- c("Sample", "Unique_OTUs")
+for(n in 1:nsamples(phy.muc)) {
+  COL.muc <- otus.muc[,n]
+  numUniq.muc <- length(which(COL.muc > 0))
+  uniq.otus.muc$Sample[n] <- sampNames.muc[n]
+  uniq.otus.muc$Unique_OTUs[n] <- numUniq.muc
+}
+uniq.otus.muc$Group <- sample_data(phy.muc)$Group
+rownames(uniq.otus.muc) <- uniq.otus.muc$Sample
+
+
+hist(uniq.otus.muc$Unique_OTUs, breaks=10)
+qqnorm(uniq.otus.muc$Unique_OTUs)
+qqline(uniq.otus.muc$Unique_OTUs)
+shapiro.test(uniq.otus.muc$Unique_OTUs)
+  # p-value =  0.01611
+  # adj p = 0.0359200
+  # Not Normal
+
+kruskal.test(formula = Unique_OTUs ~ Group, data=uniq.otus.muc)
+  # p-value = 0.004016
+  # adj p = 0.01606400
+dunn.test(x = as.numeric(uniq.otus.muc$Unique_OTUs), g = as.factor(uniq.otus.muc$Group), method = "bh", label = T)
+  # Summer-Torpor = 0.0056*
+  # Summer-IBA = 0.0104*
+  # Summer-Spring = 0.4499
+  # Torpor-IBA = 0.4079
+  # Torpor-Spring = 0.0429*
+  # IBA-Spring = 0.0389
+
+
+### P-adjust Shapiro
+p.adjust(c(0.01796,0.4471,0.6468, 0.01611), method = "BH")
+  # 0.0359200 0.5961333 0.6468000 0.0359200
+
+### P-adjust AOV/Kruskal-Wallis
+p.adjust(c(0.01219,0.0313,0.868, 0.004016), method = "BH")
+  # 0.02438000 0.04173333 0.86800000 0.01606400
+
+```
+
+### Mucosa - Alpha-Diversity Prepare Plots
+```{r}
+###### Unique # of OTUs ######
+
+### Prepare data for plot
+uniq.otus.muc.sum <- uniq.otus.muc %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Unique_OTUs),
+            SE = se(Unique_OTUs),
+            SD = sd(Unique_OTUs),
+            Median = median(Unique_OTUs))
+uniq.otus.muc.sum$YMAX <- uniq.otus.muc.sum$Mean + uniq.otus.muc.sum$SE
+uniq.otus.muc.sum$YMIN <- uniq.otus.muc.sum$Mean - uniq.otus.muc.sum$SE
+
+otu.muc.ann <- data.frame(lab = c("a", "b", "bc", "ac"), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
+
+otu.muc.plot <- ggplot(uniq.otus.muc, aes(x = Group, y = Unique_OTUs, fill = Group)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_y_continuous(limits = c(220,710), breaks = c(220,335,450,565,680)) +
+  scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  ylab("Number of Unique OTUs") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6, vjust = 10,
+                                    margin = margin(t = 8, r = 10, b = -15, l = 1)),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6, angle = 20, hjust = 0.5, vjust = 1.1),
+        axis.text.y = element_text(size=6),
+        legend.position = "none") +
+  geom_text(data = otu.muc.ann, aes(label=lab), x=c(1,2,3,4),
+            y=c(710,710,710,710), size=2.5, color="black")
+
+
+
+
+###### Faith's Phylogenetic Diversity ######
+
+### Prepare PD ###
+pd.muc.sum <- pd.muc.ready %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+pd.muc.sum$YMAX <- pd.muc.sum$Mean + pd.muc.sum$SE
+pd.muc.sum$YMIN <- pd.muc.sum$Mean - pd.muc.sum$SE
+
+pd.muc.ann <- data.frame(lab = c("a", "bc", "b", "ac"), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
+
+pd.muc.plot <- ggplot(pd.muc.ready, aes(x = Group, y = Stat, fill = Group)) +
+  geom_violin() + 
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_y_continuous(limits = c(16,36), breaks = c(16,21,26,31,36)) +
+  scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  ylab("Faith's Phylogenetic Diversity") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6, vjust = 10,
+                                    margin = margin(t = 8, r = 10, b = -15, l = 1)),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6, angle = 20, hjust = 0.5, vjust = 1.1),
+        axis.text.y = element_text(size=6),
+        legend.position = "none") +
+  geom_text(data = pd.muc.ann, aes(label=lab), x=c(1,2,3,4),
+            y=c(36,36,36,36), size=2.5, color="black")
+
+
+
+
+
+###### Phylogenetic Diversity (MPD) ######
+
+### Prepare MPD ###
+mpd.muc.sum <- mpd.muc.ready %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(Stat),
+            SE = se(Stat),
+            SD = sd(Stat),
+            Median = median(Stat))
+mpd.muc.sum$YMAX <- mpd.muc.sum$Mean + mpd.muc.sum$SE
+mpd.muc.sum$YMIN <- mpd.muc.sum$Mean - mpd.muc.sum$SE
+
+mpd.muc.ann <- data.frame(lab = c("a", "b", "ab", "ab"), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
+
+mpd.muc.plot <- ggplot(mpd.muc.ready, aes(x = Group, y = Stat, fill = Group)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_y_continuous(limits = c(-6.5,3.75), breaks = c(-6.5,-4.5,-2.5,-0.5,1.5,3.5)) +
+  scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  ylab("Phylogenetic Evenness (MPD)") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6, vjust = 10,
+                                    margin = margin(t = 8, r = 10, b = -15, l = 1)),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6, angle = 20, hjust = 0.5, vjust = 1.1),
+        axis.text.y = element_text(size=6),
+        legend.position = "none") +
+  geom_text(data = mpd.muc.ann, aes(label=lab), x=c(1,2,3,4),
+            y=c(3.75,3.75,3.75,3.75), size=2.5, color="black")
+  
+
+
+        
+        
+        
+
+
+
+### Prepare data for plot
+shannon.muc.sum <- adiv.muc %>%
+  group_by(Group) %>%
+  summarize(Mean = mean(shannon),
+            SE = se(shannon),
+            SD = sd(shannon),
+            Median = median(shannon))
+shannon.muc.sum$YMAX <- shannon.muc.sum$Mean + shannon.muc.sum$SE
+shannon.muc.sum$YMIN <- shannon.muc.sum$Mean - shannon.muc.sum$SE
+
+
+
+shannon.muc.ann <- data.frame(lab = c("ns", " ", " ", " "), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
+
+shannon.muc.plot <- ggplot(adiv.muc, aes(x = Group, y = shannon, fill = Group)) +
+  geom_violin() +
+  geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
+  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_y_continuous(limits = c(1.4,5.8), breaks = c(1.4,2.5,3.6,4.7,5.8)) +
+  scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  ylab("Shannon's Diversity Index") +
+    theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(face="bold", size=6),
+        strip.text.x = element_text(face ="bold", size=6),
+        legend.title = element_text(face="bold", size=6),
+        axis.title.x = element_text(face="bold", size=6, vjust = 10,
+                                    margin = margin(t = 8, r = 10, b = -15, l = 1)),
+        axis.title.y = element_text(face="bold", size=6),
+        axis.text.x = element_text(size=6, angle = 20, hjust = 0.5, vjust = 1.1),
+        axis.text.y = element_text(size=6),
+        legend.text = element_text(size=6),
+        legend.key.height = unit(3, 'mm'),
+        legend.key.width = unit(3, "mm"),
+        legend.box.margin=margin(-10,-10,-10,-10)) +
+  geom_text(data = shannon.muc.ann, aes(label=lab), x=c(2.5,0,0,0),
+            y=c(5.8,0,0,0), size=2.5, color="black")
+
+```
+
+### Content Plot - Alpha-Diversity
+```{r}
+tiff("CaptiveSeasons.muc.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
+grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(otu.muc.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+grid.text("B", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=2),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(pd.muc.plot, vp=viewport(layout.pos.row=2, layout.pos.col=2))
+grid.text("C", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=3),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(mpd.muc.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
+grid.text("D", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
+          gp=gpar(fontsize=8,fontface="bold"))
+print(shannon.muc.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
+dev.off()
 ```
