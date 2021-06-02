@@ -1940,7 +1940,7 @@ shannon.muc.plot <- ggplot(adiv.muc, aes(x = Group, y = shannon, fill = Group)) 
 
 ```
 
-### Content Plot - Alpha-Diversity
+### Mucosa Plot - Alpha-Diversity
 ```{r}
 tiff("CaptiveSeasons.muc.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
@@ -1958,4 +1958,575 @@ grid.text("D", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col
           gp=gpar(fontsize=8,fontface="bold"))
 print(shannon.muc.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
 dev.off()
+```
+
+
+
+### Mucosa - Beta-Diversity
+```{r}
+
+########## Weighted UniFrac ##########
+UF.w.muc <- phyloseq::distance(physeq = phy.muc, method = "wunifrac")
+UF.w.pcoa.muc <- ordinate(physeq = phy.muc, method = "PCoA", distance = "wunifrac")
+  # Variation explained = 41.9%
+
+wUF.muc.plot <- plot_ordination(physeq = phy.muc, ordination = UF.w.pcoa.muc, axes = c(1,2),
+                title = "Weighted UniFrac", color = "Group") +
+  #stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
+  scale_colour_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  geom_point(size=2, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8, colour = "black"),
+        axis.text.y = element_text(size = 8, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 10),
+        legend.position = "none"
+        )
+
+
+### PERMANOVA ###
+sampdf.muc <- data.frame(sample_data(phy.muc))
+beta.tax <- betadisper(d=UF.w.muc, group=sampdf.muc$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.745
+adonis(UF.w.muc ~ Group, data=sampdf.muc, permutations = 9999)
+  # p-value = 2e-04
+
+# Separate by season
+phy.muc.sum <- subset_samples(phy.muc, Group == "Summer_Captive")
+phy.muc.tor <- subset_samples(phy.muc, Group == "Torpor")
+phy.muc.iba <- subset_samples(phy.muc, Group == "IBA")
+phy.muc.spr <- subset_samples(phy.muc, Group == "Spring")
+
+# Separate out pairwise comparisons
+phy.muc.st <- merge_phyloseq(phy.muc.sum, phy.muc.tor)
+phy.muc.si <- merge_phyloseq(phy.muc.sum, phy.muc.iba)
+phy.muc.sp <- merge_phyloseq(phy.muc.sum, phy.muc.spr)
+phy.muc.ti <- merge_phyloseq(phy.muc.tor, phy.muc.iba)
+phy.muc.tp <- merge_phyloseq(phy.muc.tor, phy.muc.spr)
+phy.muc.ip <- merge_phyloseq(phy.muc.iba, phy.muc.spr)
+
+
+# Summer vs Torpor
+st.w.muc <- phyloseq::distance(physeq = phy.muc.st, method = "wunifrac")
+sampdf.st<- data.frame(sample_data(phy.muc.st))
+beta.tax <- betadisper(d=st.w.muc, group=sampdf.st$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.501
+  # adj P = 0.817
+adonis(st.w.muc ~ Group, data=sampdf.st, permutations = 9999)
+  # p-value = 0.0014
+  # adj p = 0.00420
+
+
+# Summer vs IBA
+si.w.muc <- phyloseq::distance(physeq = phy.muc.si, method = "wunifrac")
+sampdf.si<- data.frame(sample_data(phy.muc.si))
+beta.tax <- betadisper(d=si.w.muc, group=sampdf.si$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.606
+  # adj p = 0.817
+adonis(si.w.muc ~ Group, data=sampdf.si, permutations = 9999)
+  # p-value = 8e-04
+  # adj p = 0.00420
+
+
+# Summer vs Spring
+sp.w.muc <- phyloseq::distance(physeq = phy.muc.sp, method = "wunifrac")
+sampdf.sp<- data.frame(sample_data(phy.muc.sp))
+beta.tax <- betadisper(d=sp.w.muc, group=sampdf.sp$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.731
+  # adj p = 0.817
+adonis(sp.w.muc ~ Group, data=sampdf.sp, permutations = 9999)
+  # p-value = 0.1192
+  # adj p = 0.14304
+
+
+# Torpor vs IBA
+ti.w.muc <- phyloseq::distance(physeq = phy.muc.ti, method = "wunifrac")
+sampdf.ti<- data.frame(sample_data(phy.muc.ti))
+beta.tax <- betadisper(d=ti.w.muc, group=sampdf.ti$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.817
+  # adj p = 0.817
+adonis(ti.w.muc ~ Group, data=sampdf.ti, permutations = 9999)
+  # p-value = 0.9865
+  # adj p = 0.98650
+
+
+# Torpor vs Spring
+tp.w.muc <- phyloseq::distance(physeq = phy.muc.tp, method = "wunifrac")
+sampdf.tp<- data.frame(sample_data(phy.muc.tp))
+beta.tax <- betadisper(d=tp.w.muc, group=sampdf.tp$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.312
+  # adj p = 0.817
+adonis(tp.w.muc ~ Group, data=sampdf.tp, permutations = 9999)
+  # p-value = 0.0162
+  # adj p = 0.02430
+
+
+# IBA vs Spring
+ip.w.muc <- phyloseq::distance(physeq = phy.muc.ip, method = "wunifrac")
+sampdf.ip<- data.frame(sample_data(phy.muc.ip))
+beta.tax <- betadisper(d=ip.w.muc, group=sampdf.ip$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.385
+  # adj p = 0.817
+adonis(ip.w.muc ~ Group, data=sampdf.ip, permutations = 9999)
+  # p-value = 0.0095
+  # adj p = 0.01900
+
+
+
+# Adjust betadisper p-values
+p.adjust(c(0.501,0.606,0.731,0.817,0.312,0.385), method = "fdr")
+  # Summer-Torpor = 0.817
+  # Summer-IBA = 0.817
+  # Summer-Spring = 0.817
+  # Torpor-IBA = 0.817
+  # Torpor-Spring = 0.817
+  # IBA-Spring = 0.817
+
+# Adjust PERMANOVA p-values
+p.adjust(c(0.0014,8e-04,0.1192,0.9865,0.0162,0.0095), method = "fdr")
+  # Summer-Torpor = 0.00420
+  # Summer-IBA = 0.00420
+  # Summer-Spring = 0.14304
+  # Torpor-IBA = 0.98650
+  # Torpor-Spring = 0.02430
+  # IBA-Spring = 0.01900
+
+
+
+
+
+
+########## Unweighted UniFrac ##########
+UF.u.muc <- phyloseq::distance(physeq = phy.muc, method = "unifrac")
+UF.u.pcoa.muc <- ordinate(physeq = phy.muc, method = "PCoA", distance = "unifrac")
+  # Variation explained = 23.9%
+
+uUF.muc.plot <- plot_ordination(physeq = phy.muc, ordination = UF.u.pcoa.muc, axes = c(1,2),
+                title = "Unweighted UniFrac", color = "Group") +
+  #stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
+  scale_colour_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  geom_point(size=2, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8, colour = "black"),
+        axis.text.y = element_text(size = 8, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 10),
+        legend.position  = "none"
+        )
+
+
+### PERMANOVA ###
+sampdf <- data.frame(sample_data(phy.muc))
+beta.tax <- betadisper(d=UF.u.muc, group=sampdf$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.092
+adonis(UF.u.muc ~ Group, data=sampdf, permutations = 9999)
+  # p-value = 0.0014
+
+
+# Summer vs Torpor
+st.u.muc <- phyloseq::distance(physeq = phy.muc.st, method = "unifrac")
+sampdf.st<- data.frame(sample_data(phy.muc.st))
+beta.tax <- betadisper(d=st.u.muc, group=sampdf.st$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.11
+  # adj p = 0.220
+adonis(st.u.muc ~ Group, data=sampdf.st, permutations = 9999)
+  # p-value = 0.0027
+  # adj p = 0.00810
+
+
+# Summer vs IBA
+si.u.muc <- phyloseq::distance(physeq = phy.muc.si, method = "unifrac")
+sampdf.si<- data.frame(sample_data(phy.muc.si))
+beta.tax <- betadisper(d=si.u.muc, group=sampdf.si$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.066
+  # adj p = 0.220
+adonis(si.u.muc ~ Group, data=sampdf.si, permutations = 9999)
+  # p-value = 5e-04
+  # adj p = 0.00300
+
+
+# Summer vs Spring
+sp.u.muc <- phyloseq::distance(physeq = phy.muc.sp, method = "unifrac")
+sampdf.sp<- data.frame(sample_data(phy.muc.sp))
+beta.tax <- betadisper(d=sp.u.muc, group=sampdf.sp$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.088
+  # adj p = 0.220
+adonis(sp.u.muc ~ Group, data=sampdf.sp, permutations = 9999)
+  # p-value = 0.5296
+  # adj p = 0.63552
+
+
+# Torpor vs IBA
+ti.u.muc <- phyloseq::distance(physeq = phy.muc.ti, method = "unifrac")
+sampdf.ti<- data.frame(sample_data(phy.muc.ti))
+beta.tax <- betadisper(d=ti.u.muc, group=sampdf.ti$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.721
+  # adj p = 0.721
+adonis(ti.u.muc ~ Group, data=sampdf.ti, permutations = 9999)
+  # p-value = 0.844
+  # adj p = 0.84400
+
+
+# Torpor vs Spring
+tp.u.muc <- phyloseq::distance(physeq = phy.muc.tp, method = "unifrac")
+sampdf.tp<- data.frame(sample_data(phy.muc.tp))
+beta.tax <- betadisper(d=tp.u.muc, group=sampdf.tp$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.38
+  # adj p = 0.570
+adonis(tp.u.muc ~ Group, data=sampdf.tp, permutations = 9999)
+  # p-value = 0.0697
+  # adj p = 0.10455
+
+# IBA vs Spring
+ip.u.muc <- phyloseq::distance(physeq = phy.muc.ip, method = "unifrac")
+sampdf.ip<- data.frame(sample_data(phy.muc.ip))
+beta.tax <- betadisper(d=ip.u.muc, group=sampdf.ip$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.614
+  # adj p = 0.721
+adonis(ip.u.muc ~ Group, data=sampdf.ip, permutations = 9999)
+  # p-value = 0.0163
+  # adj p = 0.03260
+
+# Adjust betadisper p-values
+p.adjust(c(0.11,0.066,0.088,0.721,0.38,0.614), method = "fdr")
+  # Summer-Torpor = 0.220
+  # Summer-IBA = 0.220
+  # Summer-Spring = 0.220
+  # Torpor-IBA = 0.721
+  # Torpor-Spring = 0.570
+  # IBA-Spring = 0.721
+
+# Adjust PERMANOVA/ANOSIM p-values
+p.adjust(c(0.0027,5e-04,0.5296,0.844,0.0697,0.0163), method = "fdr")
+  # Summer-Torpor = 0.00810
+  # Summer-IBA = 0.00300
+  # Summer-Spring = 0.63552
+  # Torpor-IBA = 0.84400
+  # Torpor-Spring = 0.10455
+  # IBA-Spring = 0.03260
+
+
+
+
+
+
+
+########## Bray-Curtis ##########
+bray.pcoa.muc <- ordinate(physeq=phy.muc, method="PCoA", distance="bray")
+  # Variation explained = 31.8%
+
+bc.muc.plot <- plot_ordination(physeq=phy.muc, ordination=bray.pcoa.muc, color="Group",
+                           title = "Bray-Curtis Dissimilarity") +
+  #stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
+  scale_colour_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  geom_point(size=2, colour = "black", shape = 21) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.background = element_blank(),
+        axis.title.x = element_text(size = 8),
+        axis.title.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8, colour = "black"),
+        axis.text.y = element_text(size = 8, colour = "black"),
+        plot.title = element_text(hjust = 0.5, size = 10),
+        legend.position = "none"
+        #legend.title = element_text(size = 8, face = "bold"),
+        #legend.text = element_text(size = 8),
+        #legend.key.height = unit(4, 'mm'),
+        #legend.box.margin=margin(-10,-10,-10,-10)
+        )
+
+
+ord.muc.legend <- g_legend(bc.muc.plot)
+
+
+### TEST ###
+sampdf.muc <- data.frame(sample_data(phy.muc))
+bray.muc <- phyloseq::distance(physeq = phy.muc, method = "bray")
+beta.tax <- betadisper(d = bray.muc, group = sampdf.muc$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.705
+adonis(bray.muc ~ Group, data=sampdf.muc, permutations = 9999)
+  # p-value = 1e-04
+
+
+
+### Summer vs. Torpor ###
+sampdf.muc.st <- data.frame(sample_data(phy.muc.st))
+bray.muc.st <- phyloseq::distance(physeq = phy.muc.st, method = "bray")
+beta.tax <- betadisper(d = bray.muc.st, group = sampdf.muc.st$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.958
+  # adj p = 
+adonis(bray.muc.st ~ Group, data=sampdf.muc.st, permutations = 9999)
+  # p-value = 0.0016
+  # adj p = 
+
+
+### Summer vs. IBA ###
+sampdf.muc.si <- data.frame(sample_data(phy.muc.si))
+bray.muc.si <- phyloseq::distance(physeq = phy.muc.si, method = "bray")
+beta.tax <- betadisper(d = bray.muc.si, group = sampdf.muc.si$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.917
+  # adj p = 
+adonis(bray.muc.si ~ Group, data=sampdf.muc.si, permutations = 9999)
+  # p-value = 7e-04
+  # adj p = 
+
+
+### Summer vs. Spring ###
+sampdf.muc.sp <- data.frame(sample_data(phy.muc.sp))
+bray.muc.sp <- phyloseq::distance(physeq = phy.muc.sp, method = "bray")
+beta.tax <- betadisper(d = bray.muc.sp, group = sampd.mucf.sp$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.933
+  # adj p = 
+adonis(bray.muc.sp ~ Group, data=sampdf.muc.sp, permutations = 9999)
+  # p-value = 0.0791
+  # adj p = 
+
+
+### Torpor vs. IBA ###
+sampdf.muc.ti <- data.frame(sample_data(phy.muc.ti))
+bray.muc.ti <- phyloseq::distance(physeq = phy.muc.ti, method = "bray")
+beta.tax <- betadisper(d = bray.muc.ti, group = sampdf.muc.ti$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.958
+  # adj p = 
+adonis(bray.muc.ti ~ Group, data=sampdf.muc.ti, permutations = 9999)
+  # p-value = 0.9815
+  # adj p = 
+
+
+### Torpor vs. Spring ###
+sampdf.muc.tp <- data.frame(sample_data(phy.muc.tp))
+bray.muc.tp <- phyloseq::distance(physeq = phy.muc.tp, method = "bray")
+beta.tax <- betadisper(d = bray.muc.tp, group = sampdf.muc.tp$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.137
+  # adj p = 
+adonis(bray.muc.tp ~ Group, data=sampdf.muc.tp, permutations = 9999)
+  # p-value = 0.0178
+  # adj p = 
+
+
+### IBA vs. Spring ###
+sampdf.muc.ip <- data.frame(sample_data(phy.muc.ip))
+bray.muc.ip <- phyloseq::distance(physeq = phy.muc.ip, method = "bray")
+beta.tax <- betadisper(d = bray.muc.ip, group = sampdf.muc.ip$Group)
+p <- permutest(beta.tax)
+p$tab
+  # p-value = 0.354
+  # adj p = 
+adonis(bray.muc.ip ~ Group, data=sampdf.muc.ip, permutations = 9999)
+  # p-value = 0.0084
+  # adj p = 
+
+
+
+### Adjust betadisper p-values
+p.adjust(c(0.958,0.917,0.933,0.958,0.137,0.354), method = "fdr")
+  # Summer-Torpor = 0.958
+  # Summer-IBA = 0.958
+  # Summer-Spring = 0.958
+  # Torpor-IBA = 0.958
+  # Torpor-Spring = 0.822
+  # IBA-Spring = 0.958
+
+
+
+### Adjust PERMANOVA p-values
+p.adjust(c(0.0016,7e-04,0.0791,0.9815,0.0178,0.0084), method = "fdr")
+  # Summer-Torpor = 0.00480
+  # Summer-IBA = 0.00420
+  # Summer-Spring = 0.09492
+  # Torpor-IBA = 0.98150
+  # Torpor-Spring = 0.02670
+  # IBA-Spring = 0.01680
+
+```
+
+
+### Mucosa Plot - Beta-diversity
+```{r}
+tiff("CaptiveSeasons.muc.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
+grid.newpage()
+pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 0.45), heights = c(1, 1, 1))))
+
+print(wUF.muc.plot, vp=viewport(layout.pos.row=1, layout.pos.col=1))
+print(uUF.muc.plot, vp=viewport(layout.pos.row=2, layout.pos.col=1))
+print(bc.muc.plot, vp=viewport(layout.pos.row=3, layout.pos.col=1))
+
+
+ord.muc.legend$vp <- viewport(layout.pos.row = 1:3, layout.pos.col = 2)
+grid.draw(ord.muc.legend)
+
+
+grid.text("A", x=unit(0.05, "npc"), y=unit(0.95, "npc"), vp=viewport(layout.pos.row=1,
+                                                                  layout.pos.col=1),
+          gp=gpar(fontsize=12,fontface="bold"))
+grid.text("B", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos.row=2,
+                                                                   layout.pos.col=1),
+          gp=gpar(fontsize=12,fontface="bold"))
+grid.text("C", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos.row=3,
+                                                                   layout.pos.col=1),
+          gp=gpar(fontsize=12,fontface="bold"))
+
+dev.off()
+```
+
+
+
+### Mucosa - SIMPER
+```{r}
+# Change Group names to be compatible (no "_")
+muc.rename <- data.frame(sample_data(phy.muc))
+muc.rename$GroupRename <- rep(NA, nrow(muc.rename))
+muc.rename$GroupRename[which(muc.rename$Group == "Summer_Captive")] <- "Summer"
+muc.rename$GroupRename[which(muc.rename$Group == "Torpor")] <- "Torpor"
+muc.rename$GroupRename[which(muc.rename$Group == "IBA")] <- "IBA"
+muc.rename$GroupRename[which(muc.rename$Group == "Spring")] <- "Spring"
+muc.rename$GroupRename <- ordered(muc.rename$GroupRename, levels = c("Summer", "Torpor", "IBA", "Spring"))
+phy.muc.simp <- merge_phyloseq(otu_table(phy.muc), sample_data(muc.rename), tax_table(phy.muc))
+
+
+# Group
+#simper.pretty(data.frame(otu_table(phy.muc.simp)),
+              data.frame(sample_data(phy.muc.simp)),
+              c("GroupRename"),
+              perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
+              output_name='CaptiveSeason_muc')
+#group.simper <- read.csv("CaptiveSeason_muc_clean_simper.csv")
+#kruskal.pretty(data.frame(otu_table(phy.muc.simp)),
+               data.frame(sample_data(phy.muc.simp)),
+               csv = group.simper,
+               c("GroupRename"),
+               output_name = 'CaptiveSeason_muc',
+               taxonomy = data.frame(tax_table(phy.muc.simp)))
+#group.simper.kw <- read.csv("CaptiveSeason_muc_krusk_simper.csv")
+for(i in 1:nrow(group.simper.kw)){
+  save <- which(rownames(data.frame(tax_table(phy.muc.simp))) == group.simper.kw$OTU[i])
+  group.simper.kw$Taxonomy[i] <-
+    paste(data.frame(tax_table(phy.muc.simp))[save,2], "-",
+          data.frame(tax_table(phy.muc.simp))[save,3], "-",
+          data.frame(tax_table(phy.muc.simp))[save,4], "-",
+          data.frame(tax_table(phy.muc.simp))[save,5], "-",
+          data.frame(tax_table(phy.muc.simp))[save,6])
+}
+#write.table(group.simper.kw, "CaptiveSeason_muc_krusk_simper.csv", sep=",")
+#group.simper.kw <- read.csv("group_clean_simper.csv", row.names = 1)
+```
+
+
+
+### Mucosa - Core OTUs and Shared OTUs
+```{r}
+### Drop empty taxa
+phy.muc.sum.trim <- prune_taxa(taxa_sums(phy.muc.sum) > 0, phy.muc.sum)
+  # 1618 OTUs
+phy.muc.tor.trim <- prune_taxa(taxa_sums(phy.muc.tor) > 0, phy.muc.tor)
+  # 691 OTUs
+phy.muc.iba.trim <- prune_taxa(taxa_sums(phy.muc.iba) > 0, phy.muc.iba)
+  # 794 OTUs
+phy.muc.spr.trim <- prune_taxa(taxa_sums(phy.muc.spr) > 0, phy.muc.spr)
+  # 808 OTUs
+
+
+
+### Identify Core OTUs
+sum.muc.otu <- data.frame(otu_table(phy.muc.sum))
+sum.muc.core <- apply(sum.muc.otu, 1, function(row) all(row != 0))
+sum.muc.core <- sum.muc.otu[sum.muc.core,]
+phy.muc.sum.core <- merge_phyloseq(otu_table(sum.muc.core, taxa_are_rows = T), tax_table(phy.muc.sum), sample_data(phy.muc.sum))
+  # 43 OTUs
+tor.muc.otu <- data.frame(otu_table(phy.muc.tor))
+tor.muc.core <- apply(tor.muc.otu, 1, function(row) all(row != 0))
+tor.muc.core <- tor.muc.otu[tor.muc.core,]
+phy.muc.tor.core <- merge_phyloseq(otu_table(tor.muc.core, taxa_are_rows = T), tax_table(phy.muc.tor), sample_data(phy.muc.tor))
+  # 65 OTUs
+iba.muc.otu <- data.frame(otu_table(phy.muc.iba))
+iba.muc.core <- apply(iba.muc.otu, 1, function(row) all(row != 0))
+iba.muc.core <- iba.muc.otu[iba.muc.core,]
+phy.muc.iba.core <- merge_phyloseq(otu_table(iba.muc.core, taxa_are_rows = T), tax_table(phy.muc.iba), sample_data(phy.muc.iba))
+  # 60 OTUs
+spr.muc.otu <- data.frame(otu_table(phy.muc.spr))
+spr.muc.core <- apply(spr.muc.otu, 1, function(row) all(row != 0))
+spr.muc.core <- spr.muc.otu[spr.muc.core,]
+phy.muc.spr.core <- merge_phyloseq(otu_table(spr.muc.core, taxa_are_rows = T), tax_table(phy.muc.spr), sample_data(phy.muc.spr))
+  # 141 OTUs
+
+
+### Compare Core OTUs
+intersect(rownames(sum.muc.core), rownames(tor.muc.core))
+  # 24 shared core OTUs
+  # "Otu00072" "Otu00159" "Otu00241" "Otu00026" "Otu00154" "Otu00197" "Otu00120" "Otu00184" "Otu00161" "Otu00200" "Otu00093" "Otu00067" "Otu00009" "Otu00040" "Otu00452" "Otu00143" "Otu00068" "Otu00084" "Otu00043" "Otu00011" "Otu00041" "Otu00137" "Otu00112" "Otu00065"
+intersect(rownames(sum.muc.core), rownames(iba.muc.core))
+  # 26 shared core OTUs
+  # "Otu00072" "Otu00241" "Otu00026" "Otu00053" "Otu00175" "Otu00278" "Otu00197" "Otu00120" "Otu00169" "Otu00184" "Otu00156" "Otu00200" "Otu00093" "Otu00067" "Otu00452" "Otu00143" "Otu00068" "Otu00084" "Otu00043" "Otu00011" "Otu00109" "Otu00041" "Otu00137" "Otu00090" "Otu00112" "Otu00065"
+intersect(rownames(sum.muc.core), rownames(spr.muc.core))
+  # 34 shared core OTUs
+  # "Otu00072" "Otu00159" "Otu00044" "Otu00026" "Otu00053" "Otu00455" "Otu00154" "Otu00175" "Otu00278" "Otu00197" "Otu00120" "Otu00184" "Otu00161" "Otu00236" "Otu00156" "Otu00200" "Otu00093" "Otu00133" "Otu00067" "Otu00009" "Otu00040" "Otu00452" "Otu00143" "Otu00068" "Otu00043" "Otu00011" "Otu00109" "Otu00041" "Otu00340" "Otu00052" "Otu00137" "Otu00032" "Otu00090" "Otu00112"
+intersect(rownames(tor.muc.core), rownames(iba.muc.core))
+  # 35 shared core OTUs
+  # "Otu00170" "Otu00097" "Otu00051" "Otu00072" "Otu00241" "Otu00026" "Otu00197" "Otu00120" "Otu00259" "Otu00184" "Otu00200" "Otu00093" "Otu00067" "Otu00004" "Otu00012" "Otu00452" "Otu00143" "Otu00068" "Otu00084" "Otu00043" "Otu00011" "Otu00061" "Otu00094" "Otu00041" "Otu00046" "Otu00076" "Otu00138" "Otu00137" "Otu00116" "Otu00007" "Otu00086" "Otu00219" "Otu00112" "Otu00058" "Otu00065"
+intersect(rownames(tor.muc.core), rownames(spr.muc.core))
+  # 49 shared core OTUs
+  # "Otu00170" "Otu00097" "Otu00051" "Otu00348" "Otu00072" "Otu00159" "Otu00078" "Otu00026" "Otu00018" "Otu00016" "Otu00177" "Otu00154" "Otu00197" "Otu00120" "Otu00229" "Otu00184" "Otu00161" "Otu00174" "Otu00200" "Otu00093" "Otu00067" "Otu00038" "Otu00004" "Otu00108" "Otu00102" "Otu00009" "Otu00265" "Otu00110" "Otu00045" "Otu00040" "Otu00075" "Otu00021" "Otu00452" "Otu00143" "Otu00068" "Otu00043" "Otu00011" "Otu00061" "Otu00205" "Otu00094" "Otu00041" "Otu00046" "Otu00138" "Otu00137" "Otu00007" "Otu00224" "Otu00086" "Otu00112" "Otu00058"
+intersect(rownames(iba.muc.core), rownames(spr.muc.core))
+  # 41 shared core OTUs
+  # "Otu00170" "Otu00097" "Otu00051" "Otu00072" "Otu00240" "Otu00433" "Otu00026" "Otu00053" "Otu00175" "Otu00278" "Otu00197" "Otu00120" "Otu00267" "Otu00184" "Otu00150" "Otu00210" "Otu00232" "Otu00156" "Otu00200" "Otu00093" "Otu00067" "Otu00037" "Otu00004" "Otu00452" "Otu00143" "Otu00068" "Otu00043" "Otu00011" "Otu00061" "Otu00094" "Otu00109" "Otu00041" "Otu00046" "Otu00138" "Otu00137" "Otu00221" "Otu00007" "Otu00090" "Otu00086" "Otu00112" "Otu00058"
+
+
+
+### Find core of core OTUs (in every single sample)
+core1.muc <- intersect(rownames(sum.muc.core), rownames(tor.muc.core))
+core2.muc <- intersect(core1.muc, rownames(iba.muc.core))
+core3.muc <- intersect(core2.muc, rownames(spr.muc.core))
+# 16 CORE core content OTUs
+# "Otu00072" "Otu00026" "Otu00197" "Otu00120" "Otu00184" "Otu00200" "Otu00093" "Otu00067" "Otu00452" "Otu00143" "Otu00068" "Otu00043" "Otu00011" "Otu00041" "Otu00137" "Otu00112"
+
+
+### Physeq object with only core OTUs
+phy.muc.core <- merge_phyloseq(phy.muc.sum.core, phy.muc.tor.core, phy.muc.iba.core, phy.muc.spr.core)
+#write.csv(data.frame(tax_table(phy.muc.core)), "CaptiveSeasons_muc_coreOTUs.csv")
 ```
