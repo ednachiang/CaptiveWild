@@ -209,14 +209,7 @@ shapiro.test(ver.df$RelAbund)
 kruskal.test(formula = RelAbund ~ Group, data=ver.df)
   # p-value = 0.04741
   # adj P = 0.11852500
-  # NOT SIG
-#dunn.test(x = as.numeric(ver.df$RelAbund), g = as.factor(ver.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.1625
-  # Summer-IBA = 0.0189*
-  # Summer-Spring = 0.3381
-  # Torpor-IBA = 0.1766
-  # Torpor-Spring = 0.3030
-  # IBA-Spring = 0.1517
+
 
 
 
@@ -269,13 +262,7 @@ kruskal.test(formula = RelAbund ~ Group, data=kir.df)
   # p-value = 0.01657
   # adj P = 0.05523333
   # NOT SIG
-#dunn.test(x = as.numeric(kir.df$RelAbund), g = as.factor(kir.df$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.0146*
-  # Summer-IBA = 0.2433
-  # Summer-Spring =0.0448
-  # Torpor-IBA = 0.0500
-  # Torpor-Spring = 0.4716
-  # IBA-Spring = 0.0989
+
 
 
 
@@ -985,7 +972,7 @@ p$tab
   # adj p = 0.942
 adonis(ti.u ~ Group, data=sampdf.ti, permutations = 9999)
   # p-value = 0.605
-  # adj p = 0.0.605000
+  # adj p = 0.605000
 
 
 # Torpor vs Spring
@@ -1023,12 +1010,12 @@ p.adjust(c(0.48,0.495,0.019,0.942,0.027,0.18), method = "fdr")
 
 # Adjust PERMANOVA/ANOSIM p-values
 p.adjust(c(7e-04,1e-04,0.193,0.605,0.0253,0.0239), method = "fdr")
-  # Summer-Torpor = 0.00210
-  # Summer-IBA = 0.00060
+  # Summer-Torpor = 0.00210*
+  # Summer-IBA = 0.00060*
   # Summer-Spring = 0.23160
   # Torpor-IBA = 0.60500
-  # Torpor-Spring = 0.03795
-  # IBA-Spring = 0.03795
+  # Torpor-Spring = 0.03795*
+  # IBA-Spring = 0.03795*
 
 
 
@@ -1168,12 +1155,12 @@ p.adjust(c(0.4,0.25,0.059,0.627,0.234,0.6), method = "fdr")
 
 ### Adjust PERMANOVA p-values
 p.adjust(c(8e-04,4e-04,0.1099,0.7277,0.0122,0.0194), method = "fdr")
-  # Summer-Torpor = 0.00240
-  # Summer-IBA = 0.00240
+  # Summer-Torpor = 0.00240*
+  # Summer-IBA = 0.00240*
   # Summer-Spring = 0.13188
   # Torpor-IBA = 0.72770
-  # Torpor-Spring = 0.02440
-  # IBA-Spring = 0.02910
+  # Torpor-Spring = 0.02440*
+  # IBA-Spring = 0.02910*
 
 ```
 
@@ -1364,14 +1351,16 @@ qqnorm(fir.muc.df$RelAbund)
 qqline(fir.muc.df$RelAbund)
 shapiro.test(fir.muc.df$RelAbund)
   # p-value = 0.3238
+  # adj p = 0.3238000000
   # Normal
 
 # ANOVA
 summary(aov(formula = RelAbund ~ Group, data=fir.muc.df))
   # p-value = 8.41e-06
+  # adj P = 0.00009251
 TukeyHSD(aov(formula = RelAbund ~ Group, data=fir.muc.df))
-  # Summer-Torpor = 0.0000488
-  # Summer-IBA = 0.0000175
+  # Summer-Torpor = 0.0000488*
+  # Summer-IBA = 0.0000175*
   # Summer-Spring = 0.1050824
   # Torpor-IBA = 0.9999155
   # Torpor-Spring = 0.0781171
@@ -1391,11 +1380,13 @@ qqnorm(bac.muc.df$RelAbund)
 qqline(bac.muc.df$RelAbund)
 shapiro.test(bac.muc.df$RelAbund)
   # p-value = 0.2837
+  # adj p = 0.3120700000
   # Normal
 
 # ANOVA
 summary(aov(formula = RelAbund ~ Group, data=bac.muc.df))
   # p-value = 0.162
+  # adj p = 0.25457143
 
 
 
@@ -1410,11 +1401,13 @@ qqnorm(ver.muc.df$RelAbund)
 qqline(ver.muc.df$RelAbund)
 shapiro.test(ver.muc.df$RelAbund)
   # p-value = 0.0001722
+  # adj p = 0.0003157000
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ver.muc.df)
   # p-value = 0.05591
+  # adj p = 0.20500333
 
 
 
@@ -1431,18 +1424,14 @@ qqnorm(pro.muc.df$RelAbund)
 qqline(pro.muc.df$RelAbund)
 shapiro.test(pro.muc.df$RelAbund)
   # p-value = 0.2079
+  # adj p = 0.2541000000
   # Normal
 
 # ANOVA
 summary(aov(formula = RelAbund ~ Group, data=pro.muc.df))
   # p-value = 0.0287
-TukeyHSD(aov(formula = RelAbund ~ Group, data=pro.muc.df))
-  # Summer-Torpor = 0.0929545
-  # Summer-IBA = 0.0346314
-  # Summer-Spring = 0.9098571
-  # Torpor-IBA = 0.9948679
-  # Torpor-Spring = 0.5253304
-  # IBA-Spring = 0.3680455
+  # adj p = 0.15785000
+
 
 
 
@@ -1464,11 +1453,13 @@ qqnorm(kir.muc.df$RelAbund)
 qqline(kir.muc.df$RelAbund)
 shapiro.test(kir.muc.df$RelAbund)
   # p-value = 1.863e-07
+  # adj p = 0.0000006831
   # Not Normal
 
 # ANOVA
 summary(aov(formula = RelAbund ~ Group, data=kir.muc.df))
   # p-value = 0.148
+  # adj p = 0.25457143
 
 
 
@@ -1486,11 +1477,13 @@ qqnorm(cya.muc.df$RelAbund)
 qqline(cya.muc.df$RelAbund)
 shapiro.test(cya.muc.df$RelAbund)
   # p-value = 0.04871
+  # adj p = 0.0765442857
   # Normal
 
 # ANOVA
 summary(aov(formula = RelAbund ~ Group, data=kir.muc.df))
   # p-value = 0.148
+  # adj p = 0.25457143 
 
 
 
@@ -1510,36 +1503,13 @@ qqnorm(ten.muc.df$RelAbund)
 qqline(ten.muc.df$RelAbund)
 shapiro.test(ten.muc.df$RelAbund)
   # p-value = 4.415e-05
+  # adj P = 0.0000971300 
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ten.muc.df)
   # p-value = 0.1474
-
-
-
-
-
-
-##### ACTINOBACTERIA #####
-act.muc.phy <- subset_taxa(phy99.muc, Phylum == "Actinobacteria")
-act.muc.df <- data.frame(sample_data(act.muc.phy))
-act.muc.df$RelAbund <- t(data.frame(otu_table(act.muc.phy)))
-
-# Test normality
-hist(act.muc.df$RelAbund, breaks=10)
-qqnorm(act.muc.df$RelAbund)
-qqline(act.muc.df$RelAbund)
-shapiro.test(act.muc.df$RelAbund)
-  # p-value = 0.1113
-  # Normal
-
-# ANOVA
-summary(aov(formula = RelAbund ~ Group, data=act.muc.df))
-  # p-value = 0.421
-
-
-
+  # adj p = 0.25457143
 
 
 
@@ -1556,14 +1526,60 @@ qqnorm(elu.muc.df$RelAbund)
 qqline(elu.muc.df$RelAbund)
 shapiro.test(elu.muc.df$RelAbund)
   # p-value = 1.382e-07
+  # adj p = 0.0000006831
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=elu.muc.df)
   # p-value = 0.2135
+  # adj p = 0.29356250 
 
 
 
+
+##### ACTINOBACTERIA #####
+act.muc.phy <- subset_taxa(phy99.muc, Phylum == "Actinobacteria")
+act.muc.df <- data.frame(sample_data(act.muc.phy))
+act.muc.df$RelAbund <- t(data.frame(otu_table(act.muc.phy)))
+
+# Test normality
+hist(act.muc.df$RelAbund, breaks=10)
+qqnorm(act.muc.df$RelAbund)
+qqline(act.muc.df$RelAbund)
+shapiro.test(act.muc.df$RelAbund)
+  # p-value = 0.1113
+  # adj p = 0.1530375000
+  # Normal
+
+# ANOVA
+summary(aov(formula = RelAbund ~ Group, data=act.muc.df))
+  # p-value = 0.421
+  # adj P = 0.46310000
+
+
+
+
+
+
+
+##### EPSILONBACTERAEOTA #####
+eps.muc.phy <- subset_taxa(phy99.muc, Phylum == "Epsilonbacteraeota")
+eps.muc.df <- data.frame(sample_data(eps.muc.phy))
+eps.muc.df$RelAbund <- t(data.frame(otu_table(eps.muc.phy)))
+
+# Test normality
+hist(eps.muc.df$RelAbund, breaks=10)
+qqnorm(eps.muc.df$RelAbund)
+qqline(eps.muc.df$RelAbund)
+shapiro.test(eps.muc.df$RelAbund)
+  # p-value = 1.062e-07
+  # adj p = 0.0000006831
+  # Not Normal
+
+# Kruskal-Wallis
+kruskal.test(formula = RelAbund ~ Group, data=eps.muc.df)
+  # p-value = 0.5395
+  # adj P = 0.53950000
 
 
 
@@ -1579,20 +1595,49 @@ qqnorm(unc.muc.df$RelAbund)
 qqline(unc.muc.df$RelAbund)
 shapiro.test(unc.muc.df$RelAbund)
   # p-value = 3.292e-07
+  # adj p = 0.0000009053
   # Not Normal
 
 # Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=unc.muc.df)
   # p-value = 0.2998
+  # adj p = 0.36642222
 
 
 
-### P-adjust for Kruskal-Wallis
-p.adjust(c(1.669e-07,0.001312,0.001576,0.05366,0.03247,0.03781,0.04964,0.4614,0.03791,0.2277,0.1807), method = "fdr")
-  # 0.0000018359 0.0057786667 0.0057786667 0.0737825000 0.0695016667 0.0695016667 0.0737825000 0.4614000000 0.0695016667 0.2504700000 0.2208555556
+### P-adjust for Shapiro
+p.adjust(c(0.3238,0.2837,0.0001722,0.2079,1.863e-07,0.04871,4.415e-05,1.382e-07,0.1113,1.062e-07,3.292e-07), method = "fdr")
+  # Firmicutes = 0.3238000000
+  # Bacteroidetes = 0.3120700000
+  # Verrucomicrobia = 0.0003157000
+  # Proteobacteria = 0.2541000000
+  # Kirimatiellaeota = 0.0000006831
+  # Cyanobacteria = 0.0765442857
+  # Tenericutes = 0.0000971300
+  # Elusimicrobia = 0.0000006831
+  # Actinobacteria = 0.1530375000
+  # Epsilonbacteraeota = 0.0000006831
+  # Unclassified = 0.0000009053
 
 
 
+### P-adjust for Kruskal-Wallis/ANOVA
+p.adjust(c(8.41e-06,0.162,0.05591,0.0287,0.148,0.148,0.1474,0.2135,0.421,0.5395,0.2998), method = "fdr")
+  # Firmicutes = 0.00009251*
+  # Bacteroidetes = 0.25457143
+  # Verrucomicrobia = 0.20500333
+  # Proteobacteria = 0.15785000
+  # Kirimatiellaeota = 0.25457143
+  # Cyanobacteria = 0.25457143
+  # Tenericutes = 0.25457143
+  # Elusimicrobia = 0.29356250
+  # Actinobacteria = 0.46310000
+  # Epsilonbacteraeota = 0.53950000
+  # Unclassified = 0.36642222
+
+
+"Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Kiritimatiellaeota", "Bacteria_unclassified", "Cyanobacteria", "Tenericutes", "Elusimicrobia", "Actinobacteria","Epsilonbacteraeota"
+     
 
 
 
@@ -2292,10 +2337,10 @@ beta.tax <- betadisper(d = bray.muc.st, group = sampdf.muc.st$Group)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.958
-  # adj p = 
+  # adj p = 0.958
 adonis(bray.muc.st ~ Group, data=sampdf.muc.st, permutations = 9999)
   # p-value = 0.0016
-  # adj p = 
+  # adj p = 0.00480
 
 
 ### Summer vs. IBA ###
@@ -2305,10 +2350,10 @@ beta.tax <- betadisper(d = bray.muc.si, group = sampdf.muc.si$Group)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.917
-  # adj p = 
+  # adj p = 0.958
 adonis(bray.muc.si ~ Group, data=sampdf.muc.si, permutations = 9999)
   # p-value = 7e-04
-  # adj p = 
+  # adj p = 0.00420
 
 
 ### Summer vs. Spring ###
@@ -2318,10 +2363,10 @@ beta.tax <- betadisper(d = bray.muc.sp, group = sampd.mucf.sp$Group)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.933
-  # adj p = 
+  # adj p = 0.958
 adonis(bray.muc.sp ~ Group, data=sampdf.muc.sp, permutations = 9999)
   # p-value = 0.0791
-  # adj p = 
+  # adj p = 0.09492
 
 
 ### Torpor vs. IBA ###
@@ -2331,10 +2376,10 @@ beta.tax <- betadisper(d = bray.muc.ti, group = sampdf.muc.ti$Group)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.958
-  # adj p = 
+  # adj p = 0.958
 adonis(bray.muc.ti ~ Group, data=sampdf.muc.ti, permutations = 9999)
   # p-value = 0.9815
-  # adj p = 
+  # adj p = 0.98150
 
 
 ### Torpor vs. Spring ###
@@ -2344,10 +2389,10 @@ beta.tax <- betadisper(d = bray.muc.tp, group = sampdf.muc.tp$Group)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.137
-  # adj p = 
+  # adj p = 0.822
 adonis(bray.muc.tp ~ Group, data=sampdf.muc.tp, permutations = 9999)
   # p-value = 0.0178
-  # adj p = 
+  # adj p = 0.02670
 
 
 ### IBA vs. Spring ###
@@ -2357,10 +2402,10 @@ beta.tax <- betadisper(d = bray.muc.ip, group = sampdf.muc.ip$Group)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.354
-  # adj p = 
+  # adj p = 0.958
 adonis(bray.muc.ip ~ Group, data=sampdf.muc.ip, permutations = 9999)
   # p-value = 0.0084
-  # adj p = 
+  # adj p = 0.01680
 
 
 
@@ -2377,12 +2422,12 @@ p.adjust(c(0.958,0.917,0.933,0.958,0.137,0.354), method = "fdr")
 
 ### Adjust PERMANOVA p-values
 p.adjust(c(0.0016,7e-04,0.0791,0.9815,0.0178,0.0084), method = "fdr")
-  # Summer-Torpor = 0.00480
-  # Summer-IBA = 0.00420
+  # Summer-Torpor = 0.00480*
+  # Summer-IBA = 0.00420*
   # Summer-Spring = 0.09492
   # Torpor-IBA = 0.98150
-  # Torpor-Spring = 0.02670
-  # IBA-Spring = 0.01680
+  # Torpor-Spring = 0.02670*
+  # IBA-Spring = 0.01680*
 
 ```
 
