@@ -15,7 +15,6 @@ library(grid)
 library(gridExtra)
 library(phyloseq)
 library(picante)
-library(phytools)
 library(tidyr)
 library(vegan)
 
@@ -485,18 +484,20 @@ qqnorm(mpd.ready$Stat)
 qqline(mpd.ready$Stat)
 shapiro.test(mpd.ready$Stat)
   # p-value = 0.048
-  # Not Normal
+  # adj p = 0.1920
+  # Normal
 
 # Run Kruskal-Wallis
-kruskal.test(formula = Stat ~ Group, data=mpd.ready)
-  # p-value = 0.001112
-dunn.test(x = as.numeric(mpd.ready$Stat), g = as.factor(mpd.ready$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.0012*
-  # Summer-IBA = 0.0018*
-  # Summer-Spring = 0.1204
-  # Torpor-IBA = 0.4759
-  # Torpor-Spring = 0.1824
-  # IBA-Spring = 0.1408
+summary(aov(Stat ~ Group, data = mpd.ready))
+  # p-value = 1.76e-06
+  # adj p = 0.0000068
+TukeyHSD(aov(Stat ~ Group, data = mpd.ready))
+  # Summer-Torpor = 0.0000057*
+  # Summer-IBA = 0.0000093*
+  # Summer-Spring = 0.0877749
+  # Torpor-IBA = 0.9575807
+  # Torpor-Spring = 0.0424799*
+  # IBA-Spring = 0.0830843
 
 
 
@@ -513,10 +514,12 @@ qqnorm(adiv$shannon)
 qqline(adiv$shannon)
 shapiro.test(adiv$shannon)
   # p-value = 0.6322
+  # adj p = 0.9905
   # Normal
 
 summary(aov(shannon ~ Group, data = adiv))
   # p-value = 0.793
+  # adj p = 0.793
 
 
 
@@ -542,10 +545,12 @@ qqnorm(uniq.otus$Unique_OTUs)
 qqline(uniq.otus$Unique_OTUs)
 shapiro.test(uniq.otus$Unique_OTUs)
   # p-value =  0.775
+  # adj p = 0.9905
   # Normal
 
 summary(aov(Unique_OTUs ~ Group, data = uniq.otus))
   # p-value = 0.00847
+  # adj p = 0.016940
 TukeyHSD(aov(Unique_OTUs ~ Group, data = uniq.otus))
   # Summer-Torpor = 0.0104213*
   # Summer-IBA = 0.0255349*
@@ -555,6 +560,13 @@ TukeyHSD(aov(Unique_OTUs ~ Group, data = uniq.otus))
   # IBA-Spring = 0.8518157
 
 
+### P-adjust Shapiro ###
+p.adjust(c(0.9905,0.048,0.6322,0.775), method = "fdr")
+  # 0.9905 0.1920 0.9905 0.9905
+
+### P-adjust ANOVA ###
+p.adjust(c(0.0519,1.7e-06,0.793,0.00847), method = "fdr")
+  # 0.069200 0.0000068 0.793000 0.016940
 ```
 
 ### Content - Alpha-Diversity Prepare Plots
@@ -1722,12 +1734,12 @@ kruskal.test(formula = Stat ~ Group, data=pd.muc.ready)
   # p-value = 0.01219
   # adj p = 0.02438000
 dunn.test(x = as.numeric(pd.muc.ready$Stat), g = as.factor(pd.muc.ready$Group), method = "bh", label = T)
-  # Summer-Torpor = 0.0316*
+  # Summer-Torpor = 0.0316
   # Summer-IBA = 0.0175*
   # Summer-Spring = 0.4788
   # Torpor-IBA = 0.5000
   # Torpor-Spring = 0.0540
-  # IBA-Spring = 0.0373*
+  # IBA-Spring = 0.0373
  
 
 ### Test MPD ###
@@ -1808,7 +1820,7 @@ dunn.test(x = as.numeric(uniq.otus.muc$Unique_OTUs), g = as.factor(uniq.otus.muc
   # Summer-IBA = 0.0104*
   # Summer-Spring = 0.4499
   # Torpor-IBA = 0.4079
-  # Torpor-Spring = 0.0429*
+  # Torpor-Spring = 0.0429
   # IBA-Spring = 0.0389
 
 
@@ -1836,7 +1848,7 @@ uniq.otus.muc.sum <- uniq.otus.muc %>%
 uniq.otus.muc.sum$YMAX <- uniq.otus.muc.sum$Mean + uniq.otus.muc.sum$SE
 uniq.otus.muc.sum$YMIN <- uniq.otus.muc.sum$Mean - uniq.otus.muc.sum$SE
 
-otu.muc.ann <- data.frame(lab = c("a", "b", "bc", "ac"), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
+otu.muc.ann <- data.frame(lab = c("a", "b", "b", "ab"), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
 
 otu.muc.plot <- ggplot(uniq.otus.muc, aes(x = Group, y = Unique_OTUs, fill = Group)) +
   geom_violin() +
@@ -1874,7 +1886,7 @@ pd.muc.sum <- pd.muc.ready %>%
 pd.muc.sum$YMAX <- pd.muc.sum$Mean + pd.muc.sum$SE
 pd.muc.sum$YMIN <- pd.muc.sum$Mean - pd.muc.sum$SE
 
-pd.muc.ann <- data.frame(lab = c("a", "bc", "b", "ac"), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
+pd.muc.ann <- data.frame(lab = c("a", "ab", "b", "ab"), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
 
 pd.muc.plot <- ggplot(pd.muc.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_violin() + 
