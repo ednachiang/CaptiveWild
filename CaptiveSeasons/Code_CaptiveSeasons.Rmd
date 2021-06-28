@@ -1179,7 +1179,7 @@ p.adjust(c(8e-04,4e-04,0.1099,0.7277,0.0122,0.0194), method = "fdr")
 
 ### Content Plot - Beta-diversity
 ```{r}
-tiff("CaptiveSeasons.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
+#tiff("CaptiveSeasons.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 0.45), heights = c(1, 1, 1))))
 
@@ -1202,7 +1202,7 @@ grid.text("C", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos
                                                                    layout.pos.col=1),
           gp=gpar(fontsize=12,fontface="bold"))
 
-dev.off()
+#dev.off()
 ```
 
 ### Content - SIMPER
@@ -1657,9 +1657,9 @@ p.adjust(c(8.41e-06,0.162,0.05591,0.0287,0.148,0.148,0.1474,0.2135,0.421,0.5395,
 
 ### Format data
 phy99.muc.df <- psmelt(phy99.muc)
-phy99.muc.df$Phylum <- ordered(phy99.df$Phylum, levels = c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Kiritimatiellaeota", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia", "Epsilonbacteraeota"))
-phy99.df$Phylum[which(is.na(phy99.df$Phylum))] <- rep("Unclassified",length(which(is.na(phy99.df$Phylum))))
-phy.sum <- phy99.df %>%
+phy99.muc.df$Phylum <- ordered(phy99.muc.df$Phylum, levels = c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Unclassified", "Kiritimatiellaeota", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia", "Epsilonbacteraeota"))
+phy99.muc.df$Phylum[which(is.na(phy99.muc.df$Phylum))] <- rep("Unclassified",length(which(is.na(phy99.muc.df$Phylum))))
+phy.muc.sum <- phy99.muc.df %>%
   group_by(Group, Phylum) %>%
   summarize(Mean = mean(Abundance),
             Median = median(Abundance),
