@@ -106,7 +106,6 @@ phy.muc.tor <- subset_samples(phy.muc, Group == "Torpor")
 phy.muc.iba <- subset_samples(phy.muc, Group == "IBA")
 phy.muc.spr <- subset_samples(phy.muc, Group == "Spring")
 
-
 ```
 
 
@@ -132,7 +131,6 @@ fir.phy <- subset_taxa(phy99, Phylum == "Firmicutes")
 fir.df <- data.frame(sample_data(fir.phy))
 fir.df$RelAbund <- t(data.frame(otu_table(fir.phy)))
 
-# Test normality
 hist(fir.df$RelAbund, breaks=10)
 qqnorm(fir.df$RelAbund)
 qqline(fir.df$RelAbund)
@@ -140,8 +138,6 @@ shapiro.test(fir.df$RelAbund)
   # p-value = 0.02154
   # adj P = 2.393333e-02
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=fir.df)
   # p-value = 0.0004946
   # adj P = 0.00494600 
@@ -157,14 +153,11 @@ dunn.test(x = as.numeric(fir.df$RelAbund), g = as.factor(fir.df$Group), method =
 
 
 
-
-
 ##### BACTEROIDETES #####
 bac.phy <- subset_taxa(phy99, Phylum == "Bacteroidetes")
 bac.df <- data.frame(sample_data(bac.phy))
 bac.df$RelAbund <- t(data.frame(otu_table(bac.phy)))
 
-# Test normality
 hist(bac.df$RelAbund, breaks=10)
 qqnorm(bac.df$RelAbund)
 qqline(bac.df$RelAbund)
@@ -172,9 +165,6 @@ shapiro.test(bac.df$RelAbund)
   # p-value = 0.437
   # adj P = 4.370000e-01
   # Normal
-  # Sticking with Kruskal-Wallis for consistency among phyla-level comparisons
-
-# Kruskal-Wallis
 summary(aov(formula = RelAbund ~ Group, data=bac.df))
   # p-value = 0.0044
   # adj P = 0.02200000
@@ -195,7 +185,6 @@ ver.phy <- subset_taxa(phy99, Phylum == "Verrucomicrobia")
 ver.df <- data.frame(sample_data(ver.phy))
 ver.df$RelAbund <- t(data.frame(otu_table(ver.phy)))
 
-# Test normality
 hist(ver.df$RelAbund, breaks=10)
 qqnorm(ver.df$RelAbund)
 qqline(ver.df$RelAbund)
@@ -203,12 +192,9 @@ shapiro.test(ver.df$RelAbund)
   # p-value = 0.0003558
   # adj P = 6.095000e-04
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ver.df)
   # p-value = 0.04741
   # adj P = 0.11852500
-
 
 
 
@@ -219,7 +205,6 @@ pro.phy <- subset_taxa(phy99, Phylum == "Proteobacteria")
 pro.df <- data.frame(sample_data(pro.phy))
 pro.df$RelAbund <- t(data.frame(otu_table(pro.phy)))
 
-# Test normality
 hist(pro.df$RelAbund, breaks=10)
 qqnorm(pro.df$RelAbund)
 qqline(pro.df$RelAbund)
@@ -227,8 +212,6 @@ shapiro.test(pro.df$RelAbund)
   # p-value = 0.003036
   # adj P = 3.795000e-03
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=pro.df)
   # p-value = 0.35
   # adj P = 0.43750000
@@ -238,16 +221,11 @@ kruskal.test(formula = RelAbund ~ Group, data=pro.df)
 
 
 ##### KIRITIMATIELLAEOTA #####
-# Ar/ma/ti/mon/a/de/tes
-# ^        ^      ^
 # Ki/ri/ti/ma/ti/e/llae/o/ta
-#                       ^
-# Pull out kiris
 kir.phy <- subset_taxa(phy99, Phylum == "Kiritimatiellaeota")
 kir.df <- data.frame(sample_data(kir.phy))
 kir.df$RelAbund <- t(data.frame(otu_table(kir.phy)))
 
-# Test normality
 hist(kir.df$RelAbund, breaks=10)
 qqnorm(kir.df$RelAbund)
 qqline(kir.df$RelAbund)
@@ -255,26 +233,19 @@ shapiro.test(kir.df$RelAbund)
   # p-value = 2.72e-08
   # adj P = 1.370500e-07
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=kir.df)
   # p-value = 0.01657
   # adj P = 0.05523333
-  # NOT SIG
-
-
 
 
 
 
 
 ##### CYANOBACTERIA #####
-# Pull out cyanos
 cya.phy <- subset_taxa(phy99, Phylum == "Cyanobacteria")
 cya.df <- data.frame(sample_data(cya.phy))
 cya.df$RelAbund <- t(data.frame(otu_table(cya.phy)))
 
-# Test normality
 hist(cya.df$RelAbund, breaks=10)
 qqnorm(cya.df$RelAbund)
 qqline(cya.df$RelAbund)
@@ -282,8 +253,6 @@ shapiro.test(cya.df$RelAbund)
   # p-value = 0.001164
   # adj P = 1.662857e-03
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=cya.df)
   # p-value = 0.1391
   # adj P = 0.27820000
@@ -297,7 +266,6 @@ ten.phy <- subset_taxa(phy99, Phylum == "Tenericutes")
 ten.df <- data.frame(sample_data(ten.phy))
 ten.df$RelAbund <- t(data.frame(otu_table(ten.phy)))
 
-# Test normality
 hist(ten.df$RelAbund, breaks=10)
 qqnorm(ten.df$RelAbund)
 qqline(ten.df$RelAbund)
@@ -305,8 +273,6 @@ shapiro.test(ten.df$RelAbund)
   # p-value = 1.929e-05
   # adj P = 4.822500e-05
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ten.df)
   # p-value = 0.3289
   # adj P = 0.43750000
@@ -320,7 +286,6 @@ act.phy <- subset_taxa(phy99, Phylum == "Actinobacteria")
 act.df <- data.frame(sample_data(act.phy))
 act.df$RelAbund <- t(data.frame(otu_table(act.phy)))
 
-# Test normality
 hist(act.df$RelAbund, breaks=10)
 qqnorm(act.df$RelAbund)
 qqline(act.df$RelAbund)
@@ -328,13 +293,9 @@ shapiro.test(act.df$RelAbund)
   # p-value = 0.0003657
   # adj P = 6.095000e-04
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=act.df)
   # p-value = 0.5082
   # adj P = 0.56466667
-
-
 
 
 
@@ -345,7 +306,6 @@ elu.phy <- subset_taxa(phy99, Phylum == "Elusimicrobia")
 elu.df <- data.frame(sample_data(elu.phy))
 elu.df$RelAbund <- t(data.frame(otu_table(elu.phy)))
 
-# Test normality
 hist(elu.df$RelAbund, breaks=10)
 qqnorm(elu.df$RelAbund)
 qqline(elu.df$RelAbund)
@@ -353,8 +313,6 @@ shapiro.test(elu.df$RelAbund)
   # p-value = 2.741e-08
   # adj P = 1.370500e-07 
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=elu.df)
   # p-value = 0.2008
   # adj P = 0.33466667
@@ -368,7 +326,6 @@ unc.phy <- subset_taxa(phy99, Phylum == "Bacteria_unclassified")
 unc.df <- data.frame(sample_data(unc.phy))
 unc.df$RelAbund <- t(data.frame(otu_table(unc.phy)))
 
-# Test normality
 hist(unc.df$RelAbund, breaks=10)
 qqnorm(unc.df$RelAbund)
 qqline(unc.df$RelAbund)
@@ -376,23 +333,23 @@ shapiro.test(unc.df$RelAbund)
   # p-value = 6.53e-08
   # adj P = 2.176667e-07
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=unc.df)
   # p-value = 0.64
   # adj P = 0.64000000
 
 
+
+
+
 ### P-adjust for Shapiro
 p.adjust(c(0.02154,0.437,0.0003558,0.003036,2.72e-08,0.001164,1.929e-05,0.0003657,2.741e-08,6.53e-08), method = "fdr")
   # 2.393333e-02 4.370000e-01 6.095000e-04 3.795000e-03 1.370500e-07 1.662857e-03 4.822500e-05 6.095000e-04 1.370500e-07 2.176667e-07
+  # Firmicutes, Bacteroidetes, Verrucomicrobia, Proteobacteria, Kiritimatiellaeota, Cyanobacteria, Tenericutes, Actinobacteria, Elusimicrobia, Unclassified
 
 ### P-adjust for Kruskal-Wallis
 p.adjust(c(0.0004946,0.0044,0.04741,0.35,0.01657,0.1391,0.3289,0.5082,0.2008,0.64), method = "fdr")
   # 0.00494600 0.02200000 0.11852500 0.43750000 0.05523333 0.27820000 0.43750000 0.56466667 0.33466667 0.64000000
-
-
-
+  # Firmicutes, Bacteroidetes, Verrucomicrobia, Proteobacteria, Kiritimatiellaeota, Cyanobacteria, Tenericutes, Actinobacteria, Elusimicrobia, Unclassified
 
 
 
@@ -409,6 +366,7 @@ phy.sum <- phy99.df %>%
             SD = sd(Abundance),
             SE = se(Abundance),
             iqr = IQR(Abundance))
+
 ```
 
 
@@ -416,8 +374,6 @@ phy.sum <- phy99.df %>%
 
 ### Content - Alpha-Diversity - Phylogenetic Diversity and SES MPD
 ```{r}
-### Unweighted - Calculate phylogenetic diversity and MPD ###
-
 # Calculate Faith's phylogenetic diversity
 pd.res <- pd(t(data.frame(otu_table(phy.con))), phy_tree(phy.con), include.root = T)
 pd.df <- data.frame(pd.res)
@@ -428,8 +384,6 @@ pd.dist <- cophenetic(phy_tree(phy.con))
 ses.mpd.res <- ses.mpd(t(data.frame(otu_table(phy.con))), pd.dist, null.model = "taxa.labels", abundance.weighted = F, runs = 999)
   # Calculate MPD
   # This'll take a while to run-- be patient
-#save(ses.mpd.res, file = "mpd.RData")
-#load("mpd.RData")
 mpd <- data.frame(ses.mpd.res)
   # Pull out MDP results
 
@@ -440,8 +394,6 @@ pd.res$SampleID <- row.names(pd.res)
   # Make sure all SampleID's match!
 
 # Pull out first Stat of each test
-# PD test = PD
-# MPD test = SES (Standardized Effect Size)
 pd.stats <- data.frame(pd.res$SampleID, pd.res$PD)
 pd.stats$Measure <- rep("PD", nrow(pd.df))
 colnames(pd.stats) <- c("Sample", "Stat", "Measure")
@@ -461,24 +413,23 @@ mpd.ready$Group <- ordered(mpd.ready$Group, levels = c("Summer_Captive", "Torpor
 
 
         
+
         
 ########## TESTING PD & MPD ##########
 
-### Test PD ###
+### PD ###
 hist(pd.ready$Stat, breaks=10)
 qqnorm(pd.ready$Stat)
 qqline(pd.ready$Stat)
 shapiro.test(pd.ready$Stat)
   # p-value = 0.9905
   # Normal
-
-# Run Kruskal-Wallis
 summary(aov(Stat ~ Group, data = pd.ready))
   # p-value = 0.0519
 
  
 
-### Test MPD ###
+### MPD ###
 hist(mpd.ready$Stat, breaks=10)
 qqnorm(mpd.ready$Stat)
 qqline(mpd.ready$Stat)
@@ -486,8 +437,6 @@ shapiro.test(mpd.ready$Stat)
   # p-value = 0.048
   # adj p = 0.1920
   # Normal
-
-# Run Kruskal-Wallis
 summary(aov(Stat ~ Group, data = mpd.ready))
   # p-value = 1.76e-06
   # adj p = 0.0000068
@@ -516,7 +465,6 @@ shapiro.test(adiv$shannon)
   # p-value = 0.6322
   # adj p = 0.9905
   # Normal
-
 summary(aov(shannon ~ Group, data = adiv))
   # p-value = 0.793
   # adj p = 0.793
@@ -560,20 +508,27 @@ TukeyHSD(aov(Unique_OTUs ~ Group, data = uniq.otus))
   # IBA-Spring = 0.8518157
 
 
+
+
 ### P-adjust Shapiro ###
 p.adjust(c(0.9905,0.048,0.6322,0.775), method = "fdr")
   # 0.9905 0.1920 0.9905 0.9905
+  # Unique OTUs, PD, MPD, Shannon
+
+
+
+
 
 ### P-adjust ANOVA ###
 p.adjust(c(0.0519,1.7e-06,0.793,0.00847), method = "fdr")
   # 0.069200 0.0000068 0.793000 0.016940
+  # Unique OTUs, PD, MPD, Shannon
+
 ```
 
 ### Content - Alpha-Diversity Prepare Plots
 ```{r}
-###### Unique # of OTUs ######
-
-### Prepare data for plot
+##### Unique # of OTUs #####
 uniq.otus.sum <- uniq.otus %>%
   group_by(Group) %>%
   summarize(Mean = mean(Unique_OTUs),
@@ -609,8 +564,8 @@ otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
 
 
 
-###### Faith's Phylogenetic Diversity ######
 
+##### Faith's Phylogenetic Diversity #####
 ### Prepare PD ###
 pd.sum <- pd.ready %>%
   group_by(Group) %>%
@@ -648,8 +603,7 @@ pd.plot <- ggplot(pd.ready, aes(x = Group, y = Stat, fill = Group)) +
 
 
 
-###### Phylogenetic Diversity (MPD) ######
-
+##### MPD #####
 ### Prepare MPD ###
 mpd.sum <- mpd.ready %>%
   group_by(Group) %>%
@@ -685,12 +639,8 @@ mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
   
 
 
-        
-        
-        
 
-
-
+##### Shannon #####
 ### Prepare data for plot
 shannon.sum <- adiv %>%
   group_by(Group) %>%
@@ -700,8 +650,6 @@ shannon.sum <- adiv %>%
             Median = median(shannon))
 shannon.sum$YMAX <- shannon.sum$Mean + shannon.sum$SE
 shannon.sum$YMIN <- shannon.sum$Mean - shannon.sum$SE
-
-
 
 shannon.ann <- data.frame(lab = c("ns", " ", " ", " "), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
 
@@ -734,7 +682,7 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
 
 ### Content Plot - Alpha-Diversity
 ```{r}
-#tiff("CaptiveSeasons.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+#tiff("CaptiveSeasons/Content/Fig3.CaptiveSeasons.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -754,11 +702,9 @@ print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
 
 ### Content - Beta-Diversity
 ```{r}
-
 ########## Weighted UniFrac ##########
 UF.w <- phyloseq::distance(physeq = phy.con, method = "wunifrac")
 UF.w.pcoa <- ordinate(physeq = phy.con, method = "PCoA", distance = "wunifrac")
-  # Variation explained = 34.9%
 
 wUF.plot <- plot_ordination(physeq = phy.con, ordination = UF.w.pcoa, axes = c(1,2),
                 title = "Weighted UniFrac", color = "Group") +
@@ -777,7 +723,6 @@ wUF.plot <- plot_ordination(physeq = phy.con, ordination = UF.w.pcoa, axes = c(1
         )
 
 
-### PERMANOVA ###
 sampdf <- data.frame(sample_data(phy.con))
 beta.tax <- betadisper(d=UF.w, group=sampdf$Group)
 p <- permutest(beta.tax)
@@ -785,6 +730,7 @@ p$tab
   # p-value = 0.634
 adonis(UF.w ~ Group, data=sampdf, permutations = 9999)
   # p-value = 1e-04
+
 
 # Separate by season
 phy.sum <- subset_samples(phy.con, Group == "Summer_Captive")
@@ -879,7 +825,6 @@ adonis(ip.w ~ Group, data=sampdf.ip, permutations = 9999)
   # adj p = 0.01695
 
 
-
 # Adjust betadisper p-values
 p.adjust(c(0.798,0.295,0.208,0.576,0.488,0.682), method = "fdr")
   # Summer-Torpor = 0.798
@@ -902,11 +847,9 @@ p.adjust(c(6e-04,8e-04,0.0541,0.9068,0.0113,0.0103), method = "fdr")
 
 
 
-
 ########## Unweighted UniFrac ##########
 UF.u <- phyloseq::distance(physeq = phy.con, method = "unifrac")
 UF.u.pcoa <- ordinate(physeq = phy.con, method = "PCoA", distance = "unifrac")
-  # Variation explained = 20.8%
 
 uUF.plot <- plot_ordination(physeq = phy.con, ordination = UF.u.pcoa, axes = c(1,2),
                 title = "Unweighted UniFrac", color = "Group") +
@@ -925,7 +868,6 @@ uUF.plot <- plot_ordination(physeq = phy.con, ordination = UF.u.pcoa, axes = c(1
         )
 
 
-### PERMANOVA ###
 sampdf <- data.frame(sample_data(phy.con))
 beta.tax <- betadisper(d=UF.u, group=sampdf$Group)
 p <- permutest(beta.tax)
@@ -999,6 +941,7 @@ adonis(tp.u ~ Group, data=sampdf.tp, permutations = 9999)
   # p-value = 0.0253
   # adj p = 0.03795
 
+
 # IBA vs Spring
 ip.u <- phyloseq::distance(physeq = phy.ip, method = "unifrac")
 sampdf.ip<- data.frame(sample_data(phy.ip))
@@ -1010,6 +953,7 @@ p$tab
 adonis(ip.u ~ Group, data=sampdf.ip, permutations = 9999)
   # p-value = 0.0239
   # adj p = 0.03795
+
 
 # Adjust betadisper p-values
 p.adjust(c(0.48,0.495,0.019,0.942,0.027,0.18), method = "fdr")
@@ -1033,11 +977,8 @@ p.adjust(c(7e-04,1e-04,0.193,0.605,0.0253,0.0239), method = "fdr")
 
 
 
-
-
 ########## Bray-Curtis ##########
 bray.pcoa <- ordinate(physeq=phy.con, method="PCoA", distance="bray")
-  # Variation explained = 29.6%
 
 bc.plot <- plot_ordination(physeq=phy.con, ordination=bray.pcoa, color="Group",
                            title = "Bray-Curtis Dissimilarity") +
@@ -1059,11 +1000,9 @@ bc.plot <- plot_ordination(physeq=phy.con, ordination=bray.pcoa, color="Group",
         #legend.box.margin=margin(-10,-10,-10,-10)
         )
 
-
 ord.legend <- g_legend(bc.plot)
 
 
-### TEST ###
 sampdf <- data.frame(sample_data(phy.con))
 bray <- phyloseq::distance(physeq = phy.con, method = "bray")
 beta.tax <- betadisper(d = bray, group = sampdf$Group)
@@ -1072,7 +1011,6 @@ p$tab
   # p-value = 0.36
 adonis(bray ~ Group, data=sampdf, permutations = 9999)
   # p-value = 2e-04
-
 
 
 ### Summer vs. Torpor ###
@@ -1179,7 +1117,7 @@ p.adjust(c(8e-04,4e-04,0.1099,0.7277,0.0122,0.0194), method = "fdr")
 
 ### Content Plot - Beta-diversity
 ```{r}
-#tiff("CaptiveSeasons.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
+#tiff("CaptiveSeasons/Content/Fig4.CaptiveSeasons.con.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 0.45), heights = c(1, 1, 1))))
 
@@ -1223,15 +1161,15 @@ phy.con.simp <- merge_phyloseq(otu_table(phy.con), sample_data(con.rename), tax_
               data.frame(sample_data(phy.con.simp)),
               c("GroupRename"),
               perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
-              output_name='CaptiveSeason_con')
-group.simper <- read.csv("CaptiveSeason_con_clean_simper.csv")
+              output_name='CaptiveSeasons/Content/CaptiveSeasons.con')
+#group.simper <- read.csv("CaptiveSeasons/Content/CaptiveSeasons.con_clean_simper.csv")
 #kruskal.pretty(data.frame(otu_table(phy.con.simp)),
                data.frame(sample_data(phy.con.simp)),
                csv = group.simper,
                c("GroupRename"),
-               output_name = 'CaptiveSeason_con',
+               output_name = 'CaptiveSeasons/Content/CaptiveSeasons.con',
                taxonomy = data.frame(tax_table(phy.con.simp)))
-#group.simper.kw <- read.csv("CaptiveSeason_con_krusk_simper.csv")
+#group.simper.kw <- read.csv("CaptiveSeasons/Content/CaptiveSeasons.con_krusk_simper.csv")
 for(i in 1:nrow(group.simper.kw)){
   save <- which(rownames(data.frame(tax_table(phy.con.simp))) == group.simper.kw$OTU[i])
   group.simper.kw$Taxonomy[i] <-
@@ -1241,8 +1179,8 @@ for(i in 1:nrow(group.simper.kw)){
           data.frame(tax_table(phy.con.simp))[save,5], "-",
           data.frame(tax_table(phy.con.simp))[save,6])
 }
-#write.table(group.simper.kw, "CaptiveSeason_con_krusk_simper.csv", sep=",")
-#group.simper.kw <- read.csv("group_clean_simper.csv", row.names = 1)
+#write.table(group.simper.kw, "CaptiveSeasons/Content/CaptiveSeasons.con_krusk_simper.csv", sep=",")
+#group.simper.kw <- read.csv("CaptiveSeasons/Content/CaptiveSeasons.con_krusk_simper.csv", row.names = 1)
 ```
 
 ### Content - Core OTUs and Shared OTUs
@@ -1282,6 +1220,7 @@ phy.con.spr.core <- merge_phyloseq(otu_table(spr.con.core, taxa_are_rows = T), t
   # 132 OTUs
 
 
+
 ### Compare Core OTUs
 intersect(rownames(sum.con.core), rownames(tor.con.core))
   # 21 shared core OTUs
@@ -1312,12 +1251,11 @@ core3 <- intersect(core2, rownames(spr.con.core))
 # "Otu00026" "Otu00154" "Otu00197" "Otu00156" "Otu00200" "Otu00093" "Otu00133" "Otu00067" "Otu00068" "Otu00084" "Otu00043" "Otu00011" "Otu00041" "Otu00138" "Otu00137"
 
 
+
 ### Physeq object with only core OTUs
 phy.con.core <- merge_phyloseq(phy.con.sum.core, phy.con.tor.core, phy.con.iba.core, phy.con.spr.core)
-#write.csv(data.frame(tax_table(phy.con.core)), "CaptiveSeasons_con_coreOTUs.csv")
+#write.csv(data.frame(tax_table(phy.con.core)), "CaptiveSeasons/Content/CaptiveSeasons_con_coreOTUs.csv")
 ```
-
-
 
 
 
@@ -1357,7 +1295,6 @@ fir.muc.phy <- subset_taxa(phy99.muc, Phylum == "Firmicutes")
 fir.muc.df <- data.frame(sample_data(fir.muc.phy))
 fir.muc.df$RelAbund <- t(data.frame(otu_table(fir.muc.phy)))
 
-# Test normality
 hist(fir.muc.df$RelAbund, breaks=10)
 qqnorm(fir.muc.df$RelAbund)
 qqline(fir.muc.df$RelAbund)
@@ -1365,8 +1302,6 @@ shapiro.test(fir.muc.df$RelAbund)
   # p-value = 0.3238
   # adj p = 0.3238000000
   # Normal
-
-# ANOVA
 summary(aov(formula = RelAbund ~ Group, data=fir.muc.df))
   # p-value = 8.41e-06
   # adj P = 0.00009251
@@ -1381,12 +1316,12 @@ TukeyHSD(aov(formula = RelAbund ~ Group, data=fir.muc.df))
 
 
 
+
 ##### BACTEROIDETES #####
 bac.muc.phy <- subset_taxa(phy99.muc, Phylum == "Bacteroidetes")
 bac.muc.df <- data.frame(sample_data(bac.muc.phy))
 bac.muc.df$RelAbund <- t(data.frame(otu_table(bac.muc.phy)))
 
-# Test normality
 hist(bac.muc.df$RelAbund, breaks=10)
 qqnorm(bac.muc.df$RelAbund)
 qqline(bac.muc.df$RelAbund)
@@ -1394,11 +1329,11 @@ shapiro.test(bac.muc.df$RelAbund)
   # p-value = 0.2837
   # adj p = 0.3120700000
   # Normal
-
-# ANOVA
 summary(aov(formula = RelAbund ~ Group, data=bac.muc.df))
   # p-value = 0.162
   # adj p = 0.25457143
+
+
 
 
 
@@ -1407,7 +1342,6 @@ ver.muc.phy <- subset_taxa(phy99.muc, Phylum == "Verrucomicrobia")
 ver.muc.df <- data.frame(sample_data(ver.muc.phy))
 ver.muc.df$RelAbund <- t(data.frame(otu_table(ver.muc.phy)))
 
-# Test normality
 hist(ver.muc.df$RelAbund, breaks=10)
 qqnorm(ver.muc.df$RelAbund)
 qqline(ver.muc.df$RelAbund)
@@ -1415,8 +1349,6 @@ shapiro.test(ver.muc.df$RelAbund)
   # p-value = 0.0001722
   # adj p = 0.0003157000
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ver.muc.df)
   # p-value = 0.05591
   # adj p = 0.20500333
@@ -1430,7 +1362,6 @@ pro.muc.phy <- subset_taxa(phy99.muc, Phylum == "Proteobacteria")
 pro.muc.df <- data.frame(sample_data(pro.muc.phy))
 pro.muc.df$RelAbund <- t(data.frame(otu_table(pro.muc.phy)))
 
-# Test normality
 hist(pro.muc.df$RelAbund, breaks=10)
 qqnorm(pro.muc.df$RelAbund)
 qqline(pro.muc.df$RelAbund)
@@ -1438,8 +1369,6 @@ shapiro.test(pro.muc.df$RelAbund)
   # p-value = 0.2079
   # adj p = 0.2541000000
   # Normal
-
-# ANOVA
 summary(aov(formula = RelAbund ~ Group, data=pro.muc.df))
   # p-value = 0.0287
   # adj p = 0.15785000
@@ -1448,18 +1377,12 @@ summary(aov(formula = RelAbund ~ Group, data=pro.muc.df))
 
 
 
-
 ##### KIRITIMATIELLAEOTA #####
-# Ar/ma/ti/mon/a/de/tes
-# ^        ^      ^
 # Ki/ri/ti/ma/ti/e/llae/o/ta
-#                       ^
-# Pull out kiris
 kir.muc.phy <- subset_taxa(phy99.muc, Phylum == "Kiritimatiellaeota")
 kir.muc.df <- data.frame(sample_data(kir.muc.phy))
 kir.muc.df$RelAbund <- t(data.frame(otu_table(kir.muc.phy)))
 
-# Test normality
 hist(kir.muc.df$RelAbund, breaks=10)
 qqnorm(kir.muc.df$RelAbund)
 qqline(kir.muc.df$RelAbund)
@@ -1467,8 +1390,6 @@ shapiro.test(kir.muc.df$RelAbund)
   # p-value = 1.863e-07
   # adj p = 0.0000006831
   # Not Normal
-
-# ANOVA
 summary(aov(formula = RelAbund ~ Group, data=kir.muc.df))
   # p-value = 0.148
   # adj p = 0.25457143
@@ -1478,12 +1399,10 @@ summary(aov(formula = RelAbund ~ Group, data=kir.muc.df))
 
 
 ##### CYANOBACTERIA #####
-# Pull out cyanos
 cya.muc.phy <- subset_taxa(phy99.muc, Phylum == "Cyanobacteria")
 cya.muc.df <- data.frame(sample_data(cya.muc.phy))
 cya.muc.df$RelAbund <- t(data.frame(otu_table(cya.muc.phy)))
 
-# Test normality
 hist(cya.muc.df$RelAbund, breaks=10)
 qqnorm(cya.muc.df$RelAbund)
 qqline(cya.muc.df$RelAbund)
@@ -1491,14 +1410,9 @@ shapiro.test(cya.muc.df$RelAbund)
   # p-value = 0.04871
   # adj p = 0.0765442857
   # Normal
-
-# ANOVA
 summary(aov(formula = RelAbund ~ Group, data=kir.muc.df))
   # p-value = 0.148
   # adj p = 0.25457143 
-
-
-
 
 
 
@@ -1509,7 +1423,6 @@ ten.muc.phy <- subset_taxa(phy99.muc, Phylum == "Tenericutes")
 ten.muc.df <- data.frame(sample_data(ten.muc.phy))
 ten.muc.df$RelAbund <- t(data.frame(otu_table(ten.muc.phy)))
 
-# Test normality
 hist(ten.muc.df$RelAbund, breaks=10)
 qqnorm(ten.muc.df$RelAbund)
 qqline(ten.muc.df$RelAbund)
@@ -1517,8 +1430,6 @@ shapiro.test(ten.muc.df$RelAbund)
   # p-value = 4.415e-05
   # adj P = 0.0000971300 
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=ten.muc.df)
   # p-value = 0.1474
   # adj p = 0.25457143
@@ -1532,7 +1443,6 @@ elu.muc.phy <- subset_taxa(phy99.muc, Phylum == "Elusimicrobia")
 elu.muc.df <- data.frame(sample_data(elu.muc.phy))
 elu.muc.df$RelAbund <- t(data.frame(otu_table(elu.muc.phy)))
 
-# Test normality
 hist(elu.muc.df$RelAbund, breaks=10)
 qqnorm(elu.muc.df$RelAbund)
 qqline(elu.muc.df$RelAbund)
@@ -1540,11 +1450,10 @@ shapiro.test(elu.muc.df$RelAbund)
   # p-value = 1.382e-07
   # adj p = 0.0000006831
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=elu.muc.df)
   # p-value = 0.2135
   # adj p = 0.29356250 
+
 
 
 
@@ -1554,7 +1463,6 @@ act.muc.phy <- subset_taxa(phy99.muc, Phylum == "Actinobacteria")
 act.muc.df <- data.frame(sample_data(act.muc.phy))
 act.muc.df$RelAbund <- t(data.frame(otu_table(act.muc.phy)))
 
-# Test normality
 hist(act.muc.df$RelAbund, breaks=10)
 qqnorm(act.muc.df$RelAbund)
 qqline(act.muc.df$RelAbund)
@@ -1562,13 +1470,9 @@ shapiro.test(act.muc.df$RelAbund)
   # p-value = 0.1113
   # adj p = 0.1530375000
   # Normal
-
-# ANOVA
 summary(aov(formula = RelAbund ~ Group, data=act.muc.df))
   # p-value = 0.421
   # adj P = 0.46310000
-
-
 
 
 
@@ -1579,7 +1483,6 @@ eps.muc.phy <- subset_taxa(phy99.muc, Phylum == "Epsilonbacteraeota")
 eps.muc.df <- data.frame(sample_data(eps.muc.phy))
 eps.muc.df$RelAbund <- t(data.frame(otu_table(eps.muc.phy)))
 
-# Test normality
 hist(eps.muc.df$RelAbund, breaks=10)
 qqnorm(eps.muc.df$RelAbund)
 qqline(eps.muc.df$RelAbund)
@@ -1587,11 +1490,10 @@ shapiro.test(eps.muc.df$RelAbund)
   # p-value = 1.062e-07
   # adj p = 0.0000006831
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=eps.muc.df)
   # p-value = 0.5395
   # adj P = 0.53950000
+
 
 
 
@@ -1601,7 +1503,6 @@ unc.muc.phy <- subset_taxa(phy99.muc, Phylum == "Bacteria_unclassified")
 unc.muc.df <- data.frame(sample_data(unc.muc.phy))
 unc.muc.df$RelAbund <- t(data.frame(otu_table(unc.muc.phy)))
 
-# Test normality
 hist(unc.muc.df$RelAbund, breaks=10)
 qqnorm(unc.muc.df$RelAbund)
 qqline(unc.muc.df$RelAbund)
@@ -1609,11 +1510,11 @@ shapiro.test(unc.muc.df$RelAbund)
   # p-value = 3.292e-07
   # adj p = 0.0000009053
   # Not Normal
-
-# Kruskal-Wallis
 kruskal.test(formula = RelAbund ~ Group, data=unc.muc.df)
   # p-value = 0.2998
   # adj p = 0.36642222
+
+
 
 
 
@@ -1648,10 +1549,6 @@ p.adjust(c(8.41e-06,0.162,0.05591,0.0287,0.148,0.148,0.1474,0.2135,0.421,0.5395,
   # Unclassified = 0.36642222
 
 
-"Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Kiritimatiellaeota", "Bacteria_unclassified", "Cyanobacteria", "Tenericutes", "Elusimicrobia", "Actinobacteria","Epsilonbacteraeota"
-     
-
-
 
 
 
@@ -1666,14 +1563,13 @@ phy.muc.sum <- phy99.muc.df %>%
             SD = sd(Abundance),
             SE = se(Abundance),
             iqr = IQR(Abundance))
+
 ```
 
 
 
 ### Mucosa - Alpha-Diversity - Phylogenetic Diversity and SES MPD
 ```{r}
-### Unweighted - Calculate phylogenetic diversity and MPD ###
-
 # Calculate Faith's phylogenetic diversity
 pd.muc.res <- pd(t(data.frame(otu_table(phy.muc))), phy_tree(phy.muc), include.root = T)
 pd.muc.df <- data.frame(pd.muc.res)
@@ -1684,8 +1580,6 @@ pd.muc.dist <- cophenetic(phy_tree(phy.muc))
 ses.mpd.muc.res <- ses.mpd(t(data.frame(otu_table(phy.muc))), pd.muc.dist, null.model = "taxa.labels", abundance.weighted = F, runs = 999)
   # Calculate MPD
   # This'll take a while to run-- be patient
-#save(ses.mpd.muc.res, file = "mpd.muc.RData")
-#load("mpd.muc.RData")
 mpd.muc <- data.frame(ses.mpd.muc.res)
   # Pull out MDP results
 
@@ -1696,15 +1590,12 @@ pd.muc.res$SampleID <- row.names(pd.muc.res)
   # Make sure all SampleID's match!
 
 # Pull out first Stat of each test
-# PD test = PD
-# MPD test = SES (Standardized Effect Size)
 pd.muc.stats <- data.frame(pd.muc.res$SampleID, pd.muc.res$PD)
 pd.muc.stats$Measure <- rep("PD", nrow(pd.muc.df))
 colnames(pd.muc.stats) <- c("Sample", "Stat", "Measure")
 mpd.muc.stats <- data.frame(mpd.muc$SampleID, mpd.muc$mpd.obs.z)
 mpd.muc.stats$Measure <- rep("MPD SES", nrow(pd.muc.df))
 colnames(mpd.muc.stats) <- c("Sample", "Stat", "Measure")
-
 
 
 ### Prepare PD ###
@@ -1717,10 +1608,11 @@ mpd.muc.ready$Group <- ordered(mpd.muc.ready$Group, levels = c("Summer_Captive",
 
 
         
+
         
 ########## TESTING PD & MPD ##########
 
-### Test PD ###
+### PD ###
 hist(pd.muc.ready$Stat, breaks=10)
 qqnorm(pd.muc.ready$Stat)
 qqline(pd.muc.ready$Stat)
@@ -1728,8 +1620,6 @@ shapiro.test(pd.muc.ready$Stat)
   # p-value = 0.01796
   # adj p = 0.0359200
   # Not Normal
-
-# Run Kruskal-Wallis
 kruskal.test(formula = Stat ~ Group, data=pd.muc.ready)
   # p-value = 0.01219
   # adj p = 0.02438000
@@ -1742,7 +1632,7 @@ dunn.test(x = as.numeric(pd.muc.ready$Stat), g = as.factor(pd.muc.ready$Group), 
   # IBA-Spring = 0.0373
  
 
-### Test MPD ###
+### MPD ###
 hist(mpd.muc.ready$Stat, breaks=10)
 qqnorm(mpd.muc.ready$Stat)
 qqline(mpd.muc.ready$Stat)
@@ -1750,8 +1640,6 @@ shapiro.test(mpd.muc.ready$Stat)
   # p-value = 0.4471
   # adj p = 0.5961333
   # Normal
-
-# ANOVA
 summary(aov(formula = Stat ~ Group, data=mpd.muc.ready))
   # p-value = 0.0313
   # adj p = 0.04173333 
@@ -1762,8 +1650,6 @@ TukeyHSD(aov(formula = Stat ~ Group, data=mpd.muc.ready))
   # Torpor-IBA = 0.5188648
   # Torpor-Spring = 0.7642430
   # IBA-Spring = 0.9987692
-
-
 
 ```
 
@@ -1780,7 +1666,6 @@ shapiro.test(adiv.muc$shannon)
   # p-value = 0.6468
   # adj P = 0.6468000
   # Normal
-
 summary(aov(shannon ~ Group, data = adiv.muc))
   # p-value = 0.868
   # adj P = 0.86800000
@@ -1803,7 +1688,6 @@ for(n in 1:nsamples(phy.muc)) {
 uniq.otus.muc$Group <- sample_data(phy.muc)$Group
 rownames(uniq.otus.muc) <- uniq.otus.muc$Sample
 
-
 hist(uniq.otus.muc$Unique_OTUs, breaks=10)
 qqnorm(uniq.otus.muc$Unique_OTUs)
 qqline(uniq.otus.muc$Unique_OTUs)
@@ -1811,7 +1695,6 @@ shapiro.test(uniq.otus.muc$Unique_OTUs)
   # p-value =  0.01611
   # adj p = 0.0359200
   # Not Normal
-
 kruskal.test(formula = Unique_OTUs ~ Group, data=uniq.otus.muc)
   # p-value = 0.004016
   # adj p = 0.01606400
@@ -1824,20 +1707,24 @@ dunn.test(x = as.numeric(uniq.otus.muc$Unique_OTUs), g = as.factor(uniq.otus.muc
   # IBA-Spring = 0.0389
 
 
+
+
+
 ### P-adjust Shapiro
 p.adjust(c(0.01796,0.4471,0.6468, 0.01611), method = "BH")
   # 0.0359200 0.5961333 0.6468000 0.0359200
+  # Unique OTUs, PD, MPD, Shannon
 
 ### P-adjust AOV/Kruskal-Wallis
 p.adjust(c(0.01219,0.0313,0.868, 0.004016), method = "BH")
   # 0.02438000 0.04173333 0.86800000 0.01606400
+  # Unique OTUs, PD, MPD, Shannon
 
 ```
 
 ### Mucosa - Alpha-Diversity Prepare Plots
 ```{r}
 ###### Unique # of OTUs ######
-
 ### Prepare data for plot
 uniq.otus.muc.sum <- uniq.otus.muc %>%
   group_by(Group) %>%
@@ -1874,8 +1761,8 @@ otu.muc.plot <- ggplot(uniq.otus.muc, aes(x = Group, y = Unique_OTUs, fill = Gro
 
 
 
-###### Faith's Phylogenetic Diversity ######
 
+###### Faith's Phylogenetic Diversity ######
 ### Prepare PD ###
 pd.muc.sum <- pd.muc.ready %>%
   group_by(Group) %>%
@@ -1914,7 +1801,6 @@ pd.muc.plot <- ggplot(pd.muc.ready, aes(x = Group, y = Stat, fill = Group)) +
 
 
 ###### Phylogenetic Diversity (MPD) ######
-
 ### Prepare MPD ###
 mpd.muc.sum <- mpd.muc.ready %>%
   group_by(Group) %>%
@@ -1950,10 +1836,6 @@ mpd.muc.plot <- ggplot(mpd.muc.ready, aes(x = Group, y = Stat, fill = Group)) +
   
 
 
-        
-        
-        
-
 
 
 ### Prepare data for plot
@@ -1965,8 +1847,6 @@ shannon.muc.sum <- adiv.muc %>%
             Median = median(shannon))
 shannon.muc.sum$YMAX <- shannon.muc.sum$Mean + shannon.muc.sum$SE
 shannon.muc.sum$YMIN <- shannon.muc.sum$Mean - shannon.muc.sum$SE
-
-
 
 shannon.muc.ann <- data.frame(lab = c("ns", " ", " ", " "), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
 
@@ -1999,7 +1879,7 @@ shannon.muc.plot <- ggplot(adiv.muc, aes(x = Group, y = shannon, fill = Group)) 
 
 ### Mucosa Plot - Alpha-Diversity
 ```{r}
-tiff("CaptiveSeasons.muc.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+#tiff("CaptiveSeasons/Mucosa/FigS5.CaptiveSeasons.muc.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -2014,18 +1894,16 @@ print(mpd.muc.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
 grid.text("D", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
           gp=gpar(fontsize=8,fontface="bold"))
 print(shannon.muc.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
-dev.off()
+#dev.off()
 ```
 
 
 
 ### Mucosa - Beta-Diversity
 ```{r}
-
 ########## Weighted UniFrac ##########
 UF.w.muc <- phyloseq::distance(physeq = phy.muc, method = "wunifrac")
 UF.w.pcoa.muc <- ordinate(physeq = phy.muc, method = "PCoA", distance = "wunifrac")
-  # Variation explained = 41.9%
 
 wUF.muc.plot <- plot_ordination(physeq = phy.muc, ordination = UF.w.pcoa.muc, axes = c(1,2),
                 title = "Weighted UniFrac", color = "Group") +
@@ -2044,7 +1922,6 @@ wUF.muc.plot <- plot_ordination(physeq = phy.muc, ordination = UF.w.pcoa.muc, ax
         )
 
 
-### PERMANOVA ###
 sampdf.muc <- data.frame(sample_data(phy.muc))
 beta.tax <- betadisper(d=UF.w.muc, group=sampdf.muc$Group)
 p <- permutest(beta.tax)
@@ -2052,6 +1929,7 @@ p$tab
   # p-value = 0.745
 adonis(UF.w.muc ~ Group, data=sampdf.muc, permutations = 9999)
   # p-value = 2e-04
+
 
 # Separate by season
 phy.muc.sum <- subset_samples(phy.muc, Group == "Summer_Captive")
@@ -2156,6 +2034,7 @@ p.adjust(c(0.501,0.606,0.731,0.817,0.312,0.385), method = "fdr")
   # Torpor-Spring = 0.817
   # IBA-Spring = 0.817
 
+
 # Adjust PERMANOVA p-values
 p.adjust(c(0.0014,8e-04,0.1192,0.9865,0.0162,0.0095), method = "fdr")
   # Summer-Torpor = 0.00420
@@ -2169,11 +2048,9 @@ p.adjust(c(0.0014,8e-04,0.1192,0.9865,0.0162,0.0095), method = "fdr")
 
 
 
-
 ########## Unweighted UniFrac ##########
 UF.u.muc <- phyloseq::distance(physeq = phy.muc, method = "unifrac")
 UF.u.pcoa.muc <- ordinate(physeq = phy.muc, method = "PCoA", distance = "unifrac")
-  # Variation explained = 23.9%
 
 uUF.muc.plot <- plot_ordination(physeq = phy.muc, ordination = UF.u.pcoa.muc, axes = c(1,2),
                 title = "Unweighted UniFrac", color = "Group") +
@@ -2192,7 +2069,6 @@ uUF.muc.plot <- plot_ordination(physeq = phy.muc, ordination = UF.u.pcoa.muc, ax
         )
 
 
-### PERMANOVA ###
 sampdf <- data.frame(sample_data(phy.muc))
 beta.tax <- betadisper(d=UF.u.muc, group=sampdf$Group)
 p <- permutest(beta.tax)
@@ -2266,6 +2142,7 @@ adonis(tp.u.muc ~ Group, data=sampdf.tp, permutations = 9999)
   # p-value = 0.0697
   # adj p = 0.10455
 
+
 # IBA vs Spring
 ip.u.muc <- phyloseq::distance(physeq = phy.muc.ip, method = "unifrac")
 sampdf.ip<- data.frame(sample_data(phy.muc.ip))
@@ -2277,6 +2154,8 @@ p$tab
 adonis(ip.u.muc ~ Group, data=sampdf.ip, permutations = 9999)
   # p-value = 0.0163
   # adj p = 0.03260
+
+
 
 # Adjust betadisper p-values
 p.adjust(c(0.11,0.066,0.088,0.721,0.38,0.614), method = "fdr")
@@ -2300,11 +2179,8 @@ p.adjust(c(0.0027,5e-04,0.5296,0.844,0.0697,0.0163), method = "fdr")
 
 
 
-
-
 ########## Bray-Curtis ##########
 bray.pcoa.muc <- ordinate(physeq=phy.muc, method="PCoA", distance="bray")
-  # Variation explained = 31.8%
 
 bc.muc.plot <- plot_ordination(physeq=phy.muc, ordination=bray.pcoa.muc, color="Group",
                            title = "Bray-Curtis Dissimilarity") +
@@ -2326,11 +2202,9 @@ bc.muc.plot <- plot_ordination(physeq=phy.muc, ordination=bray.pcoa.muc, color="
         #legend.box.margin=margin(-10,-10,-10,-10)
         )
 
-
 ord.muc.legend <- g_legend(bc.muc.plot)
 
 
-### TEST ###
 sampdf.muc <- data.frame(sample_data(phy.muc))
 bray.muc <- phyloseq::distance(physeq = phy.muc, method = "bray")
 beta.tax <- betadisper(d = bray.muc, group = sampdf.muc$Group)
@@ -2341,8 +2215,7 @@ adonis(bray.muc ~ Group, data=sampdf.muc, permutations = 9999)
   # p-value = 1e-04
 
 
-
-### Summer vs. Torpor ###
+# Summer vs. Torpor
 sampdf.muc.st <- data.frame(sample_data(phy.muc.st))
 bray.muc.st <- phyloseq::distance(physeq = phy.muc.st, method = "bray")
 beta.tax <- betadisper(d = bray.muc.st, group = sampdf.muc.st$Group)
@@ -2355,7 +2228,7 @@ adonis(bray.muc.st ~ Group, data=sampdf.muc.st, permutations = 9999)
   # adj p = 0.00480
 
 
-### Summer vs. IBA ###
+# Summer vs. IBA
 sampdf.muc.si <- data.frame(sample_data(phy.muc.si))
 bray.muc.si <- phyloseq::distance(physeq = phy.muc.si, method = "bray")
 beta.tax <- betadisper(d = bray.muc.si, group = sampdf.muc.si$Group)
@@ -2368,7 +2241,7 @@ adonis(bray.muc.si ~ Group, data=sampdf.muc.si, permutations = 9999)
   # adj p = 0.00420
 
 
-### Summer vs. Spring ###
+# Summer vs. Spring
 sampdf.muc.sp <- data.frame(sample_data(phy.muc.sp))
 bray.muc.sp <- phyloseq::distance(physeq = phy.muc.sp, method = "bray")
 beta.tax <- betadisper(d = bray.muc.sp, group = sampd.mucf.sp$Group)
@@ -2381,7 +2254,7 @@ adonis(bray.muc.sp ~ Group, data=sampdf.muc.sp, permutations = 9999)
   # adj p = 0.09492
 
 
-### Torpor vs. IBA ###
+# Torpor vs. IBA
 sampdf.muc.ti <- data.frame(sample_data(phy.muc.ti))
 bray.muc.ti <- phyloseq::distance(physeq = phy.muc.ti, method = "bray")
 beta.tax <- betadisper(d = bray.muc.ti, group = sampdf.muc.ti$Group)
@@ -2394,7 +2267,7 @@ adonis(bray.muc.ti ~ Group, data=sampdf.muc.ti, permutations = 9999)
   # adj p = 0.98150
 
 
-### Torpor vs. Spring ###
+# Torpor vs. Spring
 sampdf.muc.tp <- data.frame(sample_data(phy.muc.tp))
 bray.muc.tp <- phyloseq::distance(physeq = phy.muc.tp, method = "bray")
 beta.tax <- betadisper(d = bray.muc.tp, group = sampdf.muc.tp$Group)
@@ -2407,7 +2280,7 @@ adonis(bray.muc.tp ~ Group, data=sampdf.muc.tp, permutations = 9999)
   # adj p = 0.02670
 
 
-### IBA vs. Spring ###
+# IBA vs. Spring
 sampdf.muc.ip <- data.frame(sample_data(phy.muc.ip))
 bray.muc.ip <- phyloseq::distance(physeq = phy.muc.ip, method = "bray")
 beta.tax <- betadisper(d = bray.muc.ip, group = sampdf.muc.ip$Group)
@@ -2446,7 +2319,7 @@ p.adjust(c(0.0016,7e-04,0.0791,0.9815,0.0178,0.0084), method = "fdr")
 
 ### Mucosa Plot - Beta-diversity
 ```{r}
-tiff("CaptiveSeasons.muc.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
+#tiff("CaptiveSeasons/Mucosa/FigS6.CaptiveSeasons.muc.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 0.45), heights = c(1, 1, 1))))
 
@@ -2469,7 +2342,7 @@ grid.text("C", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos
                                                                    layout.pos.col=1),
           gp=gpar(fontsize=12,fontface="bold"))
 
-dev.off()
+#dev.off()
 ```
 
 
@@ -2492,15 +2365,15 @@ phy.muc.simp <- merge_phyloseq(otu_table(phy.muc), sample_data(muc.rename), tax_
               data.frame(sample_data(phy.muc.simp)),
               c("GroupRename"),
               perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
-              output_name='CaptiveSeason_muc')
-#group.simper <- read.csv("CaptiveSeason_muc_clean_simper.csv")
+              output_name='CaptiveSeasons/Mucosa/CaptiveSeasons.muc')
+#group.simper <- read.csv("CaptiveSeasons/Mucosa/CaptiveSeasons.muc_clean_simper.csv")
 #kruskal.pretty(data.frame(otu_table(phy.muc.simp)),
                data.frame(sample_data(phy.muc.simp)),
                csv = group.simper,
                c("GroupRename"),
-               output_name = 'CaptiveSeason_muc',
+               output_name = 'CaptiveSeasons/Mucosa/CaptiveSeasons.muc',
                taxonomy = data.frame(tax_table(phy.muc.simp)))
-#group.simper.kw <- read.csv("CaptiveSeason_muc_krusk_simper.csv")
+#group.simper.kw <- read.csv("CaptiveSeasons/Mucosa/CaptiveSeasons.muc_krusk_simper.csv")
 for(i in 1:nrow(group.simper.kw)){
   save <- which(rownames(data.frame(tax_table(phy.muc.simp))) == group.simper.kw$OTU[i])
   group.simper.kw$Taxonomy[i] <-
@@ -2510,8 +2383,8 @@ for(i in 1:nrow(group.simper.kw)){
           data.frame(tax_table(phy.muc.simp))[save,5], "-",
           data.frame(tax_table(phy.muc.simp))[save,6])
 }
-#write.table(group.simper.kw, "CaptiveSeason_muc_krusk_simper.csv", sep=",")
-#group.simper.kw <- read.csv("group_clean_simper.csv", row.names = 1)
+#write.table(group.simper.kw, "CaptiveSeasons/Mucosa/CaptiveSeasons.muc_krusk_simper.csv", sep=",")
+#group.simper.kw <- read.csv("CaptiveSeasons/Mucosa/CaptiveSeasons.muc_krusk_simper.csv", row.names = 1)
 ```
 
 
@@ -2553,6 +2426,7 @@ phy.muc.spr.core <- merge_phyloseq(otu_table(spr.muc.core, taxa_are_rows = T), t
   # 141 OTUs
 
 
+
 ### Compare Core OTUs
 intersect(rownames(sum.muc.core), rownames(tor.muc.core))
   # 24 shared core OTUs
@@ -2583,7 +2457,8 @@ core3.muc <- intersect(core2.muc, rownames(spr.muc.core))
 # "Otu00072" "Otu00026" "Otu00197" "Otu00120" "Otu00184" "Otu00200" "Otu00093" "Otu00067" "Otu00452" "Otu00143" "Otu00068" "Otu00043" "Otu00011" "Otu00041" "Otu00137" "Otu00112"
 
 
+
 ### Physeq object with only core OTUs
 phy.muc.core <- merge_phyloseq(phy.muc.sum.core, phy.muc.tor.core, phy.muc.iba.core, phy.muc.spr.core)
-#write.csv(data.frame(tax_table(phy.muc.core)), "CaptiveSeasons_muc_coreOTUs.csv")
+#write.csv(data.frame(tax_table(phy.muc.core)), "CaptiveSeasons/Mucosa/CaptiveSeasons_muc_coreOTUs.csv")
 ```
