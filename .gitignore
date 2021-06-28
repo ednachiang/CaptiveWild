@@ -2,4 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
-figs/*.tiff
+ContentMucosa/*.tiff
+Drafts/
