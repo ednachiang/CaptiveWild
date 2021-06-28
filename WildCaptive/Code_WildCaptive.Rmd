@@ -84,8 +84,10 @@ otu.rem.tab <- otu_table(otu.rem.df, taxa_are_rows = T)
 phy.both <- merge_phyloseq(otu.rem.tab, sample_data(phy.sum), tax_table(phy.sum), phy_tree(phy.sum))
 
 # Remove unpaired samples
+# Not in Wild or Captive groups
 #phy.both <- subset_samples(phy.both, ID != 3881)
 #phy.both <- subset_samples(phy.both, ID != 4057)
+
 
 # Order factors
 sample_data(phy.both)$Diet <- ordered(sample_data(phy.both)$Diet, levels = c("Captive", "Wild"))
@@ -124,7 +126,6 @@ fir.phy <- subset_taxa(phy99, Phylum == "Firmicutes")
 fir.df <- data.frame(sample_data(fir.phy))
 fir.df$RelAbund <- t(data.frame(otu_table(fir.phy)))
 
-# Test normality
 hist(fir.df$RelAbund, breaks=10)
 qqnorm(fir.df$RelAbund)
 qqline(fir.df$RelAbund)
@@ -142,7 +143,6 @@ bac.phy <- subset_taxa(phy99, Phylum == "Bacteroidetes")
 bac.df <- data.frame(sample_data(bac.phy))
 bac.df$RelAbund <- t(data.frame(otu_table(bac.phy)))
 
-# Test normality
 hist(bac.df$RelAbund, breaks=10)
 qqnorm(bac.df$RelAbund)
 qqline(bac.df$RelAbund)
@@ -154,13 +154,11 @@ t.test(RelAbund ~ Diet, data = bac.df)
 
 
 
-
 ##### Verrucomicrobia #####
 ver.phy <- subset_taxa(phy99, Phylum == "Verrucomicrobia")
 ver.df <- data.frame(sample_data(ver.phy))
 ver.df$RelAbund <- t(data.frame(otu_table(ver.phy)))
 
-# Test normality
 hist(ver.df$RelAbund, breaks=10)
 qqnorm(ver.df$RelAbund)
 qqline(ver.df$RelAbund)
@@ -172,13 +170,11 @@ wilcox.test(RelAbund ~ Diet, data = ver.df)
 
 
 
-
 ##### PROTEOBACTERIA #####
 pro.phy <- subset_taxa(phy99, Phylum == "Proteobacteria")
 pro.df <- data.frame(sample_data(pro.phy))
 pro.df$RelAbund <- t(data.frame(otu_table(pro.phy)))
 
-# Test normality
 hist(pro.df$RelAbund, breaks=10)
 qqnorm(pro.df$RelAbund)
 qqline(pro.df$RelAbund)
@@ -190,14 +186,11 @@ t.test(RelAbund ~ Diet, data = pro.df)
 
 
 
-
 ##### CYANOBACTERIA #####
-# Pull out cyanos
 cya.phy <- subset_taxa(phy99, Phylum == "Cyanobacteria")
 cya.df <- data.frame(sample_data(cya.phy))
 cya.df$RelAbund <- t(data.frame(otu_table(cya.phy)))
 
-# Test normality
 hist(cya.df$RelAbund, breaks=10)
 qqnorm(cya.df$RelAbund)
 qqline(cya.df$RelAbund)
@@ -209,15 +202,11 @@ wilcox.test(RelAbund ~ Diet, data = cya.df)
 
 
 
-
-
-
 ##### TENERICUTES #####
 ten.phy <- subset_taxa(phy99, Phylum == "Tenericutes")
 ten.df <- data.frame(sample_data(ten.phy))
 ten.df$RelAbund <- t(data.frame(otu_table(ten.phy)))
 
-# Test normality
 hist(ten.df$RelAbund, breaks=10)
 qqnorm(ten.df$RelAbund)
 qqline(ten.df$RelAbund)
@@ -229,13 +218,11 @@ wilcox.test(RelAbund ~ Diet, data = ten.df)
 
 
 
-
 ##### ACTINOBACTERIA #####
 act.phy <- subset_taxa(phy99, Phylum == "Actinobacteria")
 act.df <- data.frame(sample_data(act.phy))
 act.df$RelAbund <- t(data.frame(otu_table(act.phy)))
 
-# Test normality
 hist(act.df$RelAbund, breaks=10)
 qqnorm(act.df$RelAbund)
 qqline(act.df$RelAbund)
@@ -252,7 +239,6 @@ elu.phy <- subset_taxa(phy99, Phylum == "Elusimicrobia")
 elu.df <- data.frame(sample_data(elu.phy))
 elu.df$RelAbund <- t(data.frame(otu_table(elu.phy)))
 
-# Test normality
 hist(elu.df$RelAbund, breaks=10)
 qqnorm(elu.df$RelAbund)
 qqline(elu.df$RelAbund)
@@ -264,13 +250,11 @@ wilcox.test(RelAbund ~ Diet, data = elu.df)
 
 
 
-
 ##### UNCLASSIFIED #####
 unc.phy <- subset_taxa(phy99, Phylum == "Bacteria_unclassified")
 unc.df <- data.frame(sample_data(unc.phy))
 unc.df$RelAbund <- t(data.frame(otu_table(unc.phy)))
 
-# Test normality
 hist(unc.df$RelAbund, breaks=10)
 qqnorm(unc.df$RelAbund)
 qqline(unc.df$RelAbund)
@@ -285,8 +269,7 @@ wilcox.test(RelAbund ~ Diet, data = unc.df)
 ########## P-Adjust ##########
 p.adjust(c(0.1972,0.3764,1,0.01182,0.01212,0.3572,0.6397,0.1817), method = "fdr")
   # 0.4437000 0.4839429 1.0000000 0.0545400 0.0545400 0.4839429 0.7196625 0.4437000 0.4839429
-
-
+  # Firmicutes, Bacteroidetes, Verrucomicrobia, Proteobacteria, Cyanobacteria, Tenericutes, Actinobacteria, Elusimicrobia, Unclassified
 
 
 
@@ -298,9 +281,7 @@ phyla.sum.df <- phyla.sum %>%
             SE = se(Abundance))
 phyla.sum.df$Phylum <- ordered(phyla.sum.df$Phylum, levels = c("Firmicutes", "Bacteroidetes", "Verrucomicrobia", "Proteobacteria", "Cyanobacteria", "Tenericutes", "Actinobacteria", "Elusimicrobia", "Bacteria_unclassified"))
 
-
-
-#write.table(phyla.sum.df, "WildCaptive_Phyla.csv", sep=",")
+#write.table(phyla.sum.df, "WildCaptive/Content/Table1.WildCaptive.con.Phyla.csv", sep=",")
 ```
 
 
@@ -309,8 +290,6 @@ phyla.sum.df$Phylum <- ordered(phyla.sum.df$Phylum, levels = c("Firmicutes", "Ba
 
 ### Content - Alpha-Diversity - Phylogenetic Diversity and SES MPD
 ```{r}
-### Unweighted - Calculate phylogenetic diversity and MPD ###
-
 # Calculate Faith's phylogenetic diversity
 pd.res <- pd(t(data.frame(otu_table(phy.con))), phy_tree(phy.con), include.root = T)
 pd.df <- data.frame(pd.res)
@@ -321,8 +300,6 @@ pd.dist <- cophenetic(phy_tree(phy.con))
 ses.mpd.res <- ses.mpd(t(data.frame(otu_table(phy.con))), pd.dist, null.model = "taxa.labels", abundance.weighted = F, runs = 999)
   # Calculate MPD
   # This'll take a while to run-- be patient
-#save(ses.mpd.res, file = "mpd.RData")
-#load("mpd.RData")
 mpd <- data.frame(ses.mpd.res)
   # Pull out MDP results
 
@@ -333,8 +310,6 @@ pd.res$SampleID <- row.names(pd.res)
   # Make sure all SampleID's match!
 
 # Pull out first Stat of each test
-# PD test = PD
-# MPD test = SES (Standardized Effect Size)
 pd.stats <- data.frame(pd.res$SampleID, pd.res$PD)
 pd.stats$Measure <- rep("PD", nrow(pd.df))
 colnames(pd.stats) <- c("Sample", "Stat", "Measure")
@@ -348,9 +323,8 @@ pd.ready$Group <- ordered(pd.ready$Group, levels = c("Summer_Captive", "Summer_W
 mpd.ready <- merge(mpd.stats, meta, by = "Sample")
 mpd.ready$Group <- ordered(mpd.ready$Group, levels = c("Summer_Captive", "Summer_Wild"))
 
-
         
-########## TESTING PD & MPD ##########
+##### TESTING PD & MPD #####
 
 ### Test PD ###
 hist(pd.ready$Stat, breaks=10)
@@ -363,8 +337,6 @@ t.test(Stat ~ Diet, data = pd.ready)
   # p-value = 0.0001161
 
 
- 
-
 ### Test MPD ###
 hist(mpd.ready$Stat, breaks=10)
 qqnorm(mpd.ready$Stat)
@@ -374,6 +346,7 @@ shapiro.test(mpd.ready$Stat)
   # Normal
 t.test(Stat ~ Diet, data = mpd.ready)
   # p-value = 0.07837
+
 ```
 
 
@@ -382,8 +355,7 @@ t.test(Stat ~ Diet, data = mpd.ready)
 ```{r}
 adiv <- data.frame(sample_data(phy.con))
 
-
-########## Shannon ##########
+##### Shannon #####
 hist(adiv$shannon, breaks=10)
 qqnorm(adiv$shannon)
 qqline(adiv$shannon)
@@ -395,9 +367,7 @@ t.test(shannon ~ Diet, data = adiv)
 
 
 
-
-
-########## Number of Unique OTUs ##########
+##### Number of Unique OTUs #####
 otus <- data.frame(otu_table(phy.con))
 sampNames <- colnames(otus)
 uniq.otus <- data.frame(matrix(nrow = nsamples(phy.con), ncol = 2))
@@ -411,7 +381,6 @@ for(n in 1:nsamples(phy.con)) {
 uniq.otus$Group <- sample_data(phy.con)$Group
 rownames(uniq.otus) <- uniq.otus$Sample
 
-
 hist(uniq.otus$Unique_OTUs, breaks=10)
 qqnorm(uniq.otus$Unique_OTUs)
 qqline(uniq.otus$Unique_OTUs)
@@ -424,15 +393,17 @@ t.test(Unique_OTUs ~ Group, data = uniq.otus)
 
 
 
+
 ###### Adjust a-div p-values ######
 p.adjust(c(0.00009851, 0.0001161, 0.07837, 0.9401), method = "fdr")
   # 0.0002322 0.0002322 0.1044933 0.9401000
+  # Order = Unique # OTUs, PD, MPD, Shannon
 ```
 
 
 ### Content - Alpha-Diversity Prepare Plots
 ```{r}
-###### Unique # of OTUs ######
+##### Unique # of OTUs #####
 
 # Prepare data for plot
 uniq.otus.sum <- uniq.otus %>%
@@ -470,8 +441,7 @@ otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
 
 
 
-
-###### Faith's Phylogenetic Diversity ######
+##### Faith's Phylogenetic Diversity #####
 
 # Prepare PD ###
 pd.sum <- pd.ready %>%
@@ -482,7 +452,6 @@ pd.sum <- pd.ready %>%
             Median = median(Stat))
 pd.sum$YMAX <- pd.sum$Mean + pd.sum$SE
 pd.sum$YMIN <- pd.sum$Mean - pd.sum$SE
-
 
 pd.ann <- data.frame(lab = c("*", " "), Group = factor(c("Summer_Captive", "Summer_Wild")))
 
@@ -508,8 +477,9 @@ pd.plot <- ggplot(pd.ready, aes(x = Group, y = Stat, fill = Group)) +
   
   
 
-        
-###### Phylogenetic Evenness (MPD) ######
+  
+      
+##### Phylogenetic Evenness (MPD) #####
 
 # Prepare MPD
 mpd.sum <- mpd.ready %>%
@@ -546,7 +516,8 @@ mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
 
         
 
-###### Shannon's Diversity #####      
+
+##### Shannon's Diversity #####      
 
 # Prepare data for plot
 shannon.sum <- adiv %>%
@@ -559,7 +530,6 @@ shannon.sum$YMAX <- shannon.sum$Mean + shannon.sum$SE
 shannon.sum$YMIN <- shannon.sum$Mean - shannon.sum$SE
 
 shannon.ann <- data.frame(lab = c("ns", " "), Group = factor(c("Summer_Captive", "Summer_Wild")))
-
 
 shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
   geom_violin() +
@@ -585,15 +555,12 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
   geom_text(data = shannon.ann, aes(label=lab), x=c(1.5,0),
             y=c(5.6,0), size=2.5, color="black")
 
-
-
-
 ```
 
 
 ### Content - Plot - Alpha-Diversity
 ```{r}
-#tiff("wild.captive.con.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+#tiff("WildCaptive/Content/Fig1.WildCaptive.con.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -615,11 +582,9 @@ print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
 
 ### Content - Beta Diversity
 ```{r}
-
 ########## Weighted UniFrac ##########
 UF.w <- phyloseq::distance(physeq = phy.con, method = "wunifrac")
 UF.w.pcoa <- ordinate(physeq = phy.con, method = "PCoA", distance = "wunifrac")
-  # Variation explained = 45.9%
 
 wUF.plot <- plot_ordination(physeq = phy.con, ordination = UF.w.pcoa, axes = c(1,2),
                 title = "Weighted UniFrac", color = "Diet") +
@@ -638,8 +603,7 @@ wUF.plot <- plot_ordination(physeq = phy.con, ordination = UF.w.pcoa, axes = c(1
         legend.position = "none"
         )
 
-
-### PERMANOVA ###
+# Test
 sampdf <- data.frame(sample_data(phy.con))
 beta.tax <- betadisper(d=UF.w, group=sampdf$Group)
 p <- permutest(beta.tax)
@@ -655,7 +619,6 @@ anosim(UF.w, sampdf$Group, permutations = 9999)
 ########## Unweighted UniFrac ##########
 UF.u <- phyloseq::distance(physeq = phy.con, method = "unifrac")
 UF.u.pcoa <- ordinate(physeq = phy.con, method = "PCoA", distance = "unifrac")
-  # Variation explained = 22.4%
 
 uUF.plot <- plot_ordination(physeq = phy.con, ordination = UF.u.pcoa, axes = c(1,2),
                 title = "Unweighted UniFrac", color = "Diet") +
@@ -674,8 +637,7 @@ uUF.plot <- plot_ordination(physeq = phy.con, ordination = UF.u.pcoa, axes = c(1
         legend.position  = "none"
         )
 
-
-### PERMANOVA ###
+# Test
 sampdf <- data.frame(sample_data(phy.con))
 beta.tax <- betadisper(d=UF.u, group=sampdf$Group)
 p <- permutest(beta.tax)
@@ -688,10 +650,8 @@ anosim(UF.u, sampdf$Group, permutations = 9999)
 
 
 
-
 ########## Bray-Curtis ##########
 bray.pcoa <- ordinate(physeq=phy.con, method="PCoA", distance="bray")
-  # Variation explained = 27.4%
 
 bc.plot <- plot_ordination(physeq=phy.con, ordination=bray.pcoa, color="Group",
                            title = "Bray-Curtis Dissimilarity") +
@@ -714,11 +674,9 @@ bc.plot <- plot_ordination(physeq=phy.con, ordination=bray.pcoa, color="Group",
         #legend.box.margin=margin(-10,-10,-10,-10)
         )
 
-
 ord.legend <- g_legend(bc.plot)
 
-
-### TEST ###
+# Test
 sampdf <- data.frame(sample_data(phy.con))
 bray <- phyloseq::distance(physeq = phy.con, method = "bray")
 beta.tax <- betadisper(d = bray, group = sampdf$Group)
@@ -731,22 +689,25 @@ anosim(bray, sampdf$Group, permutations = 9999)
 
 
 
+
 ##### Adjust P-values #####
 
 # Betadisper
 p.adjust(c(0.006, 0.005, 0.001), method = "fdr")
   # 0.006 0.006 0.003
+  # Order = Weighted UniFrac, Unweighted UniFrac, Bray-Curtis
 
 # ANOSIM
 p.adjust(c(0.1864, 0.0064, 0.013), method = "fdr")
   # 0.1864 0.0192 0.0195
+  # Order = Weighted UniFrac, Unweighted UniFrac, Bray-Curtis
 ```
 
 
 
 ### Content - Plot - Beta-Diversity
 ```{r}
-#tiff("wild.captive.con.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
+#tiff("WildCaptive/Content/Fig2.WildCaptive.con.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 0.45), heights = c(1, 1, 1))))
 
@@ -771,6 +732,8 @@ grid.text("C", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos
 
 #dev.off()
 ```
+
+
 ### Content - Simper
 ```{r}
 # Group
@@ -778,15 +741,15 @@ grid.text("C", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos
               data.frame(sample_data(phy.con)),
               c("Diet"),
               perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
-              output_name='wild.captive.con')
-group.simper <- read.csv("wild.captive.con_clean_simper.csv")
-kruskal.pretty(data.frame(otu_table(phy.con)),
+              output_name='WildCaptive/Content/WildCaptive.con')
+#group.simper <- read.csv("WildCaptive/Content/WildCaptive.con_clean_simper.csv")
+#kruskal.pretty(data.frame(otu_table(phy.con)),
                data.frame(sample_data(phy.con)),
                csv = group.simper,
                c("Diet"),
-               output_name = 'wild.captive.con',
+               output_name = 'WildCaptive/Content/WildCaptive.con',
                taxonomy = data.frame(tax_table(phy.con)))
-#group.simper.kw <- read.csv("wild.captive.con_krusk_simper.csv")
+#group.simper.kw <- read.csv("WildCaptive/Content/WildCaptive.con_krusk_simper.csv")
 #for(i in 1:nrow(group.simper.kw)){
   save <- which(rownames(data.frame(tax_table(phy.con))) == group.simper.kw$OTU[i])
   group.simper.kw$Taxonomy[i] <-
@@ -796,9 +759,10 @@ kruskal.pretty(data.frame(otu_table(phy.con)),
           data.frame(tax_table(phy.con))[save,5], "-",
           data.frame(tax_table(phy.con))[save,6])
 }
-#write.table(group.simper.kw, "wild.captive.con_krusk_simper.csv", sep=",")
-#group.simper.kw <- read.csv("wild.captive.con_clean_simper.csv", row.names = 1)
+#write.table(group.simper.kw, "WildCaptive/Content/WildCaptive.con_krusk_simper.csv", sep=",")
+#group.simper.kw <- read.csv("WildCaptive/Content/WildCaptive.con.con_clean_simper.csv", row.names = 1)
 ```
+
 
 ### Content & Mucosa - Core OTUs
 ```{r}
@@ -810,7 +774,6 @@ phy.sum.muc <- subset_samples(phy.muc, Diet == "Captive")
 
 
 ### Identify Core OTUs
-
 wild.con.otu <- data.frame(otu_table(phy.wild.con))
 wild.con.core <- apply(wild.con.otu, 1, function(row) all(row != 0))
 wild.con.core <- wild.con.otu[wild.con.core,]
@@ -841,27 +804,12 @@ phy.sum.muc.core <- merge_phyloseq(otu_table(sum.muc.core, taxa_are_rows = T),
 
 
 
-phy.wild <- subset_samples(phy.both, Diet == "Wild")
-wild.otu <- data.frame(otu_table(phy.wild))
-wild.core <- apply(wild.otu, 1, function(row) all(row != 0))
-wild.core <- wild.otu[wild.core,]
-phy.wild.core <- merge_phyloseq(otu_table(wild.core, taxa_are_rows = T), tax_table(phy.wild), sample_data(phy.wild))
-  # 237 OTUs
-
-phy.sum <- subset_samples(phy.both, Diet == "Captive")
-sum.otu <- data.frame(otu_table(phy.sum))
-sum.core <- apply(sum.otu, 1, function(row) all(row != 0))
-sum.core <- sum.otu[sum.core,]
-phy.sum.core <- merge_phyloseq(otu_table(sum.core, taxa_are_rows = T), tax_table(phy.sum), sample_data(phy.sum))
-  # 28 OTUs
-
-
-
 ### Compare Core OTUs
 
 intersect(rownames(wild.con.core), rownames(sum.con.core))
   # 19 shared core OTUs
   # "Otu00159" "Otu00044" "Otu00026" "Otu00135" "Otu00154" "Otu00175" "Otu00197" "Otu00120" "Otu00229" "Otu00267" "Otu00156" "Otu00200" "Otu00093" "Otu00133" "Otu00067" "Otu00068" "Otu00084" "Otu00011" "Otu00137"
+
 intersect(rownames(wild.muc.core), rownames(sum.muc.core))
   # 24 shared core OTUs
   # "Otu00159" "Otu00026" "Otu00154" "Otu00175" "Otu00278" "Otu00197" "Otu00120" "Otu00169" "Otu00184" "Otu00161" "Otu00236" "Otu00156" "Otu00200" "Otu00093" "Otu00133" "Otu00067" "Otu00068" "Otu00084" "Otu00043" "Otu00011" "Otu00041" "Otu00052" "Otu00137" "Otu00090"
@@ -873,16 +821,12 @@ intersect(rownames(wild.core), rownames(sum.core))
 
 
 
-
 ### Physeq object with only core OTUs
 phy.con.core <- merge_phyloseq(phy.wild.con.core, phy.sum.con.core)
 #write.csv(data.frame(tax_table(phy.con.core)), "WildCaptive.con.coreOTUs.csv")
 phy.muc.core <- merge_phyloseq(phy.wild.muc.core, phy.sum.muc.core)
 #write.csv(data.frame(tax_table(phy.muc.core)), "WildCaptive.muc.coreOTUs.csv")
 ```
-
-
-
 
 
 
@@ -910,12 +854,12 @@ phy99.muc <- prune_taxa(taxa_sums(phy99.muc) > 1, phy99.muc)
      
 
 
+
 ##### FIRMICUTES #####
 fir.muc.phy <- subset_taxa(phy99.muc, Phylum == "Firmicutes")
 fir.muc.df <- data.frame(sample_data(fir.muc.phy))
 fir.muc.df$RelAbund <- t(data.frame(otu_table(fir.muc.phy)))
 
-# Test normality
 hist(fir.muc.df$RelAbund, breaks=10)
 qqnorm(fir.muc.df$RelAbund)
 qqline(fir.muc.df$RelAbund)
@@ -928,12 +872,12 @@ t.test(RelAbund ~ Diet, data = fir.muc.df)
 
 
 
+
 ##### BACTEROIDETES #####
 bac.muc.phy <- subset_taxa(phy99.muc, Phylum == "Bacteroidetes")
 bac.muc.df <- data.frame(sample_data(bac.muc.phy))
 bac.muc.df$RelAbund <- t(data.frame(otu_table(bac.muc.phy)))
 
-# Test normality
 hist(bac.muc.df$RelAbund, breaks=10)
 qqnorm(bac.muc.df$RelAbund)
 qqline(bac.muc.df$RelAbund)
@@ -946,12 +890,12 @@ t.test(RelAbund ~ Diet, data = bac.muc.df)
 
 
 
+
 ##### CYANOBACTERIA #####
 cya.muc.phy <- subset_taxa(phy99.muc, Phylum == "Cyanobacteria")
 cya.muc.df <- data.frame(sample_data(cya.muc.phy))
 cya.muc.df$RelAbund <- t(data.frame(otu_table(cya.muc.phy)))
 
-# Test normality
 hist(cya.muc.df$RelAbund, breaks=10)
 qqnorm(cya.muc.df$RelAbund)
 qqline(cya.muc.df$RelAbund)
@@ -964,12 +908,12 @@ t.test(RelAbund ~ Diet, data = cya.muc.df)
 
 
 
+
 ##### TENERICUTES #####
 ten.muc.phy <- subset_taxa(phy99.muc, Phylum == "Tenericutes")
 ten.muc.df <- data.frame(sample_data(ten.muc.phy))
 ten.muc.df$RelAbund <- t(data.frame(otu_table(ten.muc.phy)))
 
-# Test normality
 hist(ten.muc.df$RelAbund, breaks=10)
 qqnorm(ten.muc.df$RelAbund)
 qqline(ten.muc.df$RelAbund)
@@ -982,12 +926,12 @@ t.test(RelAbund ~ Diet, data = ten.muc.df)
 
 
 
+
 ##### Verrucomicrobia #####
 ver.muc.phy <- subset_taxa(phy99.muc, Phylum == "Verrucomicrobia")
 ver.muc.df <- data.frame(sample_data(ver.muc.phy))
 ver.muc.df$RelAbund <- t(data.frame(otu_table(ver.muc.phy)))
 
-# Test normality
 hist(ver.muc.df$RelAbund, breaks=10)
 qqnorm(ver.muc.df$RelAbund)
 qqline(ver.muc.df$RelAbund)
@@ -1000,12 +944,12 @@ t.test(RelAbund ~ Diet, data = ver.muc.df)
 
 
 
+
 ##### PROTEOBACTERIA #####
 pro.muc.phy <- subset_taxa(phy99.muc, Phylum == "Proteobacteria")
 pro.muc.df <- data.frame(sample_data(pro.muc.phy))
 pro.muc.df$RelAbund <- t(data.frame(otu_table(pro.muc.phy)))
 
-# Test normality
 hist(pro.muc.df$RelAbund, breaks=10)
 qqnorm(pro.muc.df$RelAbund)
 qqline(pro.muc.df$RelAbund)
@@ -1018,12 +962,12 @@ wilcox.test(RelAbund ~ Diet, data = pro.muc.df)
 
 
 
+
 ##### EPSILONBACTERAEOTA #####
 eps.muc.phy <- subset_taxa(phy99.muc, Phylum == "Epsilonbacteraeota")
 eps.muc.df <- data.frame(sample_data(eps.muc.phy))
 eps.muc.df$RelAbund <- t(data.frame(otu_table(eps.muc.phy)))
 
-# Test normality
 hist(eps.muc.df$RelAbund, breaks=10)
 qqnorm(eps.muc.df$RelAbund)
 qqline(eps.muc.df$RelAbund)
@@ -1036,12 +980,12 @@ wilcox.test(RelAbund ~ Diet, data = eps.muc.df)
 
 
 
+
 ##### ACTINOBACTERIA #####
 act.muc.phy <- subset_taxa(phy99.muc, Phylum == "Actinobacteria")
 act.muc.df <- data.frame(sample_data(act.muc.phy))
 act.muc.df$RelAbund <- t(data.frame(otu_table(act.muc.phy)))
 
-# Test normality
 hist(act.muc.df$RelAbund, breaks=10)
 qqnorm(act.muc.df$RelAbund)
 qqline(act.muc.df$RelAbund)
@@ -1054,12 +998,12 @@ t.test(RelAbund ~ Diet, data = act.muc.df)
 
 
 
+
 ##### ELUSIMICROBIA #####
 elu.muc.phy <- subset_taxa(phy99.muc, Phylum == "Elusimicrobia")
 elu.muc.df <- data.frame(sample_data(elu.muc.phy))
 elu.muc.df$RelAbund <- t(data.frame(otu_table(elu.muc.phy)))
 
-# Test normality
 hist(elu.muc.df$RelAbund, breaks=10)
 qqnorm(elu.muc.df$RelAbund)
 qqline(elu.muc.df$RelAbund)
@@ -1072,12 +1016,12 @@ wilcox.test(RelAbund ~ Diet, data = elu.muc.df)
 
 
 
+
 ##### KIRITIMATIELLAEOTA #####
 kir.muc.phy <- subset_taxa(phy99.muc, Phylum == "Kiritimatiellaeota")
 kir.muc.df <- data.frame(sample_data(kir.muc.phy))
 kir.muc.df$RelAbund <- t(data.frame(otu_table(kir.muc.phy)))
 
-# Test normality
 hist(kir.muc.df$RelAbund, breaks=10)
 qqnorm(kir.muc.df$RelAbund)
 qqline(kir.muc.df$RelAbund)
@@ -1090,12 +1034,12 @@ wilcox.test(RelAbund ~ Diet, data = kir.muc.df)
 
 
 
+
 ##### UNCLASSIFIED #####
 unc.muc.phy <- subset_taxa(phy99.muc, Phylum == "Bacteria_unclassified")
 unc.muc.df <- data.frame(sample_data(unc.muc.phy))
 unc.muc.df$RelAbund <- t(data.frame(otu_table(unc.muc.phy)))
 
-# Test normality
 hist(unc.muc.df$RelAbund, breaks=10)
 qqnorm(unc.muc.df$RelAbund)
 qqline(unc.muc.df$RelAbund)
@@ -1107,9 +1051,12 @@ wilcox.test(RelAbund ~ Diet, data = unc.muc.df)
 
 
 
+
+
 ########## P-Adjust ##########
 p.adjust(c(0.1875,0.08753,0.01657,0.2833,0.47,0.6485,0.05971,0.2018,0.1074,0.7427,0.3152), method = "fdr")
   # 0.3699667 0.2953500 0.1822700 0.4334000 0.5744444 0.7133500 0.2953500 0.3699667 0.2953500 0.7427000 0.4334000
+  # Firmicutes, Bacteroidetes, Cyanobacteria, Tenericutes, Verrucomicrobia, Proteobacteria, Epsilonbacteraeota, Actinobacteria, Elusimicrobia, Kiritimatiellaeota, Unclassified
 
 
 
@@ -1123,9 +1070,7 @@ phyla.muc.sum.df <- phyla.muc.sum %>%
             SE = se(Abundance))
 phyla.muc.sum.df$Phylum <- ordered(phyla.muc.sum.df$Phylum, levels = c("Firmicutes", "Bacteroidetes", "Cyanobacteria", "Tenericutes", "Bacteria_unclassified", "Verrucomicrobia", "Proteobacteria", "Epsilonbacteraeota", "Actinobacteria", "Elusimicrobia", "Kiritimatiellaeota"))
 
-
-
-#write.table(phyla.muc.sum.df, "WildCaptive.muc.Phyla.csv", sep=",")
+#write.table(phyla.muc.sum.df, "WildCaptive/Mucosa/TableS5.WildCaptive.muc.Phyla.csv", sep=",")
 ```
 
 
@@ -1146,8 +1091,6 @@ pd.muc.dist <- cophenetic(phy_tree(phy.muc))
 ses.mpd.res.muc <- ses.mpd(t(data.frame(otu_table(phy.muc))), pd.muc.dist, null.model = "taxa.labels", abundance.weighted = F, runs = 999)
   # Calculate MPD
   # This'll take a while to run-- be patient
-#save(ses.mpd.res, file = "mpd.RData")
-#load("mpd.RData")
 mpd.muc <- data.frame(ses.mpd.res.muc)
   # Pull out MDP results
 
@@ -1158,8 +1101,6 @@ pd.muc.res$SampleID <- row.names(pd.muc.res)
   # Make sure all SampleID's match!
 
 # Pull out first Stat of each test
-# PD test = PD
-# MPD test = SES (Standardized Effect Size)
 pd.muc.stats <- data.frame(pd.muc.res$SampleID, pd.muc.res$PD)
 pd.muc.stats$Measure <- rep("PD", nrow(pd.muc.df))
 colnames(pd.muc.stats) <- c("Sample", "Stat", "Measure")
@@ -1176,9 +1117,7 @@ mpd.muc.ready$Group <- ordered(mpd.muc.ready$Diet, levels = c("Captive", "Wild")
 
 
 
-
-
-########## TESTING PD & MPD ##########
+########## TESTING ##########
 
 ### Test PD ###
 hist(pd.muc.ready$Stat, breaks=10)
@@ -1191,8 +1130,6 @@ t.test(Stat ~ Diet, data = pd.muc.ready)
   # p-value = 0.0001115
 
 
- 
-
 ### Test MPD ###
 hist(mpd.muc.ready$Stat, breaks=10)
 qqnorm(mpd.muc.ready$Stat)
@@ -1202,6 +1139,7 @@ shapiro.test(mpd.muc.ready$Stat)
   # Normal
 t.test(Stat ~ Diet, data = mpd.muc.ready)
   # p-value = 0.3027
+
 ```
 
 
@@ -1209,7 +1147,6 @@ t.test(Stat ~ Diet, data = mpd.muc.ready)
 ### Mucosa - Alpha Diversity - Shannon & # OTUs
 ```{r}
 adiv.muc <- data.frame(sample_data(phy.muc))
-
 
 ########## Shannon ##########
 hist(adiv.muc$shannon, breaks=10)
@@ -1220,8 +1157,6 @@ shapiro.test(adiv.muc$shannon)
   # Normal
 t.test(shannon ~ Diet, data = adiv.muc)
   # p-value = 0.6138
-
-
 
 
 
@@ -1239,7 +1174,6 @@ for(n in 1:nsamples(phy.muc)) {
 uniq.otus.muc$Group <- sample_data(phy.muc)$Group
 rownames(uniq.otus.muc) <- uniq.otus.muc$Sample
 
-
 hist(uniq.otus.muc$Unique_OTUs, breaks=10)
 qqnorm(uniq.otus.muc$Unique_OTUs)
 qqline(uniq.otus.muc$Unique_OTUs)
@@ -1251,16 +1185,17 @@ t.test(Unique_OTUs ~ Group, data = uniq.otus.muc)
 
 
 
-
 ###### Adjust a-div p-values ######
 p.adjust(c(0.00003348,0.00011150,0.30270000,0.61380000), method = "fdr")
   # 0.00013392 0.00022300 0.40360000 0.61380000
+  # Order = Unique # OTUs, PD, MPD, Shannon
+
 ```
 
 
 ### Mucosa - Alpha-Diversity Prepare Plots
 ```{r}
-###### Unique # of OTUs ######
+##### Unique # of OTUs #####
 
 # Prepare data for plot
 uniq.otus.muc.sum <- uniq.otus.muc %>%
@@ -1298,8 +1233,7 @@ muc.otu.plot <- ggplot(uniq.otus.muc, aes(x = Group, y = Unique_OTUs, fill = Gro
 
 
 
-
-###### Faith's Phylogenetic Diversity ######
+##### Faith's Phylogenetic Diversity #####
 
 # Prepare PD ###
 pd.muc.sum <- pd.muc.ready %>%
@@ -1310,7 +1244,6 @@ pd.muc.sum <- pd.muc.ready %>%
             Median = median(Stat))
 pd.muc.sum$YMAX <- pd.muc.sum$Mean + pd.muc.sum$SE
 pd.muc.sum$YMIN <- pd.muc.sum$Mean - pd.muc.sum$SE
-
 
 pd.muc.ann <- data.frame(lab = c("*", " "), Diet = factor(c("Captive", "Wild")))
 
@@ -1335,8 +1268,9 @@ muc.pd.plot <- ggplot(pd.muc.ready, aes(x = Diet, y = Stat, fill = Diet)) +
   
   
 
-        
-###### Phylogenetic Evenness (MPD) ######
+  
+      
+##### Phylogenetic Evenness (MPD) #####
 
 # Prepare MPD
 mpd.muc.sum <- mpd.muc.ready %>%
@@ -1373,7 +1307,8 @@ muc.mpd.plot <- ggplot(mpd.muc.ready, aes(x = Diet, y = Stat, fill = Diet)) +
 
         
 
-###### Shannon's Diversity #####      
+
+##### Shannon's Diversity #####      
 
 # Prepare data for plot
 shannon.muc.sum <- adiv.muc %>%
@@ -1386,7 +1321,6 @@ shannon.muc.sum$YMAX <- shannon.muc.sum$Mean + shannon.muc.sum$SE
 shannon.muc.sum$YMIN <- shannon.muc.sum$Mean - shannon.muc.sum$SE
 
 shannon.muc.ann <- data.frame(lab = c("ns", " "), Group = factor(c("Summer_Captive", "Summer_Wild")))
-
 
 muc.shannon.plot <- ggplot(adiv.muc, aes(x = Group, y = shannon, fill = Group)) +
   geom_violin() +
@@ -1412,15 +1346,12 @@ muc.shannon.plot <- ggplot(adiv.muc, aes(x = Group, y = shannon, fill = Group)) 
   geom_text(data = shannon.muc.ann, aes(label=lab), x=c(1.5,0),
             y=c(5.8,0), size=2.5, color="black")
 
-
-
-
 ```
 
 
 ### Mucosa - Plot - Alpha-Diversity Mucosa
 ```{r}
-#tiff("wild.captive.muc.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+#tiff("WildCaptive/Mucosa/FigS3.WildCaptive.muc.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -1443,11 +1374,9 @@ print(muc.shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
 
 ### Mucosa - Beta Diversity
 ```{r}
-
 ########## Weighted UniFrac ##########
 UF.muc.w <- phyloseq::distance(physeq = phy.muc, method = "wunifrac")
 UF.muc.w.pcoa <- ordinate(physeq = phy.muc, method = "PCoA", distance = "wunifrac")
-  # Variation explained = 48%
 
 wUF.muc.plot <- plot_ordination(physeq = phy.muc, ordination = UF.muc.w.pcoa, axes = c(1,2),
                 title = "Weighted UniFrac", color = "Diet") +
@@ -1467,7 +1396,6 @@ wUF.muc.plot <- plot_ordination(physeq = phy.muc, ordination = UF.muc.w.pcoa, ax
         )
 
 
-### PERMANOVA ###
 sampdf.muc <- data.frame(sample_data(phy.muc))
 beta.tax <- betadisper(d=UF.muc.w, group=sampdf.muc$Group)
 p <- permutest(beta.tax)
@@ -1483,7 +1411,6 @@ anosim(UF.muc.w, sampdf.muc$Group, permutations = 9999)
 ########## Unweighted UniFrac ##########
 UF.muc.u <- phyloseq::distance(physeq = phy.muc, method = "unifrac")
 UF.muc.u.pcoa <- ordinate(physeq = phy.muc, method = "PCoA", distance = "unifrac")
-  # Variation explained = 50.6%
 
 uUF.muc.plot <- plot_ordination(physeq = phy.muc, ordination = UF.muc.u.pcoa, axes = c(1,2),
                 title = "Unweighted UniFrac", color = "Diet") +
@@ -1503,7 +1430,6 @@ uUF.muc.plot <- plot_ordination(physeq = phy.muc, ordination = UF.muc.u.pcoa, ax
         )
 
 
-### PERMANOVA ###
 sampdf.muc <- data.frame(sample_data(phy.muc))
 beta.tax <- betadisper(d=UF.muc.u, group=sampdf.muc$Group)
 p <- permutest(beta.tax)
@@ -1516,10 +1442,8 @@ anosim(UF.muc.u, sampdf.muc$Group, permutations = 9999)
 
 
 
-
 ########## Bray-Curtis ##########
 bray.muc.pcoa <- ordinate(physeq=phy.muc, method="PCoA", distance="bray")
-  # Variation explained = 43.4%
 
 bc.muc.plot <- plot_ordination(physeq=phy.muc, ordination=bray.muc.pcoa, color="Group",
                            title = "Bray-Curtis Dissimilarity") +
@@ -1542,11 +1466,9 @@ bc.muc.plot <- plot_ordination(physeq=phy.muc, ordination=bray.muc.pcoa, color="
         #legend.box.margin=margin(-10,-10,-10,-10)
         )
 
-
 ord.muc.legend <- g_legend(bc.muc.plot)
 
 
-### TEST ###
 sampdf.muc <- data.frame(sample_data(phy.muc))
 bray <- phyloseq::distance(physeq = phy.muc, method = "bray")
 beta.tax <- betadisper(d = bray, group = sampdf.muc$Group)
@@ -1559,21 +1481,25 @@ anosim(bray, sampdf.muc$Group, permutations = 9999)
 
 
 
+
 ##### Adjust P-values #####
 
 # Betadisper
 p.adjust(c(0.241, 0.004, 0.203), method = "fdr")
   # 0.241 0.012 0.241
+  # Weighted UniFrac, Unweighted UniFrac, Bray-Curtis
 
 # ANOSIM
 p.adjust(c(0.0028, 0.0117, 0.0032), method = "fdr")
   # 0.0048 0.0117 0.0048
+  # Weighted UniFrac, Unweighted UniFrac, Bray-Curtis
+
 ```
 
 
-### Content - Plot - Beta-Diversity
+### Mucosa - Plot - Beta-Diversity
 ```{r}
-#tiff("wild.captive.muc.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
+#tiff("WildCaptive/Mucosa/Fig.S4.WildCaptive.muc.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 0.45), heights = c(1, 1, 1))))
 
@@ -1602,20 +1528,20 @@ grid.text("C", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos
 ### Mucosa - Simper
 ```{r}
 # Group
-simper.pretty(data.frame(otu_table(phy.muc)),
+#simper.pretty(data.frame(otu_table(phy.muc)),
               data.frame(sample_data(phy.muc)),
               c("Diet"),
               perc_cutoff=0.5, low_cutoff='y', low_val=0.01,
-              output_name='wild.captive.muc')
-group.muc.simper <- read.csv("wild.captive.muc_clean_simper.csv")
-kruskal.pretty(data.frame(otu_table(phy.muc)),
+              output_name='WildCaptive/Mucosa/WildCaptive.muc')
+#group.muc.simper <- read.csv("WildCaptive/Mucosa/WildCaptive.muc_clean_simper.csv")
+#kruskal.pretty(data.frame(otu_table(phy.muc)),
                data.frame(sample_data(phy.muc)),
                csv = group.muc.simper,
                c("Diet"),
                output_name = 'wild.captive.muc',
                taxonomy = data.frame(tax_table(phy.muc)))
-group.muc.simper.kw <- read.csv("wild.captive.muc_krusk_simper.csv")
-for(i in 1:nrow(group.muc.simper.kw)){
+#group.muc.simper.kw <- read.csv("WildCaptive/Mucosa/WildCaptive.muc_krusk_simper.csv")
+#for(i in 1:nrow(group.muc.simper.kw)){
   save <- which(rownames(data.frame(tax_table(phy.muc))) == group.muc.simper.kw$OTU[i])
   group.muc.simper.kw$Taxonomy[i] <-
     paste(data.frame(tax_table(phy.muc))[save,2], "-",
@@ -1624,6 +1550,6 @@ for(i in 1:nrow(group.muc.simper.kw)){
           data.frame(tax_table(phy.muc))[save,5], "-",
           data.frame(tax_table(phy.muc))[save,6])
 }
-#write.table(group.muc.simper.kw, "wild.captive.muc_krusk_simper.csv", sep=",")
-#group.muc.simper.kw <- read.csv("wild.captive.muc_clean_simper.csv", row.names = 1)
+#write.table(group.muc.simper.kw, "WildCaptive/Mucosa/WildCaptive.muc_krusk_simper.csv", sep=",")
+#group.muc.simper.kw <- read.csv("WildCaptive/Mucosa/WildCaptive.muc_clean_simper.csv", row.names = 1)
 ```
