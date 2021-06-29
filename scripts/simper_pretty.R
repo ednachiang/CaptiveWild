@@ -1,4 +1,4 @@
-# "
+# https://github.com/asteinberger9/seq_scripts
 # simper.pretty: automates simper exectution for comparisons of interest
 # Andrew Steinberger, Kim Dill-Mcfarland, Madison Cox
 # asteinberger@wisc.edu

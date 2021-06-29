@@ -1,4 +1,4 @@
-# "
+# https://github.com/asteinberger9/seq_scripts
 # kruskal.pretty: Automates kruskal.test execution on simper_pretty.R output
 # Andrew Steinberger
 # asteinberger@wisc.edu
