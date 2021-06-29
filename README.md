@@ -7,9 +7,9 @@
   
 **********
 
-#### Information about this repository:  
+### Information about this repository:  
   
-##### **Directories:**
+#### **Directories:**
   
 **1. CaptiveSeasons:** Code and files for the comparison of captive groups.  
   
