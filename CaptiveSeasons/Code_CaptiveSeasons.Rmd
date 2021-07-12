@@ -24,17 +24,17 @@ set.seed(1)
 
 ### Load Functions
 ```{r}
-source('scripts/simper_pretty.R')
-source('scripts/R_krusk.R')
-source('scripts/misc.R')
+source('../scripts/simper_pretty.R')
+source('../scripts/R_krusk.R')
+source('../scripts/misc.R')
 ```
 
 ### Import Data
 ```{r}
 # Link files
-shared = "mothur_output/final.shared"
-taxonomy = "mothur_output/final.taxonomy"
-tree = "mothur_output/final.tre"
+shared = "../mothur_output/final.shared"
+taxonomy = "../mothur_output/final.taxonomy"
+tree = "../mothur_output/final.tre"
 
 # Import mothur data
 mothurdata = import_mothur(
@@ -51,9 +51,9 @@ colnames(tax_table(mothurdata)) <-
   c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 
 # Add metadata
-meta <- read.csv("metadata.csv")
+meta <- read.csv("../metadata.csv")
 rownames(meta) <- meta$Sample
-divsum <- read.table("mothur_output/final.summary", header = T)
+divsum <- read.table("../mothur_output/final.summary", header = T)
 meta[,12:21] <- divsum[,3:12]
 
 # Update phyloseq object
@@ -543,7 +543,7 @@ otu.ann <- data.frame(lab = c("a", "b", "b", "ab"), Group = factor(c("Summer_Cap
 otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
   geom_violin() +
   geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
-  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_fill_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(240,830), breaks = c(240,354,468,582,696,810)) +
   scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
   ylab("Number of Unique OTUs") +
@@ -581,7 +581,7 @@ pd.ann <- data.frame(lab = c("ns", " ", " ", " "), Group = factor(c("Summer_Capt
 pd.plot <- ggplot(pd.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_violin() + 
   geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
-  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_fill_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(14,39), breaks = c(14,19,24,29,34,39)) +
   scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
   ylab("Faith's Phylogenetic Diversity") +
@@ -619,7 +619,7 @@ mpd.ann <- data.frame(lab = c("a", "b", "b", "ab"), Group = factor(c("Summer_Cap
 mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_violin() +
   geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
-  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_fill_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(-8.6,6.1), breaks = c(-8.6,-1.6,5.4)) +
   scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
   ylab("Phylogenetic Evenness (MPD)") +
@@ -656,7 +656,7 @@ shannon.ann <- data.frame(lab = c("ns", " ", " ", " "), Group = factor(c("Summer
 shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
   geom_violin() +
   geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
-  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_fill_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(2.3,5.5), breaks = c(2.3,3.1,3.9,4.7,5.5)) +
   scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
   ylab("Shannon's Diversity Index") +
@@ -682,7 +682,7 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
 
 ### Content Plot - Alpha-Diversity
 ```{r}
-#tiff("CaptiveSeasons/Content/Fig3.CaptiveSeasons.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+#png("../Fig3.CaptiveSeasons.adiv.png", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -709,7 +709,7 @@ UF.w.pcoa <- ordinate(physeq = phy.con, method = "PCoA", distance = "wunifrac")
 wUF.plot <- plot_ordination(physeq = phy.con, ordination = UF.w.pcoa, axes = c(1,2),
                 title = "Weighted UniFrac", color = "Group") +
   #stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
-  scale_colour_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_colour_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   geom_point(size=2, colour = "black", shape = 21) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -854,7 +854,7 @@ UF.u.pcoa <- ordinate(physeq = phy.con, method = "PCoA", distance = "unifrac")
 uUF.plot <- plot_ordination(physeq = phy.con, ordination = UF.u.pcoa, axes = c(1,2),
                 title = "Unweighted UniFrac", color = "Group") +
   #stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
-  scale_colour_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_colour_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   geom_point(size=2, colour = "black", shape = 21) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -983,7 +983,7 @@ bray.pcoa <- ordinate(physeq=phy.con, method="PCoA", distance="bray")
 bc.plot <- plot_ordination(physeq=phy.con, ordination=bray.pcoa, color="Group",
                            title = "Bray-Curtis Dissimilarity") +
   #stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
-  scale_colour_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_colour_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   geom_point(size=2, colour = "black", shape = 21) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -1117,7 +1117,7 @@ p.adjust(c(8e-04,4e-04,0.1099,0.7277,0.0122,0.0194), method = "fdr")
 
 ### Content Plot - Beta-diversity
 ```{r}
-#tiff("CaptiveSeasons/Content/Fig4.CaptiveSeasons.con.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
+#png("../Fig4.CaptiveSeasons.con.bdiv.png", width = 85, height = 180, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 0.45), heights = c(1, 1, 1))))
 
@@ -1740,7 +1740,7 @@ otu.muc.ann <- data.frame(lab = c("a", "b", "b", "ab"), Group = factor(c("Summer
 otu.muc.plot <- ggplot(uniq.otus.muc, aes(x = Group, y = Unique_OTUs, fill = Group)) +
   geom_violin() +
   geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
-  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_fill_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(220,710), breaks = c(220,335,450,565,680)) +
   scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
   ylab("Number of Unique OTUs") +
@@ -1778,7 +1778,7 @@ pd.muc.ann <- data.frame(lab = c("a", "ab", "b", "ab"), Group = factor(c("Summer
 pd.muc.plot <- ggplot(pd.muc.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_violin() + 
   geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
-  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_fill_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(16,36), breaks = c(16,21,26,31,36)) +
   scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
   ylab("Faith's Phylogenetic Diversity") +
@@ -1816,7 +1816,7 @@ mpd.muc.ann <- data.frame(lab = c("a", "b", "ab", "ab"), Group = factor(c("Summe
 mpd.muc.plot <- ggplot(mpd.muc.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_violin() +
   geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
-  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_fill_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(-6.5,3.75), breaks = c(-6.5,-4.5,-2.5,-0.5,1.5,3.5)) +
   scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
   ylab("Phylogenetic Evenness (MPD)") +
@@ -1853,7 +1853,7 @@ shannon.muc.ann <- data.frame(lab = c("ns", " ", " ", " "), Group = factor(c("Su
 shannon.muc.plot <- ggplot(adiv.muc, aes(x = Group, y = shannon, fill = Group)) +
   geom_violin() +
   geom_dotplot(binaxis = 'y', stackdir = 'center', dotsize = 1, stackratio = 1.15, fill = "black") +
-  scale_fill_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_fill_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(1.4,5.8), breaks = c(1.4,2.5,3.6,4.7,5.8)) +
   scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
   ylab("Shannon's Diversity Index") +
@@ -1879,7 +1879,7 @@ shannon.muc.plot <- ggplot(adiv.muc, aes(x = Group, y = shannon, fill = Group)) 
 
 ### Mucosa Plot - Alpha-Diversity
 ```{r}
-#tiff("CaptiveSeasons/Mucosa/FigS5.CaptiveSeasons.muc.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+#("../FigS5.CaptiveSeasons.muc.adiv.png", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -1908,7 +1908,7 @@ UF.w.pcoa.muc <- ordinate(physeq = phy.muc, method = "PCoA", distance = "wunifra
 wUF.muc.plot <- plot_ordination(physeq = phy.muc, ordination = UF.w.pcoa.muc, axes = c(1,2),
                 title = "Weighted UniFrac", color = "Group") +
   #stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
-  scale_colour_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_colour_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   geom_point(size=2, colour = "black", shape = 21) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -2055,7 +2055,7 @@ UF.u.pcoa.muc <- ordinate(physeq = phy.muc, method = "PCoA", distance = "unifrac
 uUF.muc.plot <- plot_ordination(physeq = phy.muc, ordination = UF.u.pcoa.muc, axes = c(1,2),
                 title = "Unweighted UniFrac", color = "Group") +
   #stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
-  scale_colour_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_colour_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   geom_point(size=2, colour = "black", shape = 21) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -2185,7 +2185,7 @@ bray.pcoa.muc <- ordinate(physeq=phy.muc, method="PCoA", distance="bray")
 bc.muc.plot <- plot_ordination(physeq=phy.muc, ordination=bray.pcoa.muc, color="Group",
                            title = "Bray-Curtis Dissimilarity") +
   #stat_ellipse(aes(colour = Group), size = 1, level = 0.95) +
-  scale_colour_manual(values = c("#f03e3e", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
+  scale_colour_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   geom_point(size=2, colour = "black", shape = 21) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -2319,7 +2319,7 @@ p.adjust(c(0.0016,7e-04,0.0791,0.9815,0.0178,0.0084), method = "fdr")
 
 ### Mucosa Plot - Beta-diversity
 ```{r}
-#tiff("CaptiveSeasons/Mucosa/FigS6.CaptiveSeasons.muc.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
+#png("../FigS6.CaptiveSeasons.muc.bdiv.png", width = 85, height = 180, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 0.45), heights = c(1, 1, 1))))
 
