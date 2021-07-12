@@ -22,15 +22,15 @@ set.seed(1)
 
 ### Load Functions
 ```{r}
-source('scripts/misc.R')
+source('../scripts/misc.R')
 ```
 
 ### Import Data
 ```{r}
 # Link files
-shared = "mothur_output/final.shared"
-taxonomy = "mothur_output/final.taxonomy"
-tree = "mothur_output/final.tre"
+shared = "../mothur_output/final.shared"
+taxonomy = "../mothur_output/final.taxonomy"
+tree = "../mothur_output/final.tre"
 
 # Import mothur data
 mothurdata = import_mothur(
@@ -66,9 +66,9 @@ otu.rem.tab <- otu_table(otu.rem.df, taxa_are_rows = T)
   # Convert trimmed OTU table to otu_table
 
 # Add metadata
-meta <- read.csv("metadata.csv")
+meta <- read.csv("../metadata.csv")
 rownames(meta) <- meta$Sample
-divsum <- read.table("mothur_output/final.summary", header = T)
+divsum <- read.table("../mothur_output/final.summary", header = T)
 meta[,12:21] <- divsum[,3:12]
 
 # Update phyloseq object
@@ -1518,7 +1518,7 @@ spr.shannon.plot <- ggplot(adiv.spr, aes(x = Sample_Type, y = shannon, fill = Sa
 
 ### Plot - Alpha-Diversity
 ```{r}
-#tiff("FigS1.ConMuc.adiv.tiff", width = 170, height = 225, units = "mm", res = 600)
+#png("../FigS1.ConMuc.adiv.png", width = 170, height = 225, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(10,4, widths = c(1, 1, 1, 1.3),
                                          heights = c(0.07,1.5,0.07,1.5,0.07,1.5,0.07,1.5,0.07,1.5))))
@@ -2258,13 +2258,14 @@ spr.bc.plot <- plot_ordination(physeq=physeq.spr, ordination=bray.spr.pcoa, colo
         #legend.box.margin=margin(-10,-10,-10,-10)
         )
 
+ord.legend <- g_legend(spr.bc.plot)
 ```
 
 
 
 ### Plot - Beta-Diversity
 ```{r}
-#tiff("FigS2.ConMuc.bdiv.tiff", width = 170, height = 225, units = "mm", res = 600)
+#png("../FigS2.ConMuc.bdiv.png", width = 170, height = 225, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(10,4, widths = c(1, 1, 1, 0.4), heights = c(0.04, 1,0.03,1,0.03,1,0.03,1,0.03,1))))
 
