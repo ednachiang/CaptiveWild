@@ -23,17 +23,17 @@ set.seed(1)
 
 ### Load Functions
 ```{r}
-source('scripts/simper_pretty.R')
-source('scripts/R_krusk.R')
-source('scripts/misc.R')
+source('../scripts/simper_pretty.R')
+source('../scripts/R_krusk.R')
+source('../scripts/misc.R')
 ```
 
 ### Import Data
 ```{r}
 # Link files
-shared = "mothur_output/final.shared"
-taxonomy = "mothur_output/final.taxonomy"
-tree = "mothur_output/final.tre"
+shared = "../mothur_output/final.shared"
+taxonomy = "../mothur_output/final.taxonomy"
+tree = "../mothur_output/final.tre"
 
 # Import mothur data
 mothurdata = import_mothur(
@@ -50,9 +50,9 @@ colnames(tax_table(mothurdata)) <-
   c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
 
 # Add metadata
-meta <- read.csv("metadata.csv")
+meta <- read.csv("../metadata.csv")
 rownames(meta) <- meta$Sample
-divsum <- read.table("mothur_output/final.summary", header = T)
+divsum <- read.table("../mothur_output/final.summary", header = T)
 meta[,12:21] <- divsum[,3:12]
 
 # Update phyloseq object
@@ -560,7 +560,7 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
 
 ### Content - Plot - Alpha-Diversity
 ```{r}
-#tiff("WildCaptive/Content/Fig1.WildCaptive.con.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+#png("../Fig1.WildCaptive.con.adiv.png", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -609,8 +609,9 @@ beta.tax <- betadisper(d=UF.w, group=sampdf$Group)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.006
-anosim(UF.w, sampdf$Group, permutations = 9999)
-  # p-value = 0.1864
+adonis(UF.w ~ Group, data = sampdf, permutations = 9999)
+  # p-value = 0.0132
+
 
 
 
@@ -643,7 +644,7 @@ beta.tax <- betadisper(d=UF.u, group=sampdf$Group)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.005
-anosim(UF.u, sampdf$Group, permutations = 9999)
+adonis(UF.u ~ Group, data = sampdf, permutations = 9999)
   # p-value = 0.0064
 
 
@@ -683,8 +684,8 @@ beta.tax <- betadisper(d = bray, group = sampdf$Group)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.001
-anosim(bray, sampdf$Group, permutations = 9999)
-  # p-value = 0.013
+adonis(bray ~ Group, data = sampdf, permutations = 9999)
+  # p-value = 0.0137
 
 
 
@@ -697,9 +698,9 @@ p.adjust(c(0.006, 0.005, 0.001), method = "fdr")
   # 0.006 0.006 0.003
   # Order = Weighted UniFrac, Unweighted UniFrac, Bray-Curtis
 
-# ANOSIM
-p.adjust(c(0.1864, 0.0064, 0.013), method = "fdr")
-  # 0.1864 0.0192 0.0195
+# PERMANOVA
+p.adjust(c(0.0123, 0.0064, 0.0137), method = "fdr")
+  # 0.0137 0.0137 0.0137
   # Order = Weighted UniFrac, Unweighted UniFrac, Bray-Curtis
 ```
 
@@ -707,7 +708,7 @@ p.adjust(c(0.1864, 0.0064, 0.013), method = "fdr")
 
 ### Content - Plot - Beta-Diversity
 ```{r}
-#tiff("WildCaptive/Content/Fig2.WildCaptive.con.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
+#png("../Fig2.WildCaptive.con.bdiv.png", width = 85, height = 180, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 0.45), heights = c(1, 1, 1))))
 
@@ -1351,7 +1352,7 @@ muc.shannon.plot <- ggplot(adiv.muc, aes(x = Group, y = shannon, fill = Group)) 
 
 ### Mucosa - Plot - Alpha-Diversity Mucosa
 ```{r}
-#tiff("WildCaptive/Mucosa/FigS3.WildCaptive.muc.adiv.tiff", width = 170, height = 60, units = "mm", res = 600)
+#png("../FigS3.WildCaptive.muc.adiv.png", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.06, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -1401,10 +1402,8 @@ beta.tax <- betadisper(d=UF.muc.w, group=sampdf.muc$Group)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.241
-anosim(UF.muc.w, sampdf.muc$Group, permutations = 9999)
-  # p-value = 0.0028
-
-
+adonis(UF.muc.w ~ Group, data = sampdf.muc, permutations = 9999)
+  # 0.0041
 
 
 
@@ -1435,8 +1434,8 @@ beta.tax <- betadisper(d=UF.muc.u, group=sampdf.muc$Group)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.004
-anosim(UF.muc.u, sampdf.muc$Group, permutations = 9999)
-  # p-value = 0.0117
+adonis(UF.muc.u ~ Group, data = sampdf.muc, permutations = 9999)
+  # p-value = 0.0027
 
 
 
@@ -1475,8 +1474,8 @@ beta.tax <- betadisper(d = bray, group = sampdf.muc$Group)
 p <- permutest(beta.tax)
 p$tab
   # p-value = 0.203
-anosim(bray, sampdf.muc$Group, permutations = 9999)
-  # p-value = 0.0032
+adonis(bray ~ Group, data = sampdf.muc, permutations = 9999)
+  # p-value = 0.003
 
 
 
@@ -1490,8 +1489,8 @@ p.adjust(c(0.241, 0.004, 0.203), method = "fdr")
   # Weighted UniFrac, Unweighted UniFrac, Bray-Curtis
 
 # ANOSIM
-p.adjust(c(0.0028, 0.0117, 0.0032), method = "fdr")
-  # 0.0048 0.0117 0.0048
+p.adjust(c(0.0041, 0.0027, 0.003), method = "fdr")
+  # 0.0041 0.0041 0.0041
   # Weighted UniFrac, Unweighted UniFrac, Bray-Curtis
 
 ```
@@ -1499,7 +1498,7 @@ p.adjust(c(0.0028, 0.0117, 0.0032), method = "fdr")
 
 ### Mucosa - Plot - Beta-Diversity
 ```{r}
-#tiff("WildCaptive/Mucosa/Fig.S4.WildCaptive.muc.bdiv.tiff", width = 85, height = 180, units = "mm", res = 600)
+#png("../Fig.S4.WildCaptive.muc.bdiv.png", width = 85, height = 180, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(3,2, widths = c(1, 0.45), heights = c(1, 1, 1))))
 
