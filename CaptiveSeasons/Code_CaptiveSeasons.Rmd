@@ -614,7 +614,7 @@ mpd.sum <- mpd.ready %>%
 mpd.sum$YMAX <- mpd.sum$Mean + mpd.sum$SE
 mpd.sum$YMIN <- mpd.sum$Mean - mpd.sum$SE
 
-mpd.ann <- data.frame(lab = c("a", "b", "b", "ab"), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
+mpd.ann <- data.frame(lab = c("a", "b", "bc", "ac"), Group = factor(c("Summer_Captive", "Torpor", "IBA", "Spring")))
 
 mpd.plot <- ggplot(mpd.ready, aes(x = Group, y = Stat, fill = Group)) +
   geom_violin() +
@@ -682,7 +682,7 @@ shannon.plot <- ggplot(adiv, aes(x = Group, y = shannon, fill = Group)) +
 
 ### Content Plot - Alpha-Diversity
 ```{r}
-#png("../Fig3.CaptiveSeasons.adiv.png", width = 170, height = 60, units = "mm", res = 600)
+png("../Fig3.CaptiveSeasons.adiv.png", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
@@ -697,7 +697,7 @@ print(mpd.plot, vp=viewport(layout.pos.row=2, layout.pos.col=3))
 grid.text("D", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=4),
           gp=gpar(fontsize=8,fontface="bold"))
 print(shannon.plot, vp=viewport(layout.pos.row=2, layout.pos.col=4))
-#dev.off()
+dev.off()
 ```
 
 ### Content - Beta-Diversity
