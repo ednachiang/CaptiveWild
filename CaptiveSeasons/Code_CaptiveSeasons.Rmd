@@ -1249,7 +1249,7 @@ core3 <- intersect(core2, rownames(spr.con.core))
 
 ### Physeq object with only core OTUs
 phy.con.core <- merge_phyloseq(phy.con.sum.core, phy.con.tor.core, phy.con.iba.core, phy.con.spr.core)
-#write.csv(data.frame(tax_table(phy.con.core)), "Content/CaptiveSeasons_con_coreOTUs.csv")
+#write.csv(data.frame(tax_table(phy.con.core)), "Content/TableS8.CaptiveSeasons_con_coreOTUs.csv")
 ```
 
 
@@ -2452,5 +2452,5 @@ core3.muc <- intersect(core2.muc, rownames(spr.muc.core))
 
 ### Physeq object with only core OTUs
 phy.muc.core <- merge_phyloseq(phy.muc.sum.core, phy.muc.tor.core, phy.muc.iba.core, phy.muc.spr.core)
-#write.csv(data.frame(tax_table(phy.muc.core)), "Mucosa/CaptiveSeasons_muc_coreOTUs.csv")
+#write.csv(data.frame(tax_table(phy.muc.core)), "Mucosa/TableS9.CaptiveSeasons_muc_coreOTUs.csv")
 ```
