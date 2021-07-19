@@ -1,7 +1,6 @@
 ---
 title: "Code"
 author: "Edna Chiang"
-date: "May 7, 2018"
 output: html_document
 ---
 
