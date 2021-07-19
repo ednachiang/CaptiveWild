@@ -11,45 +11,56 @@
   
 ### **Directories:**
   
-**1. CaptiveSeasons:** Code and files for the comparison of captive groups.  
+**1. Anesthesia:** Code and files for the comparison of IBA squirrels that received isoflurane vs. CO2
+
+* `Code_Anesthesia.Rmd`: Code for microbiota comparison of IBA squirrels that received isoflurane vs. CO2. This should be run separately from all other Code.Rmd files-- clear your environment before running.
+* `metadata_extra.csv`: Metadata that includes anesthesia.
+
+
+
+
+**2. CaptiveSeasons:** Code and files for the comparison of captive groups.  
   
 * `Code_CaptiveSeasons.Rmd`: Code for comparisons of captive groups. This should be run separately from all other Code.Rmd files-- clear your environment before running.
 * **Content:** Directory of output files from the content microbiota analyses in `Code_CaptiveSeaons.Rmd`.
     + `CaptiveSeasons.con_clean_simper.csv`, `CaptiveSeasons.con_krusk_simper.csv`, `CaptiveSeasons.con_krusk_simper.xlsx`: Output files from SIMPER analysis of content microbiotas.
-    + `Fig3.CaptiveSeasons.con.adiv.tiff`: Figure 3 from manuscript. This is the same file as `FigsTables/Fig3.CaptiveSeasons.adiv.tiff`.
-    + `Fig4.CaptiveSeasons.con.bdiv.tiff`: Figure 4 from manuscript. This is the same file as `FigsTables/Fig4.CaptiveSeasons.bdiv.tiff`.
-    + `TableS7.CaptiveSeasons_con_coreOTUs.csv`: Table S7 from manuscript. This is also found in the file  `FigsTables/SuppTables.xlsx`, tab `Table S7`.
+    + `Fig4.CaptiveSeasons.con.adiv.png`: Figure 4 from manuscript. This is the same file as `FigsTables/Fig4.CaptiveSeasons.adiv.png`.
+    + `Fig5.CaptiveSeasons.con.bdiv.png`: Figure 5 from manuscript. This is the same file as `FigsTables/Fig5.CaptiveSeasons.bdiv.png`.
+    + `TableS8.CaptiveSeasons_con_coreOTUs.csv`: Table S8 from manuscript. This is also found in the file  `FigsTables/SuppTables.xlsx`, tab `Table S8`.
 * **Mucosa:** Directory of output files from the mucosa microbiota analyses in `Code_CaptiveSeaons.Rmd`.
     + `CaptiveSeasons.muc_clean_simper.csv`, `CaptiveSeasons.muc_krusk_simper.csv`, `CaptiveSeasons.muc_krusk_simper.xlsx`: Output files from SIMPER analysis of mucosa microbiotas.
-    + `FigS5.CaptiveSeasons.muc.adiv.tiff`: Figure S5 from manuscript. This is the same file as `FigsTables/Fig5.CaptiveSeasons.adiv.tiff`.
-    + `FigS6.CaptiveSeasons.muc.bdiv.tiff`: Figure S6 from manuscript. This is the same file as `FigsTables/FigS6.CaptiveSeasons.bdiv.tiff`.
-    + `TableS8.CaptiveSeasons_muc_coreOTUs.csv`: Table S8 from manuscript. This is also found in the file  `FigsTables/SuppTables.xlsx`, tab `Table S8`.
+    + `FigS5.CaptiveSeasons.muc.adiv.png`: Figure S5 from manuscript. This is the same file as `FigsTables/Fig5.CaptiveSeasons.adiv.png`.
+    + `FigS6.CaptiveSeasons.muc.bdiv.png`: Figure S6 from manuscript. This is the same file as `FigsTables/FigS6.CaptiveSeasons.bdiv.png`.
+    + `TableS9.CaptiveSeasons_muc_coreOTUs.csv`: Table S8 from manuscript. This is also found in the file  `FigsTables/SuppTables.xlsx`, tab `Table S9`.
     
     
     
-**2. ContentMucosa:** Code and files for the paired comparisons of content and mucosa microbiotas.  
+**3. ContentMucosa:** Code and files for the paired comparisons of content and mucosa microbiotas.  
 
 * `Code_ContentMucosa.Rmd`: Code for paired comparisons of content and mucosa microbiotas. This should be run separately from all other Code.Rmd files-- clear your environment before running.
+* `FigS1.ConMuc.adiv.png`: Same as the file `FigsTables/FigS1.ConMuc.adiv.png`.
+* `FigS2.ConMuc.bdiv.png`: Same as the file `FigsTables/FigS2.ConMuc.bdiv.png`.
 
 
 
-**3. FigsTables:** Figures, tables, and supplementary materials in manuscript.  
+**4. FigsTables:** Figures, tables, and supplementary materials in manuscript.  
   
-* `Fig1.WildCaptive.con.adiv.tiff`: Same as the file `WildCaptive/Content/Fig1.WildCaptive.con.adiv.tiff`.
-* `Fig2.WildCaptive.con.bdiv.tiff`: Same as the file `WildCaptive/Content/Fig2.WildCaptive.con.bdiv.tiff`.
-* `Fig3.CaptiveSeasons.con.adiv.tiff`: Same as the file `CaptiveSeasons/Content/Fig3.CaptiveSeasons.con.adiv.tiff`.
-* `Fig4.CaptiveSeasons.con.bdiv.tiff`: Same as the file `CaptiveSeasons/Content/Fig4.CaptiveSeasons.con.bdiv.tiff`.
-* `FigS1.ConMuc.adiv.zip`: Zipped file of Fig S1.
-* `FigS2.ConMuc.bdiv.zip`: Zipped file of Fig S2.
-* `FigS3.WildCaptive.muc.adiv.tiff`: Same as the file `WildCaptive/Mucosa/FigS3.WildCaptive.muc.adiv.tiff`.
-* `FigS4.WildCaptive.muc.bdiv.tiff`: Same as the file `WildCaptive/Mucosa/FigS4.WildCaptive.muc.bdiv.tiff`.
-* `FigS5.CaptiveSeasons.muc.adiv.tiff`: Same as the file `CaptiveSeasons/Mucosa/FigS5.CaptiveSeasons.muc.adiv.tiff`.
-* `FigS6.CaptiveSeasons.muc.bdiv.tiff`: Same as the file `CaptiveSeasons/Mucosa/FigS6.CaptiveSeasons.muc.bdiv.tiff`.
-* `SuppTables.xlsx`: Tables S1 - S8.
+* `Fig1.ExperimentalDesign.png`: Fig 1 from manuscript
+* `Fig2.WildCaptive.con.adiv.png`: Same as the file `WildCaptive/Content/Fig2.WildCaptive.con.adiv.png`.
+* `Fig3.WildCaptive.con.bdiv.png`: Same as the file `WildCaptive/Content/Fig3.WildCaptive.con.bdiv.png`.
+* `Fig4.CaptiveSeasons.con.adiv.png`: Same as the file `CaptiveSeasons/Content/Fig4.CaptiveSeasons.con.adiv.png`.
+* `Fig5.CaptiveSeasons.con.bdiv.png`: Same as the file `CaptiveSeasons/Content/Fig5.CaptiveSeasons.con.bdiv.png`.
+* `FigS1.ConMuc.adiv.png`: Same as the file``.
+* `FigS2.ConMuc.bdiv.png`: Same as the file ``.
+* `FigS3.WildCaptive.muc.adiv.png`: Same as the file `WildCaptive/Mucosa/FigS3.WildCaptive.muc.adiv.png`.
+* `FigS4.WildCaptive.muc.bdiv.png`: Same as the file `WildCaptive/Mucosa/FigS4.WildCaptive.muc.bdiv.png`.
+* `FigS5.CaptiveSeasons.muc.adiv.png`: Same as the file `CaptiveSeasons/Mucosa/FigS5.CaptiveSeasons.muc.adiv.png`.
+* `FigS6.CaptiveSeasons.muc.bdiv.png`: Same as the file `CaptiveSeasons/Mucosa/FigS6.CaptiveSeasons.muc.bdiv.png`.
+* `SuppTables.xlsx`: Tables S1 - S9.
 
 
 
-**4. mothur_output:** Outputs files from mothur pipeline that were used in R analysis.  
+**5. mothur_output:** Outputs files from mothur pipeline that were used in R analysis.  
   
 * `fileMatches.txt`: Links short names of mothur output files (in this directory) with the corresponding long names of the files (name in logfiles).
 * `final.shared`: OTU table.
@@ -68,7 +79,7 @@
 
 
 
-**5. scripts:** Scripts used in analysis.  
+**6. scripts:** Scripts used in analysis.  
   
 * `misc.R`: Code for calculating standard error, saving figure legend, and setting equal number of breaks in a faceted figure.
 * `R_krusk.R`: Automates kruskal.test execution on simper_pretty.R output. Written by [Andrew Steinberger](https://github.com/asteinberger9/seq_scripts).
@@ -76,19 +87,19 @@
 
 
 
-**6. WildCaptive:** Code and files for the comparison of wild and captive microbiotas.  
+**7. WildCaptive:** Code and files for the comparison of wild and captive microbiotas.  
   
 * `Code_WildCaptive.Rmd`: Code for comparisons of summer wild and captive microbiotas. This should be run separately from all other Code.Rmd files-- clear your environment before running.
 * **Content:** Directory of output files from the content microbiota analyses in `Code_WildCaptive.Rmd`.
-    + `Fig1.WildCaptive.con.adiv.tiff`: Figure 1 from manuscript. This is the same file as `FigsTables/Fig1.WildCaptive.con.adiv.tiff`.
-    + `Fig2.WildCaptive.con.bdiv.tiff`: Figure 2 from manuscript. This is the same file as `FigsTables/Fig2.WildCaptive.con.bdiv.tiff`.
+    + `Fig2.WildCaptive.con.adiv.png`: Figure 2 from manuscript. This is the same file as `FigsTables/Fig1.WildCaptive.con.adiv.png`.
+    + `Fig3.WildCaptive.con.bdiv.png`: Figure 3 from manuscript. This is the same file as `FigsTables/Fig3.WildCaptive.con.bdiv.png`.
     + `Table1.WildCaptive.con.Phyla.csv` and `Table1.WildCaptive.con.Phyla.xlsx`: Table 1 from manuscript.This is the same file as `FigsTables/Table1.WildCaptive.con.Phyla.xlsx`.
     + `WildCaptive.con_clean_simper.csv`, `WildCaptive.con_krusk_simper.csv`, `WildCaptive.con_krusk_simper.xlsx`: Output files from SIMPER analysis of wild/captive microbiotas.
 * **Mucosa:** Directory of output files from the mucosa microbiota analyses in `Code_WildCaptive.Rmd`.
     + `CaptiveSeasons.muc_clean_simper.csv`, `CaptiveSeasons.muc_krusk_simper.csv`, `CaptiveSeasons.muc_krusk_simper.xlsx`: Output files from SIMPER analysis of mucosa microbiotas.
-    + `FigS5.CaptiveSeasons.muc.adiv.tiff`: Figure S5 from manuscript. This is the same file as `FigsTables/Fig5.CaptiveSeasons.adiv.tiff`.
-    + `FigS6.CaptiveSeasons.muc.bdiv.tiff`: Figure S6 from manuscript. This is the same file as `FigsTables/FigS6.CaptiveSeasons.bdiv.tiff`.
-    + `TableS8.CaptiveSeasons_muc_coreOTUs.csv`: Table S8 from manuscript. This is also found in the file  `FigsTables/SuppTables.xlsx`, tab `Table S8`.
+    + `FigS5.CaptiveSeasons.muc.adiv.png`: Figure S5 from manuscript. This is the same file as `FigsTables/Fig5.CaptiveSeasons.adiv.png`.
+    + `FigS6.CaptiveSeasons.muc.bdiv.png`: Figure S6 from manuscript. This is the same file as `FigsTables/FigS6.CaptiveSeasons.bdiv.png`.
+    + `TableS9.CaptiveSeasons_muc_coreOTUs.csv`: Table S9 from manuscript. This is also found in the file  `FigsTables/SuppTables.xlsx`, tab `Table S9`.
 
 
 ##### **Files:**
