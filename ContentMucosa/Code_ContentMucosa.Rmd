@@ -9,9 +9,12 @@ output: html_document
 library(ape)
 library(dplyr)
 library(dunn.test)
+library(effsize)
 library(ggplot2)
 library(grid)
+library(micropower)
 library(phyloseq)
+library(pwr)
 library(picante)
 library(tidyr)
 library(vegan)
@@ -106,7 +109,7 @@ physeq.spr <- subset_samples(physeq.pair, Group == "Spring")
 
 
 
-### Alpha Diversity - Summer Wild
+### Alpha Div - Summer Wild
 ```{r}
 ##### FAITH'S PHYLOGENETIC DIVERSITY AND PHYLOGENETIC EVENNESS (MPD) #####
 
@@ -612,9 +615,9 @@ ses.mpd.spr.res <- ses.mpd(t(data.frame(otu_table(physeq.spr))), pd.spr.dist,
                        null.model = "taxa.labels", abundance.weighted = F, runs = 999)
   # Calculate MPD
   # This'll take a while to run-- be patient
-
 mpd.spr <- data.frame(ses.mpd.spr.res)
   # Pull out MDP results
+
 
 ### Prepare data for plotting ###
 mpd.spr$SampleID <- row.names(mpd.spr)
@@ -2350,4 +2353,268 @@ grid.text("O", x=unit(0.05, "npc"),  y=unit(0.2, "npc"), vp=viewport(layout.pos.
           gp=gpar(fontsize=10,fontface="bold"))
 
 #dev.off()
+```
+
+
+
+
+### Calculate Effect Size - Alpha Div
+```{r}
+# https://trendingsideways.com/the-cohens-d-formula
+# https://www.statisticshowto.com/cohens-d/
+
+
+
+##### SUMMER WILD #####
+
+### PD
+cohen.d(pd.wild.ready$Stat ~ pd.wild.ready$Sample_Type)
+  # d = -0.8901782 (large)
+  # 95% CI = (-3.266759, 1.486403)
+
+### MPD
+cohen.d(mpd.wild.ready$Stat ~ mpd.wild.ready$Sample_Type)
+  # d = 0.6965079 (medium)
+  # 95% CI = (-1.638173, 3.031189)
+
+### Shannon
+cohen.d(adiv.wild$shannon ~ adiv.wild$Sample_Type)
+  # d = 0.403678 (small)
+  # 95% CI = (-1.886252, 2.693608)
+
+### Unique OTUs
+cohen.d(uniq.otus.wild$Unique_OTUs ~ uniq.otus.wild$Sample_Type)
+  # d = -0.6564615 (medium)
+  # 95% CI = (-2.983677, 1.670754)
+
+
+
+
+##### SUMMER CAPTIVE #####
+
+### PD
+cohen.d(pd.sum.ready$Stat ~ pd.sum.ready$Sample_Type)
+  # d = 0.04738304 (negligible)
+  # 95% CI = -1.117405  1.212171 
+
+### MPD
+cohen.d(mpd.sum.ready$Stat ~ mpd.sum.ready$Sample_Type)
+  # d = -0.7373258 (medium)
+  # 95% CI = -1.940872  0.466220 
+
+### Shannon
+cohen.d(adiv.sum$shannon ~ adiv.sum$Sample_Type)
+  # d = -0.241144 (small)
+  # 95% CI = -1.4099935  0.9277055 
+
+### Unique OTUs
+cohen.d(uniq.otus.sum$Unique_OTUs ~ uniq.otus.sum$Sample_Type)
+  # d = 0.1705195 (negligible)
+  # 95% CI = -0.9962195  1.3372585 
+
+
+
+
+
+##### TORPOR #####
+
+### PD
+cohen.d(pd.tor.ready$Stat ~ pd.tor.ready$Sample_Type)
+  # d = -0.2875428 (small)
+  # 95% CI = -1.753505  1.178420 
+
+### MPD
+cohen.d(mpd.tor.ready$Stat ~ mpd.tor.ready$Sample_Type)
+  # d = 0.186401 (negligible)
+  # 95% CI = -1.275208  1.648010 
+
+### Shannon
+cohen.d(adiv.tor$shannon ~ adiv.tor$Sample_Type)
+  # d = 0.1554287 (negligible)
+  # 95% CI = -1.305217  1.616074 
+
+### Unique OTUs
+cohen.d(uniq.otus.tor$Unique_OTUs ~ uniq.otus.tor$Sample_Type)
+  # d = 0.1886913 (negligible)
+  # 95% CI = -1.272996  1.650378 
+
+
+
+
+##### IBA #####
+
+### PD
+cohen.d(pd.iba.ready$Stat ~ pd.iba.ready$Sample_Type)
+  # d = 0.02297489 (negligible)
+  # 95% CI = -1.141688  1.187638
+
+### MPD
+cohen.d(mpd.iba.ready$Stat ~ mpd.iba.ready$Sample_Type)
+  # d = 0.155724 (negligible)
+  # 95% CI = -1.010664  1.322112 
+
+### Shannon
+cohen.d(adiv.iba$shannon ~ adiv.iba$Sample_Type)
+  # d = -0.2197225 (small)
+  # 95% CI = -1.3878558  0.9484108
+
+### Unique OTUs
+cohen.d(uniq.otus.iba$Unique_OTUs ~ uniq.otus.iba$Sample_Type)
+  # d = 0.2827642 (small)
+  # 95% CI = -0.8876657  1.4531941 
+
+
+
+
+##### SPRING #####
+
+### PD
+cohen.d(pd.spr.ready$Stat ~ pd.spr.ready$Sample_Type)
+  # d = -0.1788595 (negligible)
+  # 95% CI= -2.450346  2.092626
+
+### MPD
+cohen.d(mpd.spr.ready$Stat ~ mpd.spr.ready$Sample_Type)
+  # d = -0.4661396 (small)
+  # 95% CI = -2.763677  1.831398 
+
+### Shannon
+cohen.d(adiv.spr$shannon ~ adiv.spr$Sample_Type)
+  # d = 0.4049254 (small)
+  # 95% CI = -1.885146  2.694997 
+
+### Unique OTUs
+cohen.d(uniq.otus.spr$Unique_OTUs ~ uniq.otus.spr$Sample_Type)
+  # d = 0.1407349 (negligible)
+  # 95% CI = -2.129028  2.410497
+
+```
+
+
+
+### Calculate Power - Alpha Div
+```{r}
+
+### Summer Wild
+
+# PD
+pwr.t2n.test(length(which(adiv.wild$Sample_Type == "Content")),
+             length(which(adiv.wild$Sample_Type == "Mucosa")), d = -0.8901782)
+  # 0.1360301
+
+# MPD
+pwr.t2n.test(length(which(adiv.wild$Sample_Type == "Content")),
+             length(which(adiv.wild$Sample_Type == "Mucosa")), d = 0.6965079)
+  # 0.1024001
+
+# Shannon
+pwr.t2n.test(length(which(adiv.wild$Sample_Type == "Content")),
+             length(which(adiv.wild$Sample_Type == "Mucosa")), d = 0.403678)
+  # 0.06745605
+
+# Unique OTUs
+pwr.t2n.test(length(which(adiv.wild$Sample_Type == "Content")),
+             length(which(adiv.wild$Sample_Type == "Mucosa")), d = -0.6564615)
+  # 0.09649314
+
+
+
+
+
+### Summer Wild
+
+# PD
+pwr.t2n.test(length(which(adiv.sum$Sample_Type == "Content")),
+             length(which(adiv.sum$Sample_Type == "Mucosa")), d = 0.04738304)
+  # 0.05076674
+
+# MPD
+pwr.t2n.test(length(which(adiv.sum$Sample_Type == "Content")),
+             length(which(adiv.sum$Sample_Type == "Mucosa")), d = -0.7373258)
+  # 0.2458791
+
+# Shannon
+pwr.t2n.test(length(which(adiv.sum$Sample_Type == "Content")),
+             length(which(adiv.sum$Sample_Type == "Mucosa")), d = -0.241144)
+  # 0.07006686
+
+# Unique OTUs
+pwr.t2n.test(length(which(adiv.sum$Sample_Type == "Content")),
+             length(which(adiv.sum$Sample_Type == "Mucosa")), d = 0.1705195)
+  # 0.05998155
+
+
+
+
+### Torpor
+
+# PD
+pwr.t2n.test(length(which(adiv.tor$Sample_Type == "Content")),
+             length(which(adiv.tor$Sample_Type == "Mucosa")), d = -0.2875428)
+  # 0.06878096
+
+# MPD
+pwr.t2n.test(length(which(adiv.tor$Sample_Type == "Content")),
+             length(which(adiv.tor$Sample_Type == "Mucosa")), d = 0.186401)
+  # 0.05784992
+
+# Shannon
+pwr.t2n.test(length(which(adiv.tor$Sample_Type == "Content")),
+             length(which(adiv.tor$Sample_Type == "Mucosa")), d = 0.1554287)
+  # 0.05545116
+
+# Unique OTUs
+pwr.t2n.test(length(which(adiv.tor$Sample_Type == "Content")),
+             length(which(adiv.tor$Sample_Type == "Mucosa")), d = 0.1886913)
+  # 0.05804482
+
+
+
+
+### IBA
+
+# PD
+pwr.t2n.test(length(which(adiv.iba$Sample_Type == "Content")),
+             length(which(adiv.iba$Sample_Type == "Mucosa")), d = 0.02297489)
+  # 0.0501802
+
+# MPD
+pwr.t2n.test(length(which(adiv.iba$Sample_Type == "Content")),
+             length(which(adiv.iba$Sample_Type == "Mucosa")), d = 0.155724)
+  # 0.155724
+
+# Shannon
+pwr.t2n.test(length(which(adiv.iba$Sample_Type == "Content")),
+             length(which(adiv.iba$Sample_Type == "Mucosa")), d = -0.2197225)
+  # 0.06663107
+
+# Unique OTUs
+pwr.t2n.test(length(which(adiv.iba$Sample_Type == "Content")),
+             length(which(adiv.iba$Sample_Type == "Mucosa")), d = 0.2827642)
+  # 0.07769363
+
+
+
+
+### SPRING
+
+# PD
+pwr.t2n.test(length(which(adiv.spr$Sample_Type == "Content")),
+             length(which(adiv.spr$Sample_Type == "Mucosa")), d = -0.1788595)
+  # 0.05341207
+
+# MPD
+pwr.t2n.test(length(which(adiv.spr$Sample_Type == "Content")),
+             length(which(adiv.spr$Sample_Type == "Mucosa")), d = -0.4661396)
+  # 0.07331391
+
+# Shannon
+pwr.t2n.test(length(which(adiv.spr$Sample_Type == "Content")),
+             length(which(adiv.spr$Sample_Type == "Mucosa")), d = 0.4049254)
+  # 0.06756464
+
+# Unique OTUs
+pwr.t2n.test(length(which(adiv.spr$Sample_Type == "Content")),
+             length(which(adiv.spr$Sample_Type == "Mucosa")), d = 0.1407349)
+  # 0.05211159
 ```
