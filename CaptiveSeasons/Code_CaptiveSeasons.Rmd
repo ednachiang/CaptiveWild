@@ -2031,12 +2031,12 @@ p.adjust(c(0.501,0.606,0.731,0.817,0.312,0.385), method = "BH")
 
 # Adjust PERMANOVA p-values
 p.adjust(c(0.0014,8e-04,0.1192,0.9865,0.0162,0.0095), method = "BH")
-  # Summer-Torpor = 0.00420
-  # Summer-IBA = 0.00420
+  # Summer-Torpor = 0.00420*
+  # Summer-IBA = 0.00420*
   # Summer-Spring = 0.14304
   # Torpor-IBA = 0.98650
-  # Torpor-Spring = 0.02430
-  # IBA-Spring = 0.01900
+  # Torpor-Spring = 0.02430*
+  # IBA-Spring = 0.01900*
 
 
 
@@ -2161,12 +2161,12 @@ p.adjust(c(0.11,0.066,0.088,0.721,0.38,0.614), method = "BH")
 
 # Adjust PERMANOVA p-values
 p.adjust(c(0.0027,5e-04,0.5296,0.844,0.0697,0.0163), method = "BH")
-  # Summer-Torpor = 0.00810
-  # Summer-IBA = 0.00300
+  # Summer-Torpor = 0.00810*
+  # Summer-IBA = 0.00300*
   # Summer-Spring = 0.63552
   # Torpor-IBA = 0.84400
   # Torpor-Spring = 0.10455
-  # IBA-Spring = 0.03260
+  # IBA-Spring = 0.03260*
 
 
 
