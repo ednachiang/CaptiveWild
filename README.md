@@ -1,8 +1,8 @@
-## Impact of captivity and sequencing technology on the bacterial gut microbiotas of ground squirrel hibernators
+## Characterization of captive and wild 13-lined ground squirrel bacterial cecal microbiotas using Illumina-based sequencing
   
 #### **Authors:** Edna Chiang, Courtney L. Deblois, Hannah V. Carey, Garret Suen
   
-##### Submitted to *Animal Microbiome* on July ##, 2021
+##### Submitted to *Animal Microbiome* on Aug 10, 2021
 
   
 **********
