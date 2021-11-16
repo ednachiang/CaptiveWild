@@ -776,7 +776,7 @@ wild.otu.plot <- ggplot(uniq.otus.wild, aes(x = Sample_Type, y = Unique_OTUs, fi
   scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
   scale_y_continuous(limits = c(640,780), breaks = c(640, 675, 710, 745, 780)) +
   scale_x_discrete(labels = c("Content", "Mucosa")) +
-  ylab("Number of Unique OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ylab("Number of Observed OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
   ggtitle("Summer Wild") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -928,7 +928,7 @@ sum.otu.plot <- ggplot(uniq.otus.sum, aes(x = Sample_Type, y = Unique_OTUs, fill
   scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
   scale_y_continuous(limits = c(290,590), breaks = c(290,390,490,590)) +
   scale_x_discrete(labels = c("Content", "Mucosa")) +
-  ylab("Number of Unique OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ylab("Number of Observed OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
   ggtitle("Summer Captive") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -1081,7 +1081,7 @@ tor.otu.plot <- ggplot(uniq.otus.tor, aes(x = Sample_Type, y = Unique_OTUs, fill
   scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
   scale_y_continuous(limits = c(210,345), breaks = c(210,255,300,345)) +
   scale_x_discrete(labels = c("Content", "Mucosa")) +
-  ylab("Number of Unique OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ylab("Number of Observed OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
   ggtitle("Torpor") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -1234,7 +1234,7 @@ iba.otu.plot <- ggplot(uniq.otus.iba, aes(x = Sample_Type, y = Unique_OTUs, fill
   scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
   scale_y_continuous(limits = c(220,390), breaks = c(220,254,288,322,356,390)) +
   scale_x_discrete(labels = c("Content", "Mucosa")) +
-  ylab("Number of Unique OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ylab("Number of Observed OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
   ggtitle("IBA") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -1387,7 +1387,7 @@ spr.otu.plot <- ggplot(uniq.otus.spr, aes(x = Sample_Type, y = Unique_OTUs, fill
   scale_fill_manual(values = c("gray60", "gray90"), labels = c("Content", "Mucosa")) +
   scale_y_continuous(limits = c(310,410), breaks = c(310,335,360,385,410)) +
   scale_x_discrete(labels = c("Content", "Mucosa")) +
-  ylab("Number of Unique OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
+  ylab("Number of Observed OTUs") + xlab("Sample Type") + labs(fill = "Sample Type") +
   ggtitle("Spring") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -1520,7 +1520,7 @@ spr.shannon.plot <- ggplot(adiv.spr, aes(x = Sample_Type, y = shannon, fill = Sa
 
 ### Plot - Alpha-Diversity
 ```{r}
-#png("FigS1.ConMuc.adiv.png", width = 170, height = 225, units = "mm", res = 600)
+png("FigS1.ConMuc.adiv.png", width = 170, height = 225, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(10,4, widths = c(1, 1, 1, 1.3),
                                          heights = c(0.07,1.5,0.07,1.5,0.07,1.5,0.07,1.5,0.07,1.5))))
@@ -1593,7 +1593,7 @@ print(spr.mpd.plot, vp=viewport(layout.pos.row=10, layout.pos.col=3))
 grid.text("T", x=unit(0.045, "npc"), vp=viewport(layout.pos.row=9, layout.pos.col=4),
           gp=gpar(fontsize=8,fontface="bold"))
 print(spr.shannon.plot, vp=viewport(layout.pos.row=10, layout.pos.col=4))
-#dev.off()
+dev.off()
 ```
 
 
