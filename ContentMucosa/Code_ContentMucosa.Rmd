@@ -2367,24 +2367,24 @@ grid.text("O", x=unit(0.05, "npc"),  y=unit(0.2, "npc"), vp=viewport(layout.pos.
 ##### SUMMER WILD #####
 
 ### PD
-cohen.d(pd.wild.ready$Stat ~ pd.wild.ready$Sample_Type)
-  # d = -0.8901782 (large)
-  # 95% CI = (-3.266759, 1.486403)
+cohen.d(pd.wild.ready$Stat ~ pd.wild.ready$Sample_Type, paired = T)
+  # d = -0.9022288 (large)
+  # 95% CI = -4.142542  2.338084 
 
 ### MPD
-cohen.d(mpd.wild.ready$Stat ~ mpd.wild.ready$Sample_Type)
-  # d = 0.6965079 (medium)
-  # 95% CI = (-1.638173, 3.031189)
+cohen.d(mpd.wild.ready$Stat ~ mpd.wild.ready$Sample_Type, paired = T)
+  # d = 0.5213095 (medium)
+  # 95% CI = 0.0497683 0.9928506 
 
 ### Shannon
-cohen.d(adiv.wild$shannon ~ adiv.wild$Sample_Type)
-  # d = 0.403678 (small)
-  # 95% CI = (-1.886252, 2.693608)
+cohen.d(adiv.wild$shannon ~ adiv.wild$Sample_Type, paired = T)
+  # d = 0.2315921 (small)
+  # 95% CI = -0.1288982  0.5920824 
 
 ### Unique OTUs
-cohen.d(uniq.otus.wild$Unique_OTUs ~ uniq.otus.wild$Sample_Type)
-  # d = -0.6564615 (medium)
-  # 95% CI = (-2.983677, 1.670754)
+cohen.d(uniq.otus.wild$Unique_OTUs ~ uniq.otus.wild$Sample_Type, paired = T)
+  # d = -0.6473075 (medium)
+  # 95% CI = -2.762275  1.467660 
 
 
 
@@ -2392,24 +2392,24 @@ cohen.d(uniq.otus.wild$Unique_OTUs ~ uniq.otus.wild$Sample_Type)
 ##### SUMMER CAPTIVE #####
 
 ### PD
-cohen.d(pd.sum.ready$Stat ~ pd.sum.ready$Sample_Type)
-  # d = 0.04738304 (negligible)
-  # 95% CI = -1.117405  1.212171 
+cohen.d(pd.sum.ready$Stat ~ pd.sum.ready$Sample_Type, paired = T)
+  # d = 0.04735248 (negligible)
+  # 95% CI = -1.006736  1.101441 
 
 ### MPD
-cohen.d(mpd.sum.ready$Stat ~ mpd.sum.ready$Sample_Type)
-  # d = -0.7373258 (medium)
-  # 95% CI = -1.940872  0.466220 
+cohen.d(mpd.sum.ready$Stat ~ mpd.sum.ready$Sample_Type, paired = T)
+  # d = -0.7418809 (medium)
+  # 95% CI = -2.4111945  0.9274327 
 
 ### Shannon
-cohen.d(adiv.sum$shannon ~ adiv.sum$Sample_Type)
-  # d = -0.241144 (small)
-  # 95% CI = -1.4099935  0.9277055 
+cohen.d(adiv.sum$shannon ~ adiv.sum$Sample_Type, paired = T)
+  # d = -0.2417263 (small)
+  # 95% CI = -1.612390  1.128937 
 
 ### Unique OTUs
-cohen.d(uniq.otus.sum$Unique_OTUs ~ uniq.otus.sum$Sample_Type)
-  # d = 0.1705195 (negligible)
-  # 95% CI = -0.9962195  1.3372585 
+cohen.d(uniq.otus.sum$Unique_OTUs ~ uniq.otus.sum$Sample_Type, paired = T)
+  # d = 0.1704868 (negligible)
+  # 95% CI = -0.9770042  1.3179778
 
 
 
@@ -2418,24 +2418,24 @@ cohen.d(uniq.otus.sum$Unique_OTUs ~ uniq.otus.sum$Sample_Type)
 ##### TORPOR #####
 
 ### PD
-cohen.d(pd.tor.ready$Stat ~ pd.tor.ready$Sample_Type)
-  # d = -0.2875428 (small)
-  # 95% CI = -1.753505  1.178420 
+cohen.d(pd.tor.ready$Stat ~ pd.tor.ready$Sample_Type, paired = T)
+  # d = -0.2859916 (small)
+  # 95% CI = -1.251544  0.679561
 
 ### MPD
-cohen.d(mpd.tor.ready$Stat ~ mpd.tor.ready$Sample_Type)
-  # d = 0.186401 (negligible)
-  # 95% CI = -1.275208  1.648010 
+cohen.d(mpd.tor.ready$Stat ~ mpd.tor.ready$Sample_Type, paired = T)
+  # d = 0.169756 (negligible)
+  # 95% CI = -0.3499992  0.6895111
 
 ### Shannon
-cohen.d(adiv.tor$shannon ~ adiv.tor$Sample_Type)
-  # d = 0.1554287 (negligible)
-  # 95% CI = -1.305217  1.616074 
+cohen.d(adiv.tor$shannon ~ adiv.tor$Sample_Type, paired = T)
+  # d = 0.1581537 (negligible)
+  # 95% CI = -1.837849  2.154156
 
 ### Unique OTUs
-cohen.d(uniq.otus.tor$Unique_OTUs ~ uniq.otus.tor$Sample_Type)
-  # d = 0.1886913 (negligible)
-  # 95% CI = -1.272996  1.650378 
+cohen.d(uniq.otus.tor$Unique_OTUs ~ uniq.otus.tor$Sample_Type, paired = T)
+  # d = 0.1861612 (negligible)
+  # 95% CI = -0.6764332  1.0487557
 
 
 
@@ -2443,24 +2443,24 @@ cohen.d(uniq.otus.tor$Unique_OTUs ~ uniq.otus.tor$Sample_Type)
 ##### IBA #####
 
 ### PD
-cohen.d(pd.iba.ready$Stat ~ pd.iba.ready$Sample_Type)
-  # d = 0.02297489 (negligible)
-  # 95% CI = -1.141688  1.187638
+cohen.d(pd.iba.ready$Stat ~ pd.iba.ready$Sample_Type, paired = T)
+  # d = 0.02188684 (negligible)
+  # 95% CI = -0.7789911  0.8227648
 
 ### MPD
-cohen.d(mpd.iba.ready$Stat ~ mpd.iba.ready$Sample_Type)
-  # d = 0.155724 (negligible)
-  # 95% CI = -1.010664  1.322112 
+cohen.d(mpd.iba.ready$Stat ~ mpd.iba.ready$Sample_Type, paired = T)
+  # d = 0.1399599 (negligible)
+  # 95% CI = -0.1528129  0.4327328 
 
 ### Shannon
-cohen.d(adiv.iba$shannon ~ adiv.iba$Sample_Type)
-  # d = -0.2197225 (small)
-  # 95% CI = -1.3878558  0.9484108
+cohen.d(adiv.iba$shannon ~ adiv.iba$Sample_Type, paired = T)
+  # d = -0.2185459 (small)
+  # 95% CI = -0.9537933  0.5167016
 
 ### Unique OTUs
-cohen.d(uniq.otus.iba$Unique_OTUs ~ uniq.otus.iba$Sample_Type)
-  # d = 0.2827642 (small)
-  # 95% CI = -0.8876657  1.4531941 
+cohen.d(uniq.otus.iba$Unique_OTUs ~ uniq.otus.iba$Sample_Type, paired = T)
+  # d = 0.2809209 (small)
+  # 95% CI = -0.8090023  1.3708440 
 
 
 
@@ -2468,24 +2468,24 @@ cohen.d(uniq.otus.iba$Unique_OTUs ~ uniq.otus.iba$Sample_Type)
 ##### SPRING #####
 
 ### PD
-cohen.d(pd.spr.ready$Stat ~ pd.spr.ready$Sample_Type)
-  # d = -0.1788595 (negligible)
-  # 95% CI= -2.450346  2.092626
+cohen.d(pd.spr.ready$Stat ~ pd.spr.ready$Sample_Type, paired = T)
+  # d = -0.1633663 (negligible)
+  # 95% CI = -0.7639579  0.4372254
 
 ### MPD
-cohen.d(mpd.spr.ready$Stat ~ mpd.spr.ready$Sample_Type)
-  # d = -0.4661396 (small)
-  # 95% CI = -2.763677  1.831398 
+cohen.d(mpd.spr.ready$Stat ~ mpd.spr.ready$Sample_Type, paired = T)
+  # d = -0.4335896 (small)
+  # 95% CI = -1.3832070  0.5160279 
 
 ### Shannon
-cohen.d(adiv.spr$shannon ~ adiv.spr$Sample_Type)
-  # d = 0.4049254 (small)
-  # 95% CI = -1.885146  2.694997 
+cohen.d(adiv.spr$shannon ~ adiv.spr$Sample_Type, paired = T)
+  # d = 0.2428866 (small)
+  # 95% CI = -0.3900956  0.8758689 
 
 ### Unique OTUs
-cohen.d(uniq.otus.spr$Unique_OTUs ~ uniq.otus.spr$Sample_Type)
-  # d = 0.1407349 (negligible)
-  # 95% CI = -2.129028  2.410497
+cohen.d(uniq.otus.spr$Unique_OTUs ~ uniq.otus.spr$Sample_Type, paired = T)
+  # d = 0.1406595 (negligible)
+  # 95% CI = -0.8939879  1.1753069
 
 ```
 
@@ -2498,23 +2498,23 @@ cohen.d(uniq.otus.spr$Unique_OTUs ~ uniq.otus.spr$Sample_Type)
 
 # PD
 pwr.t2n.test(length(which(adiv.wild$Sample_Type == "Content")),
-             length(which(adiv.wild$Sample_Type == "Mucosa")), d = -0.8901782)
-  # 0.1360301
+             length(which(adiv.wild$Sample_Type == "Mucosa")), d = -0.9022288)
+  # 0.1383985
 
 # MPD
 pwr.t2n.test(length(which(adiv.wild$Sample_Type == "Content")),
-             length(which(adiv.wild$Sample_Type == "Mucosa")), d = 0.6965079)
-  # 0.1024001
+             length(which(adiv.wild$Sample_Type == "Mucosa")), d = 0.5213095)
+  # 0.07920397
 
 # Shannon
 pwr.t2n.test(length(which(adiv.wild$Sample_Type == "Content")),
-             length(which(adiv.wild$Sample_Type == "Mucosa")), d = 0.403678)
-  # 0.06745605
+             length(which(adiv.wild$Sample_Type == "Mucosa")), d = 0.2315921)
+  # 0.05572493
 
 # Unique OTUs
 pwr.t2n.test(length(which(adiv.wild$Sample_Type == "Content")),
-             length(which(adiv.wild$Sample_Type == "Mucosa")), d = -0.6564615)
-  # 0.09649314
+             length(which(adiv.wild$Sample_Type == "Mucosa")), d = -0.6473075)
+  # 0.09519332
 
 
 
@@ -2524,23 +2524,23 @@ pwr.t2n.test(length(which(adiv.wild$Sample_Type == "Content")),
 
 # PD
 pwr.t2n.test(length(which(adiv.sum$Sample_Type == "Content")),
-             length(which(adiv.sum$Sample_Type == "Mucosa")), d = 0.04738304)
-  # 0.05076674
+             length(which(adiv.sum$Sample_Type == "Mucosa")), d = 0.04735248)
+  # 0.05076575
 
 # MPD
 pwr.t2n.test(length(which(adiv.sum$Sample_Type == "Content")),
-             length(which(adiv.sum$Sample_Type == "Mucosa")), d = -0.7373258)
-  # 0.2458791
+             length(which(adiv.sum$Sample_Type == "Mucosa")), d = -0.7418809)
+  # 0.2483309
 
 # Shannon
 pwr.t2n.test(length(which(adiv.sum$Sample_Type == "Content")),
-             length(which(adiv.sum$Sample_Type == "Mucosa")), d = -0.241144)
-  # 0.07006686
+             length(which(adiv.sum$Sample_Type == "Mucosa")), d = -0.2417263)
+  # 0.07016487
 
 # Unique OTUs
 pwr.t2n.test(length(which(adiv.sum$Sample_Type == "Content")),
-             length(which(adiv.sum$Sample_Type == "Mucosa")), d = 0.1705195)
-  # 0.05998155
+             length(which(adiv.sum$Sample_Type == "Mucosa")), d = 0.1704868)
+  # 0.0599777
 
 
 
@@ -2549,23 +2549,23 @@ pwr.t2n.test(length(which(adiv.sum$Sample_Type == "Content")),
 
 # PD
 pwr.t2n.test(length(which(adiv.tor$Sample_Type == "Content")),
-             length(which(adiv.tor$Sample_Type == "Mucosa")), d = -0.2875428)
-  # 0.06878096
+             length(which(adiv.tor$Sample_Type == "Mucosa")), d = -0.2859916)
+  # 0.06857708
 
 # MPD
 pwr.t2n.test(length(which(adiv.tor$Sample_Type == "Content")),
-             length(which(adiv.tor$Sample_Type == "Mucosa")), d = 0.186401)
-  # 0.05784992
+             length(which(adiv.tor$Sample_Type == "Mucosa")), d = 0.169756)
+  # 0.05650604
 
 # Shannon
 pwr.t2n.test(length(which(adiv.tor$Sample_Type == "Content")),
-             length(which(adiv.tor$Sample_Type == "Mucosa")), d = 0.1554287)
-  # 0.05545116
+             length(which(adiv.tor$Sample_Type == "Mucosa")), d = 0.1581537)
+  # 0.05564455
 
 # Unique OTUs
 pwr.t2n.test(length(which(adiv.tor$Sample_Type == "Content")),
-             length(which(adiv.tor$Sample_Type == "Mucosa")), d = 0.1886913)
-  # 0.05804482
+             length(which(adiv.tor$Sample_Type == "Mucosa")), d = 0.1861612)
+  # 0.05782966
 
 
 
@@ -2574,23 +2574,23 @@ pwr.t2n.test(length(which(adiv.tor$Sample_Type == "Content")),
 
 # PD
 pwr.t2n.test(length(which(adiv.iba$Sample_Type == "Content")),
-             length(which(adiv.iba$Sample_Type == "Mucosa")), d = 0.02297489)
-  # 0.0501802
+             length(which(adiv.iba$Sample_Type == "Mucosa")), d = 0.02188684)
+  # 0.05016354
 
 # MPD
 pwr.t2n.test(length(which(adiv.iba$Sample_Type == "Content")),
-             length(which(adiv.iba$Sample_Type == "Mucosa")), d = 0.155724)
-  # 0.155724
+             length(which(adiv.iba$Sample_Type == "Mucosa")), d = 0.1399599)
+  # 0.05671242
 
 # Shannon
 pwr.t2n.test(length(which(adiv.iba$Sample_Type == "Content")),
-             length(which(adiv.iba$Sample_Type == "Mucosa")), d = -0.2197225)
-  # 0.06663107
+             length(which(adiv.iba$Sample_Type == "Mucosa")), d = -0.2185459)
+  # 0.06645192
 
 # Unique OTUs
 pwr.t2n.test(length(which(adiv.iba$Sample_Type == "Content")),
-             length(which(adiv.iba$Sample_Type == "Mucosa")), d = 0.2827642)
-  # 0.07769363
+             length(which(adiv.iba$Sample_Type == "Mucosa")), d = 0.2809209)
+  # 0.07732905
 
 
 
@@ -2599,21 +2599,21 @@ pwr.t2n.test(length(which(adiv.iba$Sample_Type == "Content")),
 
 # PD
 pwr.t2n.test(length(which(adiv.spr$Sample_Type == "Content")),
-             length(which(adiv.spr$Sample_Type == "Mucosa")), d = -0.1788595)
-  # 0.05341207
+             length(which(adiv.spr$Sample_Type == "Mucosa")), d = -0.1633663)
+  # 0.05284601
 
 # MPD
 pwr.t2n.test(length(which(adiv.spr$Sample_Type == "Content")),
-             length(which(adiv.spr$Sample_Type == "Mucosa")), d = -0.4661396)
-  # 0.07331391
+             length(which(adiv.spr$Sample_Type == "Mucosa")), d = -0.4335896)
+  # 0.07015416
 
 # Shannon
 pwr.t2n.test(length(which(adiv.spr$Sample_Type == "Content")),
-             length(which(adiv.spr$Sample_Type == "Mucosa")), d = 0.4049254)
-  # 0.06756464
+             length(which(adiv.spr$Sample_Type == "Mucosa")), d = 0.2428866)
+  # 0.0562981
 
 # Unique OTUs
 pwr.t2n.test(length(which(adiv.spr$Sample_Type == "Content")),
-             length(which(adiv.spr$Sample_Type == "Mucosa")), d = 0.1407349)
-  # 0.05211159
+             length(which(adiv.spr$Sample_Type == "Mucosa")), d = 0.1406595)
+  # 0.05210932
 ```
