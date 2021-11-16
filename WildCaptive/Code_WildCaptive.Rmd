@@ -9,10 +9,12 @@ output: html_document
 library(ape)
 library(dplyr)
 library(dunn.test)
+library(effsize)
 library(ggplot2)
 library(grid)
 library(gridExtra)
 library(phyloseq)
+library(pwr)
 library(picante)
 library(tidyr)
 library(vegan)
@@ -423,7 +425,7 @@ otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
   scale_fill_manual(values = c("#e60000", "#ec9393"), labels = c("Captive", "Wild")) +
   scale_y_continuous(limits = c(250,710), breaks = c(250, 340, 430, 520, 610, 700)) +
   scale_x_discrete(labels = c("Captive", "Wild")) +
-  ylab("Number of Unique OTUs") +
+  ylab("Number of Observed OTUs") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
@@ -829,6 +831,53 @@ phy.muc.core <- merge_phyloseq(phy.wild.muc.core, phy.sum.muc.core)
 
 
 
+### Content - Calculate Effect Size - Adiv
+```{r}
+### PD
+cohen.d(pd.ready$Stat ~ pd.ready$Group)
+  # d = -2.845633 (large)
+  # 95% CI = -4.9020914 -0.7891752
+
+### MPD
+cohen.d(mpd.ready$Stat ~ mpd.ready$Group)
+  # d = -1.983765 (large)
+  # 95% CI = -3.7895437 -0.1779855
+
+### Shannon
+cohen.d(adiv$shannon ~ adiv$Group)
+  # d = -0.05054058 (negligible)
+  # 95% CI = -1.582222  1.481141
+
+### Unique OTUs
+cohen.d(uniq.otus$Unique_OTUs ~ uniq.otus$Group)
+  # d = -2.944866 (large)
+  # 95% CI = -5.0335689 -0.8561639
+```
+
+
+
+### Content - Calculate Power - Alpha Div
+```{r}
+# PD
+pwr.t2n.test(length(which(adiv$Group == "Summer_Wild")),
+             length(which(adiv$Group == "Summer_Captive")), d = -2.845633)
+  # 0.9611536
+
+# MPD
+pwr.t2n.test(length(which(adiv$Group == "Summer_Wild")),
+             length(which(adiv$Group == "Summer_Captive")), d = -1.983765)
+  # 0.7417039
+
+# Shannon
+pwr.t2n.test(length(which(adiv$Group == "Summer_Wild")),
+             length(which(adiv$Group == "Summer_Captive")), d = -0.05054058)
+  # 0.0505153
+
+# Unique OTUs
+pwr.t2n.test(length(which(adiv$Group == "Summer_Wild")),
+             length(which(adiv$Group == "Summer_Captive")), d = -2.944866)
+  # 0.970757
+```
 
 
 # BELOW IS MUCOSAAAAAAAAAAAAAAAA 
@@ -1214,7 +1263,7 @@ muc.otu.plot <- ggplot(uniq.otus.muc, aes(x = Group, y = Unique_OTUs, fill = Gro
   scale_fill_manual(values = c("#e60000", "#ec9393"), labels = c("Captive", "Wild")) +
   scale_y_continuous(limits = c(280,760), breaks = c(280,400,520,640,760)) +
   scale_x_discrete(labels = c("Captive", "Wild")) +
-  ylab("Number of Unique OTUs") +
+  ylab("Number of Observed OTUs") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
@@ -1549,4 +1598,54 @@ grid.text("C", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos
 }
 #write.table(group.muc.simper.kw, "Mucosa/WildCaptive.muc_krusk_simper.csv", sep=",")
 #group.muc.simper.kw <- read.csv("Mucosa/WildCaptive.muc_clean_simper.csv", row.names = 1)
+```
+
+
+
+### Mucosa - Calculate Effect Size - Adiv
+```{r}
+### PD
+cohen.d(pd.muc.ready$Stat ~ pd.muc.ready$Group)
+  # d = -3.62433 (large)
+  # 95% CI = -5.875077 -1.373583
+
+### MPD
+cohen.d(mpd.muc.ready$Stat ~ mpd.muc.ready$Group)
+  # d = -0.6733588 (medium)
+  # 95% CI = -2.1279571  0.7812396
+
+### Shannon
+cohen.d(adiv.muc$shannon ~ adiv.muc$Group)
+  # d = 0.3152049 (small)
+  # 95% CI = -1.110804  1.741213 
+
+### Unique OTUs
+cohen.d(uniq.otus.muc$Unique_OTUs ~ uniq.otus.muc$Group)
+  # d = -4.012347 (large)
+  # 95% CI = -6.411328 -1.613365
+```
+
+
+
+### Content - Calculate Power - Alpha Div
+```{r}
+# PD
+pwr.t2n.test(length(which(adiv.muc$Group == "Summer_Wild")),
+             length(which(adiv.muc$Group == "Summer_Captive")), d = -2.845633)
+  # 0.9801901
+
+# MPD
+pwr.t2n.test(length(which(adiv.muc$Group == "Summer_Wild")),
+             length(which(adiv.muc$Group == "Summer_Captive")), d = -1.983765)
+  # 0.8037583
+
+# Shannon
+pwr.t2n.test(length(which(adiv.muc$Group == "Summer_Wild")),
+             length(which(adiv.muc$Group == "Summer_Captive")), d = -0.05054058)
+  # 0.05060122
+
+# Unique OTUs
+pwr.t2n.test(length(which(adiv.muc$Group == "Summer_Wild")),
+             length(which(adiv.muc$Group == "Summer_Captive")), d = -2.944866)
+  # 0.985933
 ```
