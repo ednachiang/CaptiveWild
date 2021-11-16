@@ -2493,6 +2493,7 @@ cohen.d(uniq.otus.spr$Unique_OTUs ~ uniq.otus.spr$Sample_Type, paired = T)
 
 ### Calculate Power - Alpha Div
 ```{r}
+# https://cran.r-project.org/web/packages/pwr/vignettes/pwr-vignette.html
 
 ### Summer Wild
 
