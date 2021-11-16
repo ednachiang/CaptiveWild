@@ -2357,7 +2357,7 @@ grid.text("O", x=unit(0.05, "npc"),  y=unit(0.2, "npc"), vp=viewport(layout.pos.
 
 
 
-### Calculate Effect Size - Alpha Div
+### Effect Size - Alpha Div
 ```{r}
 # https://trendingsideways.com/the-cohens-d-formula
 # https://www.statisticshowto.com/cohens-d/
@@ -2491,7 +2491,7 @@ cohen.d(uniq.otus.spr$Unique_OTUs ~ uniq.otus.spr$Sample_Type, paired = T)
 
 
 
-### Calculate Power - Alpha Div
+### Power - Alpha Div
 ```{r}
 # https://cran.r-project.org/web/packages/pwr/vignettes/pwr-vignette.html
 
@@ -2521,7 +2521,7 @@ pwr.t2n.test(length(which(adiv.wild$Sample_Type == "Content")),
 
 
 
-### Summer Wild
+### Summer Captive
 
 # PD
 pwr.t2n.test(length(which(adiv.sum$Sample_Type == "Content")),
@@ -2618,3 +2618,38 @@ pwr.t2n.test(length(which(adiv.spr$Sample_Type == "Content")),
              length(which(adiv.spr$Sample_Type == "Mucosa")), d = 0.1406595)
   # 0.05210932
 ```
+
+
+
+### Detectable Effect Size - Alpha Div
+```{r}
+# https://cran.r-project.org/web/packages/pwr/vignettes/pwr-vignette.html
+
+# Summer Wild
+pwr.t2n.test(length(which(adiv.wild$Sample_Type == "Content")),
+             length(which(adiv.wild$Sample_Type == "Mucosa")), power = 0.8)
+  # 3.070917
+
+
+# Summer Captive
+pwr.t2n.test(length(which(adiv.sum$Sample_Type == "Content")),
+             length(which(adiv.sum$Sample_Type == "Mucosa")), power = 0.8)
+  # 1.631722
+
+
+# Torpor
+pwr.t2n.test(length(which(adiv.tor$Sample_Type == "Content")),
+             length(which(adiv.tor$Sample_Type == "Mucosa")), power = 0.8)
+  # 2.024439
+
+
+# IBA
+pwr.t2n.test(length(which(adiv.iba$Sample_Type == "Content")),
+             length(which(adiv.iba$Sample_Type == "Mucosa")), power = 0.8)
+  # 1.631722
+
+
+# SPRING
+pwr.t2n.test(length(which(adiv.spr$Sample_Type == "Content")),
+             length(which(adiv.spr$Sample_Type == "Mucosa")), power = 0.8)
+  # 3.070917
