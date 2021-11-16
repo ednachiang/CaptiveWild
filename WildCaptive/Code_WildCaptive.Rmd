@@ -837,7 +837,7 @@ phy.muc.core <- merge_phyloseq(phy.wild.muc.core, phy.sum.muc.core)
 # Firmicutes
 cohen.d(fir.df$RelAbund ~ fir.df$Group)
   # d = 1.008523 (large)
-  # 95% CI =-0.5983509  2.6153966 
+  # 95% CI = -0.5983509  2.6153966 
 
 # Bacteroidetes
 cohen.d(bac.df$RelAbund ~ bac.df$Group)
@@ -979,6 +979,18 @@ pwr.t2n.test(length(which(adiv$Group == "Summer_Wild")),
              length(which(adiv$Group == "Summer_Captive")), d = -2.944866)
   # 0.970757
 ```
+
+
+
+### Content - Detectable Effect Size
+```{r}
+# https://cran.r-project.org/web/packages/pwr/vignettes/pwr-vignette.html
+
+pwr.t2n.test(length(which(adiv$Group == "Summer_Wild")),
+             length(which(adiv$Group == "Summer_Captive")), power = 0.8)
+  # 2.132304
+```
+
 
 
 # BELOW IS MUCOSAAAAAAAAAAAAAAAA 
@@ -1848,7 +1860,7 @@ cohen.d(uniq.otus.muc$Unique_OTUs ~ uniq.otus.muc$Group)
 
 
 
-### Content - Power - Alpha Div
+### Mucosa - Power - Alpha Div
 ```{r}
 # PD
 pwr.t2n.test(length(which(adiv.muc$Group == "Summer_Wild")),
@@ -1869,4 +1881,15 @@ pwr.t2n.test(length(which(adiv.muc$Group == "Summer_Wild")),
 pwr.t2n.test(length(which(adiv.muc$Group == "Summer_Wild")),
              length(which(adiv.muc$Group == "Summer_Captive")), d = -2.944866)
   # 0.985933
+```
+
+
+
+### Mucosa - Detectable Effect Size
+```{r}
+# https://cran.r-project.org/web/packages/pwr/vignettes/pwr-vignette.html
+
+pwr.t2n.test(length(which(adiv.muc$Group == "Summer_Wild")),
+             length(which(adiv.muc$Group == "Summer_Captive")), power = 0.8)
+  # 1.974137
 ```
