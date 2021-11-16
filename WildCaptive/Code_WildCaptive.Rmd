@@ -831,7 +831,108 @@ phy.muc.core <- merge_phyloseq(phy.wild.muc.core, phy.sum.muc.core)
 
 
 
-### Content - Calculate Effect Size - Adiv
+
+### Content - Effect Size - Phyla
+```{r}
+# Firmicutes
+cohen.d(fir.df$RelAbund ~ fir.df$Group)
+  # d = 1.008523 (large)
+  # 95% CI =-0.5983509  2.6153966 
+
+# Bacteroidetes
+cohen.d(bac.df$RelAbund ~ bac.df$Group)
+  # d = -0.7042115 (medium)
+  # 95% CI = -2.2729076  0.8644846 
+
+# Verrucomicrobia
+cohen.d(ver.df$RelAbund ~ ver.df$Group)
+  # d = 0.3057369 (small)
+  # 95% CI = -1.232833  1.844307
+
+# Proteobacteria
+cohen.d(pro.df$RelAbund ~ pro.df$Group)
+  # d = 1.349339 (large)
+  # 95% CI = -0.3146818  3.0133601 
+
+# Cyanobacteria
+cohen.d(cya.df$RelAbund ~ cya.df$Group)
+  # d = -5.671383 (large)
+  # 95% CI = -8.806213 -2.536552
+
+# Tenericutes
+cohen.d(ten.df$RelAbund ~ ten.df$Group)
+  # d = -0.4128499 (small)
+  # 95% CI = -1.957227  1.131527
+
+# Actinobacteria
+cohen.d(act.df$RelAbund ~ act.df$Group)
+  # d = -0.2908292 (small)
+  # 95% CI = -1.828727  1.247068 
+
+# Elusimicrobia
+cohen.d(elu.df$RelAbund ~ elu.df$Group)
+  # d = -2.386911 (large)
+  # 95% CI = -4.302818 -0.471005 
+
+# Unclassified
+cohen.d(unc.df$RelAbund ~ unc.df$Group)
+  # d = -0.5924999 (medium)
+  # 95% CI = -2.1504192  0.9654194
+```
+
+
+
+### Content - Power - Phyla
+```{r}
+# Firmicutes
+pwr.t2n.test(n1 = length(which(fir.df$Group == "Summer_Wild")),
+             n2 = length(which(fir.df$Group == "Summer_Captive")), d = 1.008523)
+  # 0.2659606
+
+# Bacteroidetes
+pwr.t2n.test(n1 = length(which(bac.df$Group == "Summer_Wild")),
+             n2 = length(which(bac.df$Group == "Summer_Captive")), d = -0.7042115)
+  # 0.1540151
+
+# Verrucomicrobia
+pwr.t2n.test(n1 = length(which(ver.df$Group == "Summer_Wild")),
+             n2 = length(which(ver.df$Group == "Summer_Captive")), d = 0.3057369)
+  # 0.0690403
+
+# Proteobacteria
+pwr.t2n.test(n1 = length(which(pro.df$Group == "Summer_Wild")),
+             n2 = length(which(pro.df$Group == "Summer_Captive")), d = 1.349339)
+  # 0.4289275
+
+# Cyanobacteria
+pwr.t2n.test(n1 = length(which(cya.df$Group == "Summer_Wild")),
+             n2 = length(which(cya.df$Group == "Summer_Captive")), d = -5.671383)
+  # 1
+
+# Tenericutes
+pwr.t2n.test(n1 = length(which(ten.df$Group == "Summer_Wild")),
+             n2 = length(which(ten.df$Group == "Summer_Captive")), d = -0.4128499)
+  # 0.08497037
+
+# Actinobacteria
+pwr.t2n.test(n1 = length(which(act.df$Group == "Summer_Wild")),
+             n2 = length(which(act.df$Group == "Summer_Captive")), d = -0.2908292)
+  # 0.06721344
+
+# Elusimicrobia
+pwr.t2n.test(n1 = length(which(elu.df$Group == "Summer_Wild")),
+             n2 = length(which(elu.df$Group == "Summer_Captive")), d = -2.386911)
+  # 0.8793452
+
+# Unclassified
+pwr.t2n.test(n1 = length(which(unc.df$Group == "Summer_Wild")),
+             n2 = length(which(unc.df$Group == "Summer_Captive")), d = -0.5924999)
+  # 0.1230292
+```
+
+
+
+### Content - Effect Size - Adiv
 ```{r}
 ### PD
 cohen.d(pd.ready$Stat ~ pd.ready$Group)
@@ -856,7 +957,7 @@ cohen.d(uniq.otus$Unique_OTUs ~ uniq.otus$Group)
 
 
 
-### Content - Calculate Power - Alpha Div
+### Content - Power - Alpha Div
 ```{r}
 # PD
 pwr.t2n.test(length(which(adiv$Group == "Summer_Wild")),
@@ -1602,7 +1703,127 @@ grid.text("C", x=unit(0.05, "npc"),  y=unit(0.95, "npc"), vp=viewport(layout.pos
 
 
 
-### Mucosa - Calculate Effect Size - Adiv
+### Mucosa - Effect Size - Phyla
+```{r}
+# Firmicutes
+cohen.d(fir.muc.df$RelAbund ~ fir.muc.df$Group)
+  # d = -1.175883 (large)
+  # 95% CI = -2.7029766  0.3512109 
+
+# Bacteroidetes
+cohen.d(bac.muc.df$RelAbund ~ bac.muc.df$Group)
+  # d = 1.740787 (large)
+  # 95% CI = 0.09297978 3.38859353 
+
+# Cyanobacteria
+cohen.d(cya.muc.df$RelAbund ~ cya.muc.df$Group)
+  # d = -2.899711 (large)
+  # 95% CI = -4.8912498 -0.9081729
+
+# Tenericutes
+cohen.d(ten.muc.df$RelAbund ~ ten.muc.df$Group)
+  # d = -0.8316089 (large)
+  # 95% CI = -2.3051266  0.6419088 
+
+# Verrucomicrobia
+cohen.d(ver.muc.df$RelAbund ~ ver.muc.df$Group)
+  # d = 0.446308 (small)
+  # 95% CI = -0.9878198  1.8804359
+
+# Proteobacteria
+cohen.d(pro.muc.df$RelAbund ~ pro.muc.df$Group)
+  # d = 0.6173098 (medium)
+  # 95% CI = -0.8314929  2.0661125 
+
+# Epsilonbacteraeota
+cohen.d(eps.muc.df$RelAbund ~ eps.muc.df$Group)
+  # d = -0.9771534 (large)
+  # 95% CI = -2.4713051  0.5169983 
+
+# Actinobacteria
+cohen.d(act.muc.df$RelAbund ~ act.muc.df$Group)
+  # d = -0.9344695 (large)
+  # 95% CI = -2.4222563  0.5533173  
+
+# Elusimicrobia
+cohen.d(elu.muc.df$RelAbund ~ elu.muc.df$Group)
+  # d = -2.124502 (large)
+  # 95% CI = -3.8738631 -0.3751413 
+
+# Kiritimatiellaeota
+cohen.d(kir.muc.df$RelAbund ~ kir.muc.df$Group)
+  # d = 0.436739 (small)
+  # 95% CI = -0.9967035  1.8701814  
+
+# Unclassified
+cohen.d(unc.muc.df$RelAbund ~ unc.muc.df$Group)
+  # d = -0.0859002 (negligible)
+  # 95% CI = -1.504387  1.332587
+```
+
+
+
+### Mucosa - Power - Phyla
+```{r}
+# Firmicutes
+pwr.t2n.test(n1 = length(which(fir.muc.df$Group == "Summer_Wild")),
+             n2 = length(which(fir.muc.df$Group == "Summer_Captive")), d = -1.175883)
+  # 0.3886627
+
+# Bacteroidetes
+pwr.t2n.test(n1 = length(which(bac.muc.df$Group == "Summer_Wild")),
+             n2 = length(which(bac.muc.df$Group == "Summer_Captive")), d = 1.740787)
+  # 0.6963536
+
+# Cyanobacteria
+pwr.t2n.test(n1 = length(which(cya.muc.df$Group == "Summer_Wild")),
+             n2 = length(which(cya.muc.df$Group == "Summer_Captive")), d = -2.899711)
+  # 0.9835279
+
+# Tenericutes
+pwr.t2n.test(n1 = length(which(ten.muc.df$Group == "Summer_Wild")),
+             n2 = length(which(ten.muc.df$Group == "Summer_Captive")), d = -0.8316089)
+  # 0.2209699
+
+# Verrucomicrobia
+pwr.t2n.test(n1 = length(which(ver.muc.df$Group == "Summer_Wild")),
+             n2 = length(which(ver.muc.df$Group == "Summer_Captive")), d = 0.446308)
+  # 0.09792902
+
+# Proteobacteria
+pwr.t2n.test(n1 = length(which(pro.muc.df$Group == "Summer_Wild")),
+             n2 = length(which(pro.muc.df$Group == "Summer_Captive")), d = 0.6173098)
+  # 0.143003
+
+# Epsilonbacteraeota
+pwr.t2n.test(n1 = length(which(act.muc.df$Group == "Summer_Wild")),
+             n2 = length(which(act.muc.df$Group == "Summer_Captive")), d = -0.9771534)
+  # 0.2864668
+
+# Actinobacteria
+pwr.t2n.test(n1 = length(which(act.muc.df$Group == "Summer_Wild")),
+             n2 = length(which(act.muc.df$Group == "Summer_Captive")), d = -0.9344695)
+  # 0.2663121
+
+# Elusimicrobia
+pwr.t2n.test(n1 = length(which(elu.muc.df$Group == "Summer_Wild")),
+             n2 = length(which(elu.muc.df$Group == "Summer_Captive")), d = -2.124502)
+  # 0.853669
+
+# Kiritimatiellaeota
+pwr.t2n.test(n1 = length(which(elu.muc.df$Group == "Summer_Wild")),
+             n2 = length(which(elu.muc.df$Group == "Summer_Captive")), d = 0.436739)
+  # 0.09585929
+
+# Unclassified
+pwr.t2n.test(n1 = length(which(unc.muc.df$Group == "Summer_Wild")),
+             n2 = length(which(unc.muc.df$Group == "Summer_Captive")), d = -0.0859002)
+  # 0.05173786
+```
+
+
+
+### Mucosa - Effect Size - Adiv
 ```{r}
 ### PD
 cohen.d(pd.muc.ready$Stat ~ pd.muc.ready$Group)
@@ -1627,7 +1848,7 @@ cohen.d(uniq.otus.muc$Unique_OTUs ~ uniq.otus.muc$Group)
 
 
 
-### Content - Calculate Power - Alpha Div
+### Content - Power - Alpha Div
 ```{r}
 # PD
 pwr.t2n.test(length(which(adiv.muc$Group == "Summer_Wild")),
