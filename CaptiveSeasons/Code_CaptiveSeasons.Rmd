@@ -9,11 +9,13 @@ output: html_document
 library(ape)
 library(dplyr)
 library(dunn.test)
+library(effsize)
 library(ggplot2)
 library(grid)
 library(gridExtra)
 library(phyloseq)
 library(picante)
+library(pwr)
 library(tidyr)
 library(vegan)
 
@@ -370,7 +372,6 @@ phy.sum <- phy99.df %>%
 
 
 
-
 ### Content - Alpha Diversity - Phylogenetic Diversity and SES MPD
 ```{r}
 # Calculate Faith's phylogenetic diversity
@@ -543,7 +544,7 @@ otu.plot <- ggplot(uniq.otus, aes(x = Group, y = Unique_OTUs, fill = Group)) +
   scale_fill_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(240,830), breaks = c(240,354,468,582,696,810)) +
   scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
-  ylab("Number of Unique OTUs") +
+  ylab("Number of Observed OTUs") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
@@ -1737,7 +1738,7 @@ otu.muc.plot <- ggplot(uniq.otus.muc, aes(x = Group, y = Unique_OTUs, fill = Gro
   scale_fill_manual(values = c("#e60000", "#5876d1", "#36ccff", "chartreuse3"), labels = c("Summer", "Torpor", "IBA", "Spring")) +
   scale_y_continuous(limits = c(220,710), breaks = c(220,335,450,565,680)) +
   scale_x_discrete(labels = c("Summer", "Torpor", "IBA", "Spring")) +
-  ylab("Number of Unique OTUs") +
+  ylab("Number of Observed OTUs") +
     theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank(),
@@ -1873,7 +1874,7 @@ shannon.muc.plot <- ggplot(adiv.muc, aes(x = Group, y = shannon, fill = Group)) 
 
 ### Mucosa Plot - Alpha Diversity
 ```{r}
-#("Mucosa/FigS5.CaptiveSeasons.muc.adiv.png", width = 170, height = 60, units = "mm", res = 600)
+#png("Mucosa/FigS5.CaptiveSeasons.muc.adiv.png", width = 170, height = 60, units = "mm", res = 600)
 grid.newpage()
 pushViewport(viewport(layout=grid.layout(2,4, widths = c(1, 1, 1, 1.4), heights = c(0.07, 1.5))))
 grid.text("A", x=unit(0.03, "npc"), vp=viewport(layout.pos.row=1, layout.pos.col=1),
