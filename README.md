@@ -2,9 +2,11 @@
   
 #### **Authors:** Edna Chiang, Courtney L. Deblois, Hannah V. Carey, Garret Suen
   
-##### Accepted by *Animal Microbiome* on Dec 12, 2021
+##### Accepted by *Animal Microbiome* on Dec 12, 2021. Published on Jan 3, 2022.
 
-  
+Link to article: https://animalmicrobiome.biomedcentral.com/articles/10.1186/s42523-021-00154-9
+
+
 **********
 
 ### Information about this repository:  
